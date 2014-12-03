@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  Leo
+  %%
+  Copyright (C) 2010 - 2013 University of Utah
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <primitive>true</primitive>
+  <annotatorImplementationName>gov.va.vinci.leo.ae.WordTokenizer</annotatorImplementationName>
+  <analysisEngineMetaData>
+    <name>aeWordTokenizerDescriptor</name>
+    <description/>
+    <version>1.0</version>
+    <vendor/>
+    <configurationParameters defaultGroup="yomamma" searchStrategy="language_fallback">
+      <configurationParameter>
+        <name>filterStopWords</name>
+        <type>Boolean</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+    </configurationParameters>
+    <configurationParameterSettings>
+      <nameValuePair>
+        <name>filterStopWords</name>
+        <value>
+          <boolean>true</boolean>
+        </value>
+      </nameValuePair>
+    </configurationParameterSettings>
+    <typeSystemDescription>
+      <types>
+        <typeDescription>
+          <name>gov.va.vinci.leo.types.WordToken</name>
+          <description/>
+          <supertypeName>uima.tcas.Annotation</supertypeName>
+          <features>
+            <featureDescription>
+              <name>token</name>
+              <description>The processed word token</description>
+              <rangeTypeName>uima.cas.String</rangeTypeName>
+            </featureDescription>
+          </features>
+        </typeDescription>
+      </types>
+    </typeSystemDescription>
+    <typePriorities/>
+    <fsIndexCollection/>
+    <capabilities>
+      <capability>
+        <inputs/>
+        <outputs/>
+        <languagesSupported/>
+      </capability>
+    </capabilities>
+    <operationalProperties>
+      <modifiesCas>true</modifiesCas>
+      <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+      <outputsNewCASes>false</outputsNewCASes>
+    </operationalProperties>
+  </analysisEngineMetaData>
+  <externalResourceDependencies>
+    <externalResourceDependency>
+      <key>StopWordFilterSet</key>
+      <description/>
+      <interfaceName>gov.va.vinci.leo.resources.WordFilter</interfaceName>
+      <optional>false</optional>
+    </externalResourceDependency>
+  </externalResourceDependencies>
+  <resourceManagerConfiguration>
+    <externalResources>
+      <externalResource>
+        <name>StopWordsFile</name>
+        <description>File that contains a list of stop words, one word per line</description>
+        <fileResourceSpecifier>
+          <fileUrl>file:stopwords.txt</fileUrl>
+        </fileResourceSpecifier>
+        <implementationName>gov.va.vinci.leo.resources.StopWordFilter</implementationName>
+      </externalResource>
+    </externalResources>
+    <externalResourceBindings>
+      <externalResourceBinding>
+        <key>StopWordFilterSet</key>
+        <resourceName>StopWordsFile</resourceName>
+      </externalResourceBinding>
+    </externalResourceBindings>
+  </resourceManagerConfiguration>
+</analysisEngineDescription>

@@ -1,0 +1,62 @@
+ReportText
+Study Information:
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+PATIENT NAME: ***PHIREMOVE***
+GENDER: MALE
+AGE: 76 YEARS
+ORDERING MD: ***PHIREMOVE***, MD READING MD: ***PHIREMOVE***
+
+EXAM DESCRIPTION:
+M-MODE/2D MEASUREMENT
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+READINGS:
+LV DIASTOLIC DIMENSION: 6.2 cm
+LV SYSTOLIC DIMENSION: 5.1 cm
+FRACTIONAL SHORTENING: 15%
+SEPTAL THICKNESS: 1.0 cm
+POSTERIOR WALL THICKNESS: 1.6 cm
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+VALVES:
+MITRAL VALVE MEAN GRADIENT: mmHG
+MITRAL VALVE AREA: cm2
+AORTIC VALVE MEAN GRADIENT: mmHG
+AORTIC VALVE AREA: cm2
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - STUDY DATE/TIME: 09/20/2009 00:00
+STUDY TYPE: ECHOCARDIOGRAM WITH DOPPLER
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - COMMENTS:
+1. The left ventricular appears normal. Left ventricular systolic function is moderately to severely reduced with estimated ejection fraction of 20% to 30&. Left ventricular systolic dysfunction is observed.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CHAMBERS:
+Elevated left atrial pressures seen upon Doppler examination.
+2. The left atrium shows mild dilation. 
+3. Right atrium and right ventricle appear normal.
+4. Left ventriclular systolic dysfunction is present.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+VALVES:
+4. Mild stenosis of the aortic valve is observed with calcification. 5. No thickening of the mitral valve is seen
+6. Mild mitral valve regurgitation is noted. 
+7. Tricuspid valve regurgitation, thickening, and motion all appear normal.
+8. Moderate pulmonary artery hypertension is present. Estimated pulmonary artery systolic pressure is 61 mmHg. Estimated right atrial pressure of 18 mmHg.
+8. There is trace pulmonary valve insufficiency. The pulmonary valuve appears normal. 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SUMMARY:
+10. The study was adequate. LV Systolic function is moderately to severely reduced with estimated EF of 25%.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - CARDIAC LABORATORY INFORMATION:
+Primary CPT code:
+Secondary CPT code:
+Tertiary CPT code:
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - OTHER CONCLUSIONS:
+LV systolic dysfunction present with EF 25%.
+
+Signed by: DR. Phil, ***PHIREMOVE***, MD
+Date:  09/20/2009

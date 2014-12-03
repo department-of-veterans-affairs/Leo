@@ -1,0 +1,34 @@
+ReportText
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - STUDY INFORMATION:
+PATIENT ***PHI REMOVE***
+AGE: 86 YEARS
+GENDER: FEMALE
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Study Type: 2-D ECHOCARDIOGRAM  and M-mode Doppler study of adequate quality. Information is in comparison to report on 09/17.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - FINDINGS:
+
+1. Views of the heart and great vessels show normal intracardiac and great vessel relationships.
+2. Notable chamber enlargement and hypertrophy is present.
+3. The left ventricle is mildly enlarged to 6.0 cm, wall thickness is normal, with mild global hypokinesis with ejection fraction by 35% by M-mode and 40% by Simpson?s method.  
+4. Pericardial effusion and vegetations are observed. 
+5. Doppler interrogation, including color flow imaging, reveals systemic venous return to the right atrium with abnormal tricuspid inflow. 
+6. Pulmonary outflow is abnormal at the valve. 
+7. Pulmonary venous return is to the left atrium. 
+8. The interatrial septum is intact. Mitral inflow and ascending aorta flow are abnormal. 
+9. The aortic valve is trileaflet. 
+10. The coronary arteries appear to be normal in their origins. 
+11. The aortic arch is left-sided and patent with normal descending aorta pulsatility. 
+12. Moderate LV systolic function is noted. Ejection fraction of 30%.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - CONCLUSIONS:
+1. Study Quality: Nominal
+2. LEFT VENTRICLE: abnormal systolic function
+3. Aortic valve: Normal
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - SUMMARY:
+Moderate left ventricular enlargement without remodeling. Moderate LV SYSTOLIC FUNCTION. Mild right atrial enlargement observed on 2D views with normal vena cava.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Signed by: ***PHI REMOVE***
+Date: 09/21/2009 00:00
+

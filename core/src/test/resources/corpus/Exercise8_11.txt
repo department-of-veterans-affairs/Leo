@@ -1,0 +1,40 @@
+ReportText
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+STUDY INFORMATION:
+PATIENT ***PHI REMOVE***,BRETT
+AGE: 38 YEARS
+GENDER: MALE
+CLINICSTOP: CARDIAC CATH LAB, SALT LAKE CITY, UTAH
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Study Type: 2-D ECHOCARDIOGRAM. Study was of sufficient quality. Report on 09/20 was indicated signs of abnormal left ventricular systolic function. 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+MEASUREMENTS: Left Atrial pressure: 40 mm Aortic Root: 50 mm Systolic Pressure: 130 mmHg Diastolic Pressure: 95 mmHg Ejection Fraction: 30%
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+FINDINGS:
+
+1. Great vessel and intracardiac relationships are normal.
+2. Cardiac function is abnormal. 
+3. Significant chamber enlargement and hypertrophy is present. Significant thinning of the left ventricular wall is noted. 
+4. Vegitations and pericardial effusions are present.
+5. Coronary arteries appear normal in origin.
+6. LV systolic function is moderately reduced. Estimated ejection fraction of 25-30%.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CONCLUSIONS:
+1. Study Quality: Nominal
+2. LEFT VENTRICLE: abnormal systolic function
+3. Aortic valve: Normal
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SUMMARY:
+Moderately reduced LVEF function. Blood pressure recorded as 165/95mmhg during study.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Author: Iman, Intern
+Signed by: ***PHI REMOVE***,VADDOCK
+Date: 09/22/2009 00:00
+
+
+

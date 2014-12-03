@@ -1,0 +1,11 @@
+/.classpath
+/.project
+target/
+/bin
+.DS_Store
+/.idea/
+.metadata/
+.settings/
+*.iml
+release.properties
+pom.xml.releaseBackup

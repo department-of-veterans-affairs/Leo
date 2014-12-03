@@ -1,0 +1,25 @@
+ReportText
+Study Information:
+Study type: Transthoracic Cardiac ultrasound Examination
+Study date/time: 09/21/2009 ***PHIREMOVE***
+
+Requesting information:
+1. Indication: 90 year old male with OSA and PULMONARY EDEMA.
+2. Clinician requesting: ***PHIREMOVE***, MD
+
+ECHOCARDIOGRAM:
+1. Technically adequate study. Rhythm is irregular. 
+2. The echocardiographic appearance of the aortic valve is a normal-appearing semilunar valve with adequate excursion. There is mild aortic root sclerosis. The aortic root is of normal dimension. Mitral valve is mildly thickened with mildly decreased opening felt secondary to low cardiac output. Tricuspid valve and pulmonic valves were suboptimally imaged but appeared grossly normal. 
+3. Left atrium is moderately enlarged. Left ventricle is moderately dilated as well. Right atrium and right ventricle appear to be at upper limits of normal in dimensions. 
+4. The left ventricular wall thickness appears to be at upper limits of normal. The basal inferior segment is akinetic. Overall left ventricular contractility is moderately to severely impaired with the ejection fraction estimated at 20% to 25%. Right ventricular contractility is moderately impaired. 
+5. No intracavitary mass, thrombus or valvular vegetations are identified. 
+6. No pericardial effusion is present. 
+7. Doppler reveals mild mitral regurgitation. There is increased E:A ratio consistent with a restricted pattern of diastolic dysfunction. Mild tricuspid regurgitation is also present.
+
+CONCLUSIONS:
+1. Dilated cardiomyopathy with mildly dilated left ventricle and moderately dilated left atrium present. Severe global wall motion abnormalities as described above with severely impaired left ventricular systolic function. Impaired right ventricular function is also seen. 
+2. Fibrocalcific changes of the aortic and mitral valve without significant valvular disease. 
+3. Mild mitral and tricuspid regurgitation. 
+
+AUTHOR: ***PHIREMOVE***, 09/212009 15:00
+SIGNED BY: ***PHIREMOVE***, MD 09/21/2009 15:20
