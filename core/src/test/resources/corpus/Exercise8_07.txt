@@ -1,0 +1,34 @@
+ReportText
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+PATIENT NAME: ***PHIREMOVE***, IV
+AGE: 65 YEARS
+GENDER: MALE
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+STUDY TYPE: ECHOCARDIOGRAM WITH DOPPLER
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+MEASUREMENTS:
+          Left Atrium:                 	38 mm
+          Aortic Root:               	35 mm     
+          Systolic Pressure:         	120 mmHg
+          Diastolic Pressure:       	80 mmHg
+          Ejection Fraction:         	75%
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+OTHER CONCLUSIONS:
+          Left Ventricle: The LV is normal in size with a  
+          normal ejection fraction at 75%.
+
+          Atria:  Both right and left atria are functioning 
+         	well.
+
+          Right Ventricle: Normal size with healthy      
+          output.
+
+          Valves:  No regurgitation.  Tight valve    
+          closures.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+Summary:  Healthy adult with normal ejection fraction.
+

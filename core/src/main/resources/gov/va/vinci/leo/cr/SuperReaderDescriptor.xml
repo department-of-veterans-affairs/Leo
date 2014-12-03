@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  Leo
+  %%
+  Copyright (C) 2010 - 2013 University of Utah
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+
+<collectionReaderDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+  <implementationName>gov.va.vinci.leo.cr.BaseLeoCollectionReader</implementationName>
+  <processingResourceMetaData>
+    <name>SuperReaderDescriptor</name>
+    <description/>
+    <version>1.0</version>
+    <vendor/>
+    <configurationParameters>
+      <configurationParameter>
+        <name>SubClassName</name>
+        <description>Fully qualified class name for the SubReader to be used</description>
+        <type>String</type>
+        <multiValued>false</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>SubReaderParams</name>
+        <description>Parameters for the SubReader in the format of Name|Value for each value in the array</description>
+        <type>String</type>
+        <multiValued>true</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+      <configurationParameter>
+        <name>TextFilters</name>
+        <description>TextFilters to be applied to the document text before being added to each CAS</description>
+        <type>String</type>
+        <multiValued>true</multiValued>
+        <mandatory>false</mandatory>
+      </configurationParameter>
+    </configurationParameters>
+    <configurationParameterSettings>
+      <nameValuePair>
+        <name>SubReaderParams</name>
+        <value>
+          <array>
+            <string>Driver|com.mysql.jdbc.Driver</string>
+            <string>URL|jdbc:mysql://localhost:3306/my_data</string>
+            <string>Username|my_data</string>
+            <string>Password|my_data</string>
+            <string>Query|Select * from notes</string>
+            <string>IdIndex|0</string>
+            <string>NoteIndex|1</string>
+            <string>inputDirectory|C:\VA_input</string>
+            <string>find_recurse|false</string>
+            <string>find_recurse|true</string>
+          </array>
+        </value>
+      </nameValuePair>
+      <nameValuePair>
+        <name>SubClassName</name>
+        <value>
+          <string>gov.va.vinci.leo.cr.FileSubReader</string>
+        </value>
+      </nameValuePair>
+    </configurationParameterSettings>
+    <typeSystemDescription>
+      <imports>
+        <import name="gov.va.vinci.leo.types.CSITypeDescriptor"/>
+      </imports>
+    </typeSystemDescription>
+    <typePriorities/>
+    <fsIndexCollection/>
+    <capabilities>
+      <capability>
+        <inputs/>
+        <outputs/>
+        <languagesSupported/>
+      </capability>
+    </capabilities>
+    <operationalProperties>
+      <modifiesCas>true</modifiesCas>
+      <multipleDeploymentAllowed>false</multipleDeploymentAllowed>
+      <outputsNewCASes>true</outputsNewCASes>
+    </operationalProperties>
+  </processingResourceMetaData>
+  <resourceManagerConfiguration/>
+</collectionReaderDescription>

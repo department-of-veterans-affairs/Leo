@@ -1,0 +1,43 @@
+ReportText
+Study type: ECHOCARDIOGRAPHIC EXAM REPORT
+	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+EXAM DESCRIPTION
+Two dimensional and color flow Doppler was performed. Image quality was poor and technically limited.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+COMMENTS:
+1. Wall motion and left ventricular systolic function is low/borderline with estimated ejection fraction of 50% to 55%. 
+2. There is increased left ventricular outflow consistent with low/borderline left ventricular systolic function. 
+3. Elevated left atrial pressures are observed by Doppler examination.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CHAMBERS:
+2. Mild dilation of the left atrium.
+3. The right atrium and right ventricle appear normal.
+4. The aortic root appears normal.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+VALVES:
+5. The aortic valve appears calcified with mild aortic valve stenosis, calculated aortic valve area is 1.3 cm square with a maximum instantaneous gradient of 34 mm and a mean gradient of 22 mm.
+6. There is thickening of mitral valve leaflets as well as mild mitral valvue regurgitation. 
+7. Tricuspid valve appears normal with trace tricuspid regurgitation with moderate pulmonary artery hypertension. Estimated pulmonary artery systolic pressure is 52 mmHg. Estimated right atrial pressure of 12 mmHg.
+8. There is some pulmonary insufficiency.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+MISCELLANEOUS:
+9. No intracardiac mass is observed.
+10. Color Doppler exam suggests hypertrophy of the interatrial septum.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+IMPRESSIONS:
+11. Normal left ventricle dimensions, systolic and diastolic function 
+12. Color Doppler exam suggests right ventricular enlargement and hypertrophy
+13. Hypertrophy has increased since previous study last week on 9/18. Estimated right ventricular systolic pressure of at least 50mmHG.
+ 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SUMMARY:
+The study was somewhat technically limited and hence subtle abnormalities could be missed from the study.
+
+LV Systolic function is low/borderline with estimated EF of 50-55%
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+

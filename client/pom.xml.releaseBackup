@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Project metadata -->
+    <groupId>gov.va.vinci.leo</groupId>
+    <artifactId>leo-client</artifactId>
+    <packaging>jar</packaging>
+    <name>Leo Client</name>
+    <version>2014.07.10-SNAPSHOT</version>
+ 
+    <parent>
+        <groupId>gov.va.vinci</groupId>
+        <artifactId>leo</artifactId>
+        <version>2014.07.10-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <skipJavadoc>false</skipJavadoc>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>gov.va.vinci.leo</groupId>
+            <artifactId>leo-core</artifactId>
+            <version>2014.07.10-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.uima</groupId>
+            <artifactId>uimaj-core</artifactId>
+            <version>${uima-as-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.3</version>
+        </dependency>
+
+
+        <!-- Testing dependencies below here -->
+        <dependency>
+            <groupId>gov.va.vinci</groupId>
+            <artifactId>whitespaceTokenizer</artifactId>
+            <version>2013.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>gov.va.vinci</groupId>
+            <artifactId>regexAnnotator</artifactId>
+            <version>2013.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.2.7</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

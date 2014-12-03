@@ -1,0 +1,40 @@
+ReportText
+
+STUDY TYPE: 2-D M-Mode Doppler
+
+PATIENT INFORMATION:
+
+A. PATIENT NAME: Name (Last, First, Middle) ***PHIREMOVE***
+B. AGE: 38 Years
+C. Height: 72 inches
+D. Weight: 250 lbs
+ 
+EXAM DESCRIPTION:
+A 2-D M-MODE Doppler was performed.
+
+CONCLUSIONS:
+1. Left atrial enlargement with left atrial diameter of 4.7 cm.
+2. Normal size right and left ventricle.
+3. Normal LV systolic function with left ventricular ejection fraction of 51%.
+4. Normal LV diastolic function.
+5. No pericardial effusion.
+6. Normal morphology of aortic valve, mitral valve, tricuspid valve, and pulmonary valve.
+7. PA systolic pressure is 38 mmHg.
+
+DOPPLER: 
+1. Mild mitral and tricuspid regurgitation.
+2. Trace aortic and pulmonary regurgitation.
+
+VALVE ASSESSMENT:
+1. Aortic valve:
+2. Aortic valve regurgitation: 	NONE **
+3. Aortic valve thickening:		NORMAL
+4. Aortic valve motion:		6mm HG
+5. Mitral valve:	
+6. Mitral valve regurgitation:	NONE **
+7. Mitral valve thickening:		NORMAL
+
+Author: 
+Signed by: Dr. ***PHI REMOVE***
+DATE: 09/19/2009
+

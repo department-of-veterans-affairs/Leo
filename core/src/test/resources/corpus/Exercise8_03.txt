@@ -1,0 +1,43 @@
+ReportText
+Study Information:
+
+PATIENT NAME: ***PHI REMOVE***
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+COMMENTS:
+1. The left ventricular appears normal. Left ventricular systolic function is normal with estimated ejection fraction of 55% to 65&. Normal left ventricular systolic function.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+CHAMBERS:
+Elevated left atrial pressures seen upon Doppler examination.
+2. There is mild dilation of the left atrium.
+3. Right atrium and right ventricle appear normal.
+4. Left ventricle appears normal.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+VALVES:
+4. The aortic valve appears calcified with mild stenosis. 
+5. No thickening of the mitral valve is seen
+6. Mild mitral valve regurgitation is noted. 
+7. Tricuspid valve regurgitation, thickening, and motion all appear normal.
+8. Moderate pulmonary artery hypertension is present. Estimated pulmonary artery systolic pressure is 51 mmHg. Estimated right atrial pressure of 15 mmHg.
+8. The pulmonary valve appears normal with trace pulmonary insufficiency.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+SUMMARY:
+10. The study was technically limited due to patient body habitus and poor ultrasound penetration. LV Systolic function is normal with estimated EF of 60%.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+CARDIAC LABORATORY INFORMATION:
+Primary CPT code:
+Secondary CPT code:
+Tertiary CPT code:
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+OTHER CONCLUSIONS:
+LV systolic function is normal with EF 60%.
+
+Signed by: DR. PHILIP, ***PHIREMOVE***
+Date:  09/21/2009
