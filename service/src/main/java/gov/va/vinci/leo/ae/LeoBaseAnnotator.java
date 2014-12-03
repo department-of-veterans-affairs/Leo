@@ -599,16 +599,21 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
                 if(!field.isAnnotationPresent(LeoAnnotatorParameter.class))
                     continue;
                 ConfigurationParameter param = new ConfigurationParameterImpl();
-                LeoAnnotatorParameter annotation = field.getDeclaredAnnotation(LeoAnnotatorParameter.class);
-                if(annotation.name().equals(LeoAnnotatorParameter.FIELD_NAME)) {
-                    param.setName(field.getName());
-                } else {
-                    param.setName(annotation.name());
+                for(java.lang.annotation.Annotation a : field.getAnnotations()) {
+                    if(a instanceof LeoAnnotatorParameter) {
+                        LeoAnnotatorParameter annotation = (LeoAnnotatorParameter) a;
+                        if (annotation.name().equals(LeoAnnotatorParameter.FIELD_NAME)) {
+                            param.setName(field.getName());
+                        } else {
+                            param.setName(annotation.name());
+                        }
+                        param.setDescription(annotation.description());
+                        param.setMandatory(annotation.mandatory());
+                        getParameterTypeFromField(field, param);
+                        parameterList.add(param);
+                        break;
+                    }
                 }
-                param.setDescription(annotation.description());
-                param.setMandatory(annotation.mandatory());
-                getParameterTypeFromField(field, param);
-                parameterList.add(param);
             }
         }
 
