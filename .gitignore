@@ -7,3 +7,5 @@ target/
 .metadata/
 .settings/
 *.iml
+release.properties
+pom.xml.releaseBackup

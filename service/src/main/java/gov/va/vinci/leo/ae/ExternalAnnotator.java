@@ -14,8 +14,6 @@ import java.io.IOException;
  * User: Thomas Ginter
  * Date: 8/8/14
  * Time: 10:21
- *
- * TODO Add set parameter method with the interface of setParameter(String name, Object value) or maybe uses generics <code>T value</code>
  */
 public class ExternalAnnotator implements LeoAnnotator {
 

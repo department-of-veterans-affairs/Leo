@@ -163,21 +163,3 @@ database selects and returns POJO objects. It can be used outside of the UIMA en
 
 The second part is the actual UIMA Reader **gov.va.vinci.leo.cr.OldManSimanDatabaseReader**.
 
-# Notes / Bugs
-
-## Release Build
-
-To do a release build:
-
-1. Insert license into code: mvn clean license:update-file-header
-2. Make sure the project has a license file: mvn license:update-project-license [Optional, if doing this, copy
-   LICENCE.txt to src/main/resource/META-INF after it is generated.]
-3. To update the license text:  mvn license:update-file-header
-4. Make sure everything is committed in git
-5. Do the actual release: mvn clean release:prepare release:release
-
-## TODO
-
-* Document the different group options
-* Read all clinical elements with a configuration id that have existing annotations. (in addition to by process/project)
-* Database reader to use content template idea
