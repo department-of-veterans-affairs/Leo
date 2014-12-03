@@ -501,7 +501,7 @@ You will need a copy of the JDK on your system.
 
 After launching Eclipse, in the Preferences window, select "Install/update" -> "Available Software Sites" in the tree on the left.  On the far right, there should be an "Add" button as depicted in this image:
 
-<img src="images/Available_software_sites.png" alt="Available Software" style="width: 650px;"/>
+<img src="images/Available_software_sites.PNG" alt="Available Software" style="width: 650px;"/>
 
 Using the "Add" button, ensure that the following sites are in your list and are enabled.  If Eclipse warns you that any of these already exist, that's fine; you can skip those.
 
@@ -639,7 +639,7 @@ Run the service program by opening its source file (i.e src/main/java/ExampleSer
 Now that the Service is running, it's time to open the client program and click the Run button again. You will now need to open a new terminal window, cd to your UIMA_HOME/bin directory again and run the "annotationViewer" script(./annotationViewer.sh).   This dialog will now appear:
 
 
-<img src="images/annotation_viewer.png" alt="Annotation Viewer" style="width: 650px;"/>
+<img src="images/annotation_viewer.PNG" alt="Annotation Viewer" style="width: 650px;"/>
 
 Change the first text field "input directory" to the *output directory* that you created.
 
