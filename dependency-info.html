@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>Dependency Information | Leo Service</title>
+		<title>Dependency Information | Leo Base Components</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -32,7 +32,7 @@
 
 	</head>
 
-	<body class="page-dependency-info project-leo-service" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-dependency-info project-leo-base" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -100,8 +100,9 @@
   <div class="source"> 
    <pre>&lt;dependency&gt;
   &lt;groupId&gt;gov.va.vinci.leo&lt;/groupId&gt;
-  &lt;artifactId&gt;leo-service&lt;/artifactId&gt;
+  &lt;artifactId&gt;leo-base&lt;/artifactId&gt;
   &lt;version&gt;2014.08.1-SNAPSHOT&lt;/version&gt;
+  &lt;type&gt;pom&lt;/type&gt;
 &lt;/dependency&gt;</pre> 
   </div> 
  </div> 
@@ -109,15 +110,15 @@
   <h3 id="Apache_Buildr">Apache Buildr</h3> 
   <a name="Apache_Buildr"></a> 
   <div class="source"> 
-   <pre>'gov.va.vinci.leo:leo-service:jar:2014.08.1-SNAPSHOT'</pre> 
+   <pre>'gov.va.vinci.leo:leo-base:pom:2014.08.1-SNAPSHOT'</pre> 
   </div> 
  </div> 
  <div class="section"> 
   <h3 id="Apache_Ant">Apache Ant</h3> 
   <a name="Apache_Ant"></a> 
   <div class="source"> 
-   <pre>&lt;dependency org=&quot;gov.va.vinci.leo&quot; name=&quot;leo-service&quot; rev=&quot;2014.08.1-SNAPSHOT&quot;&gt;
-  &lt;artifact name=&quot;leo-service&quot; type=&quot;jar&quot; /&gt;
+   <pre>&lt;dependency org=&quot;gov.va.vinci.leo&quot; name=&quot;leo-base&quot; rev=&quot;2014.08.1-SNAPSHOT&quot;&gt;
+  &lt;artifact name=&quot;leo-base&quot; type=&quot;pom&quot; /&gt;
 &lt;/dependency&gt;</pre> 
   </div> 
  </div> 
@@ -126,7 +127,7 @@
   <a name="Groovy_Grape"></a> 
   <div class="source"> 
    <pre>@Grapes(
-@Grab(group='gov.va.vinci.leo', module='leo-service', version='2014.08.1-SNAPSHOT')
+@Grab(group='gov.va.vinci.leo', module='leo-base', version='2014.08.1-SNAPSHOT')
 )</pre> 
   </div> 
  </div> 
@@ -134,21 +135,21 @@
   <h3 id="Grails">Grails</h3> 
   <a name="Grails"></a> 
   <div class="source"> 
-   <pre>compile 'gov.va.vinci.leo:leo-service:2014.08.1-SNAPSHOT'</pre> 
+   <pre>compile 'gov.va.vinci.leo:leo-base:2014.08.1-SNAPSHOT'</pre> 
   </div> 
  </div> 
  <div class="section"> 
   <h3 id="Leiningen">Leiningen</h3> 
   <a name="Leiningen"></a> 
   <div class="source"> 
-   <pre>[gov.va.vinci.leo/leo-service &quot;2014.08.1-SNAPSHOT&quot;]</pre> 
+   <pre>[gov.va.vinci.leo/leo-base &quot;2014.08.1-SNAPSHOT&quot;]</pre> 
   </div> 
  </div> 
  <div class="section"> 
   <h3 id="SBT">SBT</h3> 
   <a name="SBT"></a> 
   <div class="source"> 
-   <pre>libraryDependencies += &quot;gov.va.vinci.leo&quot; %% &quot;leo-service&quot; % &quot;2014.08.1-SNAPSHOT&quot;</pre> 
+   <pre>libraryDependencies += &quot;gov.va.vinci.leo&quot; %% &quot;leo-base&quot; % &quot;2014.08.1-SNAPSHOT&quot;</pre> 
   </div> 
  </div> 
 </div>
