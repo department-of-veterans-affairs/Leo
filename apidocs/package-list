@@ -1,8 +1,5 @@
 gov.va.vinci.leo
-gov.va.vinci.leo.ae
-gov.va.vinci.leo.cr
 gov.va.vinci.leo.descriptors
-gov.va.vinci.leo.listener
 gov.va.vinci.leo.model
 gov.va.vinci.leo.tools
 gov.va.vinci.leo.tools.db
