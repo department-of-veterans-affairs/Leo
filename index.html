@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title> | Leo Parent Project</title>
+		<title>About | Leo Core</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -32,7 +32,7 @@
 
 	</head>
 
-	<body class="page-index project-leo" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-index project-leo-core" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -45,21 +45,21 @@
 					<div class="brand">Leo</div>
 					<div class="nav-collapse">
 						<ul class="nav pull-right">
-							<li class="active"><a href="" title="Home">Home </a></li>
+							<li><a href="../index.html" title="Home">Home </a></li>
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Learn <b class="caret"></b></a>
 								<ul class="dropdown-menu">
-									<li><a href="userguide.html" title="User Guide">User Guide </a></li>
-									<li><a href="components.html" title="Components and Tools">Components and Tools </a></li>
-									<li><a href="faq.html" title="FAQ">FAQ </a></li>
-									<li><a href="apidocs/index.html" title="Javadoc">Javadoc </a></li>
+									<li><a href="../userguide.html" title="User Guide">User Guide </a></li>
+									<li><a href="../components.html" title="Components and Tools">Components and Tools </a></li>
+									<li><a href="../faq.html" title="FAQ">FAQ </a></li>
+									<li><a href="../apidocs/index.html" title="Javadoc">Javadoc </a></li>
 								</ul>
 							</li>
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Download <b class="caret"></b></a>
 								<ul class="dropdown-menu">
-									<li><a href="license_apache.html" title="License">License </a></li>
-									<li><a href="download.html" title="Download">Download </a></li>
+									<li><a href="../license_apache.html" title="License">License </a></li>
+									<li><a href="../download.html" title="Download">Download </a></li>
 								</ul>
 							</li>
 						</ul>
@@ -89,37 +89,13 @@
 	<div class="row">
 		<div class="span12">
 			<div class="body-content">
-<p><b>The Leo framework</b> - The <a class="externalLink" href="http://www.hsrd.research.va.gov/for_researchers/vinci/">VINCI</a>-developed Natural Language Processing(NLP) infrastructure, is a set of services and libraries that facilitate the rapid creation and deployment of Apache UIMA-AS annotators focused on NLP. Leo, named for the Spanish word meaning <i>&#x201c;I read&#x201d;</i>, was first built to support scalable deployment of NLP pipelines (VINCI now has more than 2 billion clinical text notes available). It extends the open-source Apache Unstructured Information Management Architecture (UIMA). </p>
-<p>UIMA provides a common workflow and basic functionalities with which to develop and integrate reusable components for NLP and information extraction. Leo eliminates the maintenance required by UIMA descriptor files and generates pipelines based on parameters and type definitions provided programmatically. By providing a solid infrastructure, Leo changes the focus of NLP researchers to algorithm development. The UIMA-AS underpinning allows Leo to manage the scale needed for real-time processing. It provides remote configuration tools for enabling automatic system optimization. With its developer utilities, functionality can be added and seamlessly integrated with existing NLP services. Leo enables users to programmatically generate primitive and aggregate UIMA analysis engine descriptors and deployment descriptors.</p>
-<p>After the success of using Leo for being able to process millions of notes for a single project, Leo was further developed to include reusable, configurable components for finding keywords and phrases, using regular expressions and patterns, building complex rules for identifying and associating annotations within a document, mapping strings of text found in notes to standard terminologies, and developing feature vectors for training and validating ML components. Leo supports the whole workflow of annotation, iterative NLP development, and validation by seamlessly connecting UIMA functionality with annotation and validation tools and ML libraries. By using a community-developed data model and standard API, we were also able to take existing, open-source components and incorporate them into Leo. An upcoming publication will describe how Leo enabled the Apache Clinical Text Analysis and Knowledge Extraction System <a class="externalLink" href="https://ctakes.apache.org">cTAKES</a>, a commonly used open-source information extraction NLP pipeline, to scale from one document at a time to a number only constrained by hardware resources. In addition, Leo has integrated the National Library of Medicine&#x2019;s <a class="externalLink" href="http://metamap.nlm.nih.gov">MetaMap system</a>, the <a class="externalLink" href="http://orbit.nlm.nih.gov/resource/context">ConText algorithm</a>, and many parsing and syntax modules available in open-source that can be made available as part of this prototype.</p>
-<p>Leo provides factories, base annotators, base readers, base listeners, and other utilities for UIMA AS, so that all UIMA AS components can be instantiated, configured, and deployed programmatically.</p>
-<p><b>Some of the features of Leo are:</b></p>
-
-<ul>
-  
-<li>Rapid Natural Language Processing (NLP) Development</li>
-  
-<li>Programmatically Generate:
-  
-<ul>
-    
-<li>UIMA Descriptors</li>
-    
-<li>Parameter and Type information for Analysis Engine (AE)</li>
-    
-<li>Aggregate AE for a Service</li>
-    
-<li>Configuration and Service Launch</li>
-    
-<li>Standard and Custom CollectionReaders</li>
-  </ul></li>
-  
-<li>Plug and Play Algorithm Modules</li>
-  
-<li>Launch Services and Clients in UIMA-AS</li>
-</ul>
-<p><b>UIMA</b> &#x2013; <a class="externalLink" href="http://uima.apache.org/index.html">Unstructured Information Management Architecture</a> &#x2013; is a powerful and flexible software system designed to analyze large volumes of unstructured information. In order to accommodate all the available functionality, configuration and deployment of systems based on UIMA AS require a set of descriptor files in XML format. Creating and maintaining these descriptor files manually can be complicated and time consuming. Apache uimaFit (<a class="externalLink" href="http://uima.apache.org/uimafit.html">http://uima.apache.org/uimafit.html</a> ) is a library that enables programmatic instantiation of UIMA components. </p>
-<p><b>UIMA AS</b> &#x2013; <a class="externalLink" href="http://uima.apache.org/doc-uimaas-what.html">UIMA Asynchronous Scaleout</a> - is substantially different from UIMA and provides a range of additional functionality enabling scalable processing. While UIMA components can be run within UIMA AS with no descriptor changes, additional descriptor files are required to deploy systems based on UIMA AS. </p>
+<div class="section"> 
+ <div class="page-header">
+  <h2 id="About_Leo_Core">About Leo Core</h2>
+ </div> 
+ <a name="About_Leo_Core"></a> 
+ <p>There is currently no description associated with this project.</p> 
+</div>
 			</div>
 		</div>
 	</div>
@@ -136,10 +112,10 @@
 					<ul class="nav nav-list">
 						<li class="nav-header">Download</li>
 						<li>
-							<a href="license_apache.html" title="License">License </a>
+							<a href="../license_apache.html" title="License">License </a>
 						</li>
 						<li>
-							<a href="download.html" title="Download">Download </a>
+							<a href="../download.html" title="Download">Download </a>
 						</li>
 					</ul>
 				</div>
@@ -147,16 +123,16 @@
 					<ul class="nav nav-list">
 						<li class="nav-header">Learn</li>
 						<li>
-							<a href="userguide.html" title="User Guide">User Guide </a>
+							<a href="../userguide.html" title="User Guide">User Guide </a>
 						</li>
 						<li>
-							<a href="components.html" title="Components and Tools">Components and Tools </a>
+							<a href="../components.html" title="Components and Tools">Components and Tools </a>
 						</li>
 						<li>
-							<a href="faq.html" title="FAQ">FAQ </a>
+							<a href="../faq.html" title="FAQ">FAQ </a>
 						</li>
 						<li>
-							<a href="apidocs/index.html" title="Javadoc">Javadoc </a>
+							<a href="../apidocs/index.html" title="Javadoc">Javadoc </a>
 						</li>
 					</ul>
 				</div>
