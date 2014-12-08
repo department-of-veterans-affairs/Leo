@@ -2,20 +2,20 @@
 
 <rss version="0.91">
   <channel>
-    <title>Leo Core - Checkstyle report</title>
-    <link>http://github.com/department-of-veterans-affairs/Leo/leo-core</link>
-    <description>Leo Core - Checkstyle report</description>
+    <title>Leo Client - Checkstyle report</title>
+    <link>http://github.com/department-of-veterans-affairs/Leo/leo-client</link>
+    <description>Leo Client - Checkstyle report</description>
     <language>en-us</language>
     <copyright>&#169;2014 Department of Veterans Affairs</copyright>
     <item>
-      <title>File: 47,
-             Errors: 120,
+      <title>File: 19,
+             Errors: 17,
              Warnings: 0,
              Infos: 0
       </title>
-            <link>http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html</link>
+            <link>http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html</link>
       <description>
-        <p>Click <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html">here</a> for the full Checkstyle report.</p>
+        <p>Click <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html">here</a> for the full Checkstyle report.</p>
 
         <table summary="Files" boder="1">
           <thead>
@@ -29,7 +29,7 @@
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.LeoUtils.java">gov/va/vinci/leo/tools/LeoUtils.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.cr.LeoCollectionReaderInterface.java">gov/va/vinci/leo/cr/LeoCollectionReaderInterface.java</a>
                 </td>
                 <td>
                   0
@@ -43,7 +43,21 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.db.LeoArrayListHandler.java">gov/va/vinci/leo/tools/db/LeoArrayListHandler.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.cr.FileCollectionReader.java">gov/va/vinci/leo/cr/FileCollectionReader.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.listener.SimpleXmiListener.java">gov/va/vinci/leo/listener/SimpleXmiListener.java</a>
                 </td>
                 <td>
                   0
@@ -57,7 +71,7 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.CasTools.java">gov/va/vinci/leo/tools/CasTools.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.Client.java">gov/va/vinci/leo/Client.java</a>
                 </td>
                 <td>
                   0
@@ -71,7 +85,7 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.DeployDescriptorWriter.java">gov/va/vinci/leo/descriptors/DeployDescriptorWriter.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.cr.XmiFileCollectionReader.java">gov/va/vinci/leo/cr/XmiFileCollectionReader.java</a>
                 </td>
                 <td>
                   0
@@ -85,7 +99,7 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.db.package-info.java">gov/va/vinci/leo/tools/db/package-info.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.package-info.java">gov/va/vinci/leo/package-info.java</a>
                 </td>
                 <td>
                   0
@@ -99,7 +113,7 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#leo.properties">leo.properties</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.listener.package-info.java">gov/va/vinci/leo/listener/package-info.java</a>
                 </td>
                 <td>
                   0
@@ -113,7 +127,21 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.TextFilter.java">gov/va/vinci/leo/tools/TextFilter.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.cr.BatchDatabaseCollectionReader.java">gov/va/vinci/leo/cr/BatchDatabaseCollectionReader.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.CommandLineClient.java">gov/va/vinci/leo/CommandLineClient.java</a>
                 </td>
                 <td>
                   0
@@ -127,21 +155,7 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.LeoInheritanceGsonAdapter.java">gov/va/vinci/leo/tools/LeoInheritanceGsonAdapter.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  2
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.TypeSystemFactory.java">gov/va/vinci/leo/descriptors/TypeSystemFactory.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.cr.ExternalCollectionReader.java">gov/va/vinci/leo/cr/ExternalCollectionReader.java</a>
                 </td>
                 <td>
                   0
@@ -155,7 +169,21 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.AsciiFilter.java">gov/va/vinci/leo/tools/AsciiFilter.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.cr.BaseLeoCollectionReader.java">gov/va/vinci/leo/cr/BaseLeoCollectionReader.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.listener.BaseCsvListener.java">gov/va/vinci/leo/listener/BaseCsvListener.java</a>
                 </td>
                 <td>
                   0
@@ -169,7 +197,7 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.package-info.java">gov/va/vinci/leo/tools/package-info.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.cr.BaseDatabaseCollectionReader.java">gov/va/vinci/leo/cr/BaseDatabaseCollectionReader.java</a>
                 </td>
                 <td>
                   0
@@ -178,488 +206,12 @@
                   0
                 </td>
                 <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.ConfigurationParameterImpl.java">gov/va/vinci/leo/tools/ConfigurationParameterImpl.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
+                  3
                 </td>
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.types.package-info.java">gov/va/vinci/leo/types/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.AsciiService.java">gov/va/vinci/leo/tools/AsciiService.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.TypeDescriptionBuilder.java">gov/va/vinci/leo/descriptors/TypeDescriptionBuilder.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.model.DataQueryInformation.java">gov/va/vinci/leo/model/DataQueryInformation.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.LeoDeployDescriptor.java">gov/va/vinci/leo/descriptors/LeoDeployDescriptor.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.RemoteEngineFactory.java">gov/va/vinci/leo/descriptors/RemoteEngineFactory.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.LeoTypeSystemDescription.java">gov/va/vinci/leo/descriptors/LeoTypeSystemDescription.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.MetaDataObjectFactory.java">gov/va/vinci/leo/descriptors/MetaDataObjectFactory.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.model.package-info.java">gov/va/vinci/leo/model/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.package-info.java">gov/va/vinci/leo/descriptors/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.XMLSerializer.java">gov/va/vinci/leo/tools/XMLSerializer.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.ResourceSpecifierFactory.java">gov/va/vinci/leo/descriptors/ResourceSpecifierFactory.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.LeoAEDescriptor.java">gov/va/vinci/leo/descriptors/LeoAEDescriptor.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  1
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.LeoDelegate.java">gov/va/vinci/leo/descriptors/LeoDelegate.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.XmlFilter.java">gov/va/vinci/leo/tools/XmlFilter.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.LeoProperties.java">gov/va/vinci/leo/tools/LeoProperties.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.AutoCompile.java">gov/va/vinci/leo/tools/AutoCompile.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.package-info.java">gov/va/vinci/leo/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.types.TypeLibrarian.java">gov/va/vinci/leo/types/TypeLibrarian.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.XMLException.java">gov/va/vinci/leo/tools/XMLException.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.model.NameValue.java">gov/va/vinci/leo/model/NameValue.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#logging.properties">logging.properties</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.types.CSI.java">gov/va/vinci/leo/types/CSI.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  43
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.model.DatabaseConnectionInformation.java">gov/va/vinci/leo/model/DatabaseConnectionInformation.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.AnalysisEngineFactory.java">gov/va/vinci/leo/descriptors/AnalysisEngineFactory.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.db.LeoDataSource.java">gov/va/vinci/leo/tools/db/LeoDataSource.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  1
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.db.JdbcScriptRunner.java">gov/va/vinci/leo/tools/db/JdbcScriptRunner.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  25
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.AggregateEngineFactory.java">gov/va/vinci/leo/descriptors/AggregateEngineFactory.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.model.FeatureNameType.java">gov/va/vinci/leo/model/FeatureNameType.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#log4j.properties">log4j.properties</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.LeoRemoteAEDescriptor.java">gov/va/vinci/leo/descriptors/LeoRemoteAEDescriptor.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  1
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.StringException.java">gov/va/vinci/leo/tools/StringException.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.descriptors.DeployDescriptorFactory.java">gov/va/vinci/leo/descriptors/DeployDescriptorFactory.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.tools.db.DataManager.java">gov/va/vinci/leo/tools/db/DataManager.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.cr.DatabaseCollectionReader.java">gov/va/vinci/leo/cr/DatabaseCollectionReader.java</a>
                 </td>
                 <td>
                   0
@@ -673,7 +225,7 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-core/checkstyle.html#gov.va.vinci.leo.types.CSI_Type.java">gov/va/vinci/leo/types/CSI_Type.java</a>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.listener.SimpleCsvListener.java">gov/va/vinci/leo/listener/SimpleCsvListener.java</a>
                 </td>
                 <td>
                   0
@@ -682,7 +234,63 @@
                   0
                 </td>
                 <td>
-                  43
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.cr.package-info.java">gov/va/vinci/leo/cr/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.cr.BaseFileCollectionReader.java">gov/va/vinci/leo/cr/BaseFileCollectionReader.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.listener.BaseListener.java">gov/va/vinci/leo/listener/BaseListener.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://github.com/department-of-veterans-affairs/Leo/leo-client/checkstyle.html#gov.va.vinci.leo.listener.BaseDatabaseListener.java">gov/va/vinci/leo/listener/BaseDatabaseListener.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
                 </td>
               </tr>
                       </tbody>
