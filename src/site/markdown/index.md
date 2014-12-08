@@ -23,16 +23,4 @@ Leo provides factories, base annotators, base readers, base listeners, and other
 
 **UIMA AS** – [UIMA Asynchronous Scaleout]( http://uima.apache.org/doc-uimaas-what.html ) - is substantially different from UIMA and provides a range of additional functionality enabling scalable processing. While UIMA components can be run within UIMA AS with no descriptor changes, additional descriptor files are required to deploy systems based on UIMA AS.  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Questions? Comments? Contact us at vinciservices@va.gov

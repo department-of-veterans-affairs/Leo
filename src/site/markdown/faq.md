@@ -48,5 +48,5 @@ And it will send a full path to the standard output. The individual descriptor f
 
 **I think I found a bug; where do I report it?**
 
-Bugs, errors and any other problem associated with Leo can be reported to Tom at thomas.ginter@utah.edu
+Bugs, errors and any other problem associated with Leo can be reported to Vinci Services at vinciservices@va.gov
 
