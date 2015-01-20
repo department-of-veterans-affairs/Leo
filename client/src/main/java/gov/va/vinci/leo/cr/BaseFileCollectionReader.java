@@ -148,7 +148,7 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
      */
     public BaseFileCollectionReader(File inputDirectory, String encoding,  boolean recurse, SuffixFileFilter filter) {
         if (inputDirectory == null || !inputDirectory.isDirectory()) {
-            throw new IllegalArgumentException("Input Directory must not be null, and must point to an existing directory.");
+            throw new IllegalArgumentException("Input Directory must not be null, and must point to an existing directory. ('" + inputDirectory + "')");
         }
 
         filenameFilter = filter;

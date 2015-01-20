@@ -32,7 +32,11 @@ public class ExternalFileCollectionReaderTest extends FileCollectionReader {
 
     @Before
     public void setup() throws Exception {
-        externalReader = new ExternalFileCollectionReader(descriptor, new File("client/src/test/resources/inputDirectory"), false);
+        if (new File("client/src/test/resources/inputDirectory").exists()) {
+            externalReader = new ExternalFileCollectionReader(descriptor, new File("client/src/test/resources/inputDirectory"), false);
+        } else {
+            externalReader = new ExternalFileCollectionReader(descriptor, new File("src/test/resources/inputDirectory"), false);
+        }
         externalReader.produceCollectionReader();
     }
 

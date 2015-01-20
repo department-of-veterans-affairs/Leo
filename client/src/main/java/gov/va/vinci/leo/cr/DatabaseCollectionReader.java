@@ -187,7 +187,10 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
             if(index == noteIndex) {
                 item = null;
             } else {
-                item = row[index].toString();
+                if(row[index] != null)
+                    item=row[index].toString();
+                else
+                    item="";
             }
             rowArray.set(index, item);
         }
