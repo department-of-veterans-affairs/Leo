@@ -181,13 +181,23 @@ public abstract class BaseDatabaseCollectionReader extends BaseLeoCollectionRead
      */
     protected void getData(String query) throws SQLException, ClassNotFoundException {
         StopWatch timer = new StopWatch();
-        dataManager = new DataManager(mDriver, mURL, mUsername, mPassword);
+        dataManager = getDataManager();
         LOG.info("Query: " + query);
         timer.start();
         mRecordList = dataManager.query(query);
         mRowIndex = 0;
         timer.stop();
         LOG.info("Query and result parsing took: " + timer);
+    }
+
+    /**
+     * Get the data manager to run queries with.
+     * @return the data manager to run queries with.
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    protected DataManager getDataManager() throws SQLException, ClassNotFoundException {
+        return new DataManager(mDriver, mURL, mUsername, mPassword);
     }
 
     /**
