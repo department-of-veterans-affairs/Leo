@@ -39,7 +39,8 @@ import java.util.Random;
  * Database CollectionReader that pulls the data in pages of a configurable size from SQL Server. This uses the
  * SQL Server OFFSET functionality available in SQL Server 2008+.
  *
- * Assumes the query provided returns one record per row of results.
+ * Assumes the query provided returns one record per row of results. Query must include an order by to work
+ * with offset (SQL Server requirement)
  *
  */
 public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionReader {
@@ -114,7 +115,7 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
         super.initialize();
         this.pageSize = (Integer) getConfigParameterValue(Param.PAGE_SIZE.getName());
 
-        sqlServerPagedQuery= new SQLServerPagedQuery(mDriver, mURL, mUsername, mPassword, query, pageSize);
+        sqlServerPagedQuery= new SQLServerPagedQuery(query, pageSize);
 
     }
 
