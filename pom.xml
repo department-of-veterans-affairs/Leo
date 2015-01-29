@@ -254,9 +254,7 @@
               </goals>
               <phase>site</phase>
               <configuration>
-                <properties>
-                  <maven.javadoc.skip>${project.skipJavadoc}</maven.javadoc.skip>
-                </properties>
+                <skip>${project.skipJavadoc}</skip>
               </configuration>
             </execution>
           </executions>
