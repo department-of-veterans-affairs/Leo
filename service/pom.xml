@@ -7,7 +7,7 @@
     <artifactId>leo-service</artifactId>
     <packaging>jar</packaging>
     <name>Leo Service</name>
-    <version>2015.01.5</version>
+    <version>2015.01.6-SNAPSHOT</version>
  
     <parent>
         <groupId>gov.va.vinci</groupId>
