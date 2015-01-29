@@ -332,11 +332,18 @@
     <url>http://decipher.chpc.utah.edu/gitblit/git/bones/leo.git/</url>
   </scm>
   <distributionManagement>
-  <site>
-    <id>github-pages-site</id>
-    <name>Deployment through GitHub's site deployment plugin</name>
-    <url>site/Leo/${project.version}</url>
-  </site>
+	<site>
+            <id>decipher-site</id>
+            <name>Deployment Server</name>
+            <url>
+                scp://decipher.chpc.utah.edu/var/www/html/sites/${project.groupId}/${project.artifactId}/${project.version}/
+            </url>
+        </site>
+        <repository>
+            <id>nexus</id>
+            <name>Nexus Staging Repo</name>
+            <url>http://decipher.chpc.utah.edu/nexus/content/repositories/releases</url>
+        </repository>
   </distributionManagement>
 
 </project>
