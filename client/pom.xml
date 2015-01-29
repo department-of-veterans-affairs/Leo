@@ -7,12 +7,12 @@
     <artifactId>leo-client</artifactId>
     <packaging>jar</packaging>
     <name>Leo Client</name>
-    <version>2015.01.7-SNAPSHOT</version>
+    <version>2015.01.7</version>
  
     <parent>
         <groupId>gov.va.vinci</groupId>
         <artifactId>leo</artifactId>
-        <version>2015.01.7-SNAPSHOT</version>
+        <version>2015.01.7</version>
     </parent>
 
     <properties>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>gov.va.vinci.leo</groupId>
             <artifactId>leo-core</artifactId>
-            <version>2015.01.7-SNAPSHOT</version>
+            <version>2015.01.7</version>
         </dependency>
 
         <dependency>
