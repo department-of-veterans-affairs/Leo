@@ -140,6 +140,7 @@
           </dependency>
         </dependencies>
       </plugin>
+        <!-- Removed for local deployments. Should be uncommented when deploying to github.
       <plugin>
         <groupId>com.github.github</groupId>
         <artifactId>site-maven-plugin</artifactId>
@@ -159,7 +160,7 @@
             <phase>site-deploy</phase>
           </execution>
         </executions>
-      </plugin>
+      </plugin> -->
     </plugins>
     <pluginManagement>
       <plugins>
