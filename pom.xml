@@ -13,6 +13,7 @@
     <module>core</module>
     <module>service</module>
   </modules>
+
   <organization>
     <name>Department of Veterans Affairs</name>
   </organization>
@@ -245,6 +246,7 @@
             <additionalparam>
                             -sourceclasspath ${project.build.outputDirectory}
                         </additionalparam>
+              <skip>${skipJavadoc}</skip>
           </configuration>
           <executions>
             <execution>
@@ -254,7 +256,7 @@
               </goals>
               <phase>site</phase>
               <configuration>
-                <skip>${project.skipJavadoc}</skip>
+                <skip>${skipJavadoc}</skip>
               </configuration>
             </execution>
           </executions>
