@@ -622,6 +622,18 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     }
 
     /**
+     * Get a map of parameters and their values.  Parameter list is retrieved from the inner Param class.  Values are
+     * retrieved by matching the name of the ConfigurationParameter to the name of a variable set in the class.
+     *
+     * @return a map of parameters and their values that is created during initialization.
+     * @deprecated This method has been replaced with LeoBaseAnnotator#getParametersToValuesMap
+     */
+    @Deprecated
+    public Map<ConfigurationParameter, Object> getParameters() {
+        return parameters;
+    }
+
+    /**
      * A set of default parameters for the base annotation.
      *
      * Extending annotators may use persist parameters from a parent class by extending the inner Param from the parent as in:
