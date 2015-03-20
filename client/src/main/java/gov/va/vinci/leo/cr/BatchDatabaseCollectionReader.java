@@ -29,7 +29,6 @@ import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
@@ -229,26 +228,26 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
 
     /**
      * @return true if and only if there are more elements available from this CollectionReader.
-     * @throws java.io.IOException
      * @throws org.apache.uima.collection.CollectionException
      */
     @Override
-    public boolean hasNext() throws IOException, CollectionException {
+    public boolean hasNext() throws CollectionException {
         //if the current row set is empty or the index is still -1 then setup the query for the next set
-        if(mRowIndex < 0 || mRecordList == null || mRowIndex == mRecordList.size()) {
-            //Setup the query string first
-            if(isRandom && randomBatches > 0) {
+        while(mRecordList == null || !super.hasNext()) {
+            //Setup the next batch query if there is one
+            if(isRandom && randomBatches > 0) { //Setup another random batch
                 this.query = getQuery(getNextRandomBatchNumber());
                 randomBatches--;
-            } else if(currentBatch < totalNumberOfBatches) {
+            } else if(currentBatch < totalNumberOfBatches) { //Setup another inline batch
                 this.query = getQuery(currentBatch);
                 currentBatch++;
-            } else {
+            } else {    //No more batches or batch data to process, return false
                 return false;
             }
-            mRowIndex = -1;
+            getData(query);
         }
-        return super.hasNext();
+
+        return true;
     }
 
     /**

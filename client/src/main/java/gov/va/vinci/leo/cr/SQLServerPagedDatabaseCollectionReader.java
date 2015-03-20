@@ -30,10 +30,7 @@ import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 
-import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Database CollectionReader that pulls the data in pages of a configurable size from SQL Server. This uses the
@@ -121,11 +118,10 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
 
     /**
      * @return true if and only if there are more elements available from this CollectionReader.
-     * @throws java.io.IOException
      * @throws org.apache.uima.collection.CollectionException
      */
     @Override
-    public boolean hasNext() throws IOException, CollectionException {
+    public boolean hasNext() throws CollectionException {
         //if the current row set is empty or the index is still -1 then setup the query for the next set
         if(mRowIndex < 0 || mRecordList == null || mRowIndex == mRecordList.size()) {
             this.query = sqlServerPagedQuery.getPageQuery(currentBatch);

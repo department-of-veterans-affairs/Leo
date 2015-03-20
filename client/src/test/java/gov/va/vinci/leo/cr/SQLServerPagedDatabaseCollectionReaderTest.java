@@ -62,29 +62,37 @@ public class SQLServerPagedDatabaseCollectionReaderTest {
         CAS mockCas = ae.newCAS();
         cr.setDataManager(dm);
 
-        assert(cr.hasNext());
+        boolean hasNext = cr.hasNext();
+
+        assert(hasNext);
 
         /** Batch 1 **/
         cr.getNext(ae.newCAS());
-        assert(cr.hasNext());
+        hasNext = cr.hasNext();
+        assert(hasNext);
 
         cr.getNext(ae.newCAS());
-        assert(cr.hasNext());
+        hasNext = cr.hasNext();
+        assert(hasNext);
 
         cr.getNext(ae.newCAS());
-        assert(cr.hasNext());
+        hasNext = cr.hasNext();
+        assert(hasNext);
 
         /** Batch 2 **/
         cr.getNext(ae.newCAS());
-        assert(cr.hasNext());
+        hasNext = cr.hasNext();
+        assert(hasNext);
 
         cr.getNext(ae.newCAS());
-        assert(cr.hasNext());
+        hasNext = cr.hasNext();
+        assert(hasNext);
 
         cr.getNext(ae.newCAS());
 
         /** Empty batch **/
-        assert(!cr.hasNext());
+        hasNext = cr.hasNext();
+        assert(!hasNext);
     }
 
 
