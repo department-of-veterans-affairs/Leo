@@ -7,12 +7,12 @@
     <artifactId>leo-base</artifactId>
     <packaging>pom</packaging>
     <name>Leo Base Components</name>
-    <version>2015.03.1-SNAPSHOT</version>
+    <version>2015.03.1</version>
  
     <parent>
         <groupId>gov.va.vinci</groupId>
         <artifactId>leo</artifactId>
-        <version>2015.03.1-SNAPSHOT</version>
+        <version>2015.03.1</version>
     </parent>
 
     <properties>
@@ -25,17 +25,17 @@
         <dependency>
             <groupId>gov.va.vinci.leo</groupId>
             <artifactId>leo-client</artifactId>
-            <version>2015.03.1-SNAPSHOT</version>
+            <version>2015.03.1</version>
         </dependency>
         <dependency>
             <groupId>gov.va.vinci.leo</groupId>
             <artifactId>leo-core</artifactId>
-            <version>2015.03.1-SNAPSHOT</version>
+            <version>2015.03.1</version>
         </dependency>
         <dependency>
             <groupId>gov.va.vinci.leo</groupId>
             <artifactId>leo-service</artifactId>
-            <version>2015.03.1-SNAPSHOT</version>
+            <version>2015.03.1</version>
         </dependency>
     </dependencies>
 </project>
