@@ -39,6 +39,11 @@ import java.util.Map;
  * Assumes the query provided returns one record per row of results. Query must include an order by to work
  * with offset (SQL Server requirement)
  *
+ * Notes:
+ *    firstOffset can be set to start from any record besides the first record.
+ *    maxOffset The maximum record offset to get. If (currentBatch * pageSize) + firstOffset > [this value], then
+ *              the collection reader is finished. If -1, no max is set.
+ *
  */
 public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionReader {
 
@@ -46,6 +51,17 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
      * Size of each batch to pull.
      */
     protected int pageSize = -1;
+
+    /**
+     * the first row to start with. Generally this will be 0.
+     */
+    protected int firstOffset=0;
+
+    /**
+     * The maximum record offset to get. If (currentBatch * pageSize) + firstOffset > [this value], then
+     * the collection reader is finished. If -1, no max is set.
+     */
+    protected int maxOffset;
 
     /**
      * Current batch number we are executing.
@@ -61,7 +77,6 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
      */
     public SQLServerPagedDatabaseCollectionReader() { /** Do Nothing **/ }
 
-
     /**
      * Initialize the reader using the database connection and query information provided, including the size of each
      * batch and optionally the number of random batches to execute.
@@ -76,7 +91,25 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
         this(databaseConnectionInformation.getDriver(), databaseConnectionInformation.getUrl(),
                 databaseConnectionInformation.getUsername(), databaseConnectionInformation.getPassword(),
                 dataQueryInformation.getQuery(), dataQueryInformation.getIdColumn(),
-                dataQueryInformation.getNoteColumn(),  pageSize);
+                dataQueryInformation.getNoteColumn(),  pageSize, 0);
+    }
+
+    /**
+     * Initialize the reader using the database connection and query information provided, including the size of each
+     * batch and optionally the number of random batches to execute.
+     *
+     * @param databaseConnectionInformation database connection information to use.
+     * @param dataQueryInformation database query for retrieving results, assumes one record per row.
+     * @param pageSize size of each batch to retrieve at a time.  Optimal size will vary with the database environment.
+     * @param firstOffset the first row to start with. Generally this will be 0.
+     */
+    public SQLServerPagedDatabaseCollectionReader(DatabaseConnectionInformation databaseConnectionInformation,
+                                                  DataQueryInformation dataQueryInformation,
+                                                  int pageSize, int firstOffset) {
+        this(databaseConnectionInformation.getDriver(), databaseConnectionInformation.getUrl(),
+                databaseConnectionInformation.getUsername(), databaseConnectionInformation.getPassword(),
+                dataQueryInformation.getQuery(), dataQueryInformation.getIdColumn(),
+                dataQueryInformation.getNoteColumn(),  pageSize, firstOffset);
     }
 
     /**
@@ -95,13 +128,54 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
      */
     public SQLServerPagedDatabaseCollectionReader(String driver, String url, String username, String password, String query,
                                                   String idColumn, String noteColumn,int pageSize ) {
+        this(driver, url, username, password, query, idColumn, noteColumn, pageSize, 0);
+    }
+
+    /**
+     * Initialize the reader using the provided connection and query information, including the size of each batch and
+     * optionally the number of random batches to execute.
+     *
+     * @param driver JDBC driver class
+     * @param url JDBC connection URL
+     * @param username database user name.
+     * @param password database user password.
+     * @param query SQL query used to retrieve the data, one record per row of results.
+     * @param idColumn name of the ID column in the SQL query. Assumes only one column to use as the record ID.
+     *                 Additional ID fields are propagated through the row results String array of the CSI annotation.
+     * @param noteColumn name of the note column in the SQL query. Assumes only one note column.
+     * @param pageSize size of each batch to retrieve at a time.  Optimal size will vary with the database environment.
+     * @param firstOffset the first row to start with. Generally this will be 0.
+     */
+    public SQLServerPagedDatabaseCollectionReader(String driver, String url, String username, String password, String query,
+                                                  String idColumn, String noteColumn,int pageSize, int firstOffset ) {
+        this(driver, url, username, password, query, idColumn, noteColumn, pageSize, firstOffset, -1);
+    }
+
+    /**
+     * Initialize the reader using the provided connection and query information, including the size of each batch and
+     * optionally the number of random batches to execute.
+     *
+     * @param driver JDBC driver class
+     * @param url JDBC connection URL
+     * @param username database user name.
+     * @param password database user password.
+     * @param query SQL query used to retrieve the data, one record per row of results.
+     * @param idColumn name of the ID column in the SQL query. Assumes only one column to use as the record ID.
+     *                 Additional ID fields are propagated through the row results String array of the CSI annotation.
+     * @param noteColumn name of the note column in the SQL query. Assumes only one note column.
+     * @param pageSize size of each batch to retrieve at a time.  Optimal size will vary with the database environment.
+     * @param firstOffset the first row to start with. Generally this will be 0.
+     */
+    public SQLServerPagedDatabaseCollectionReader(String driver, String url, String username, String password, String query,
+                                                  String idColumn, String noteColumn,int pageSize, int firstOffset, int maxOffset ) {
         super(driver, url, username, password, query, idColumn, noteColumn);
         if(pageSize < 1) {
             throw new IllegalArgumentException("Page size must be 1 or greater!");
         }
         this.pageSize = pageSize;
+        this.firstOffset = firstOffset;
+        this.maxOffset = maxOffset;
     }
-
     /**
      * This method is called during initialization. Subclasses should override it to perform one-time startup logic.
      *
@@ -112,7 +186,11 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
         super.initialize();
         this.pageSize = (Integer) getConfigParameterValue(Param.PAGE_SIZE.getName());
 
-        sqlServerPagedQuery= new SQLServerPagedQuery(query, pageSize);
+        this.firstOffset = (Integer)getConfigParameterValue(Param.FIRST_OFFSET.getName());
+        this.maxOffset = (Integer)getConfigParameterValue(Param.MAX_OFFSET.getName());
+
+
+        sqlServerPagedQuery= new SQLServerPagedQuery(query, pageSize, firstOffset, maxOffset);
 
     }
 
@@ -125,6 +203,9 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
         //if the current row set is empty or the index is still -1 then setup the query for the next set
         if(mRowIndex < 0 || mRecordList == null || mRowIndex == mRecordList.size()) {
             this.query = sqlServerPagedQuery.getPageQuery(currentBatch);
+            if (this.query == null) {
+                return false;
+            }
             currentBatch++;
             mRowIndex = -1;
         }
@@ -144,6 +225,8 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
         parameterValues.put(Param.ID_COLUMN.getName(), idColumn);
         parameterValues.put(Param.NOTE_COLUMN.getName(), noteColumn);
         parameterValues.put(Param.PAGE_SIZE.getName(), pageSize);
+        parameterValues.put(Param.FIRST_OFFSET.getName(), firstOffset);
+        parameterValues.put(Param.MAX_OFFSET.getName(), maxOffset);
         return produceCollectionReader(LeoUtils.getStaticConfigurationParameters(Param.class), parameterValues);
     }
 
@@ -156,6 +239,21 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
          */
         public static ConfigurationParameter PAGE_SIZE =
                 new ConfigurationParameterImpl("PageSize", "Number of records to retrieve in each page",
+                        ConfigurationParameter.TYPE_INTEGER, true, false, new String[] {} );
+
+        /**
+         * the first row to start with. Generally this will be 0.
+         */
+        public static ConfigurationParameter FIRST_OFFSET =
+                new ConfigurationParameterImpl("FirstOffset", "the first row to start with. Generally this will be 0.",
+                        ConfigurationParameter.TYPE_INTEGER, true, false, new String[] {} );
+
+        /**
+         * the first row to start with. Generally this will be 0.
+         */
+        public static ConfigurationParameter MAX_OFFSET =
+                new ConfigurationParameterImpl("MaxOffset", "The maximum record offset to get. If (currentBatch * pageSize) + firstOffset > [this value], then" +
+                        " the collection reader is finished. If -1, no max is set.",
                         ConfigurationParameter.TYPE_INTEGER, true, false, new String[] {} );
     }
 }

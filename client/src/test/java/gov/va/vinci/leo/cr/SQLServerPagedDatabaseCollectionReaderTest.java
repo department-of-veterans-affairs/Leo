@@ -96,4 +96,153 @@ public class SQLServerPagedDatabaseCollectionReaderTest {
     }
 
 
+
+    @Test
+    public void testHasNextWithStartOffset() throws Exception {
+        MockSQLServerPagedDatabaseCollectionReader cr = (MockSQLServerPagedDatabaseCollectionReader) new MockSQLServerPagedDatabaseCollectionReader("com.mock", "url", "user", "password", "select id, note from doc order by id",
+                "id", "note", 3, 2).produceCollectionReader();
+
+
+        DataManager dm = mock(DataManager.class);
+        LeoArrayListHandler handler = mock(LeoArrayListHandler.class);
+
+
+        List<Object[]> mockResults = new ArrayList<Object[]>();
+
+        mockResults.add(new Object[] { new Integer(1), "abc", new Integer(1), });
+        mockResults.add(new Object[] { new Integer(2), "def", new Integer(2), });
+        mockResults.add(new Object[] { new Integer(3), "ghi", new Integer(3), });
+
+        /** First Batch **/
+        when(dm.query("select id, note from doc order by id\n" +
+                "\t\tOFFSET 2 ROWS\n" +
+                "\t\tFETCH NEXT 3 ROWS ONLY;")).thenReturn(mockResults);
+
+        /** Second batch **/
+        when(dm.query("select id, note from doc order by id\n" +
+                "\t\tOFFSET 5 ROWS\n" +
+                "\t\tFETCH NEXT 3 ROWS ONLY;")).thenReturn(mockResults);
+
+        /** Last batch, return an empty batch. **/
+        when(dm.query("select id, note from doc order by id\n" +
+                "\t\tOFFSET 8 ROWS\n" +
+                "\t\tFETCH NEXT 3 ROWS ONLY;")).thenReturn(new ArrayList<Object[]>());
+
+        when(handler.getColumnIndex("id")).thenReturn(0);
+        when(handler.getColumnIndex("note")).thenReturn(1);
+
+        when(dm.getHandler()).thenReturn(handler);
+
+        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(SampleService
+                .simpleServiceDefinition()
+                .getAnalysisEngineDescription());
+        CAS mockCas = ae.newCAS();
+        cr.setDataManager(dm);
+
+        boolean hasNext = cr.hasNext();
+
+        assert(hasNext);
+
+        /** Batch 1 **/
+        cr.getNext(ae.newCAS());
+        hasNext = cr.hasNext();
+        assert(hasNext);
+
+        cr.getNext(ae.newCAS());
+        hasNext = cr.hasNext();
+        assert(hasNext);
+
+        cr.getNext(ae.newCAS());
+        hasNext = cr.hasNext();
+        assert(hasNext);
+
+        /** Batch 2 **/
+        cr.getNext(ae.newCAS());
+        hasNext = cr.hasNext();
+        assert(hasNext);
+
+        cr.getNext(ae.newCAS());
+        hasNext = cr.hasNext();
+        assert(hasNext);
+
+        cr.getNext(ae.newCAS());
+
+        /** Empty batch **/
+        hasNext = cr.hasNext();
+        assert(!hasNext);
+    }
+
+
+
+    @Test
+    public void testHasNextWithStartOffsetMaxOffset() throws Exception {
+        MockSQLServerPagedDatabaseCollectionReader cr = (MockSQLServerPagedDatabaseCollectionReader) new MockSQLServerPagedDatabaseCollectionReader("com.mock", "url", "user", "password", "select id, note from doc order by id",
+                "id", "note", 3, 2, 7).produceCollectionReader();
+
+
+        DataManager dm = mock(DataManager.class);
+        LeoArrayListHandler handler = mock(LeoArrayListHandler.class);
+
+
+        List<Object[]> mockResults = new ArrayList<Object[]>();
+
+        mockResults.add(new Object[] { new Integer(1), "abc", new Integer(1), });
+        mockResults.add(new Object[] { new Integer(2), "def", new Integer(2), });
+        mockResults.add(new Object[] { new Integer(3), "ghi", new Integer(3), });
+
+
+        List<Object[]> mockResults2 = new ArrayList<Object[]>();
+
+        mockResults2.add(new Object[] { new Integer(1), "abc", new Integer(1), });
+        mockResults2.add(new Object[] { new Integer(2), "def", new Integer(2), });
+
+        /** First Batch **/
+        when(dm.query("select id, note from doc order by id\n" +
+                "\t\tOFFSET 2 ROWS\n" +
+                "\t\tFETCH NEXT 3 ROWS ONLY;")).thenReturn(mockResults);
+
+        /** Second batch **/
+        when(dm.query("select id, note from doc order by id\n" +
+                "\t\tOFFSET 5 ROWS\n" +
+                "\t\tFETCH NEXT 2 ROWS ONLY;")).thenReturn(mockResults2);
+
+        when(handler.getColumnIndex("id")).thenReturn(0);
+        when(handler.getColumnIndex("note")).thenReturn(1);
+
+        when(dm.getHandler()).thenReturn(handler);
+
+        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(SampleService
+                .simpleServiceDefinition()
+                .getAnalysisEngineDescription());
+        CAS mockCas = ae.newCAS();
+        cr.setDataManager(dm);
+
+        boolean hasNext = cr.hasNext();
+
+        assert(hasNext);
+
+        /** Batch 1 **/
+        cr.getNext(ae.newCAS());
+        hasNext = cr.hasNext();
+        assert(hasNext);
+
+        cr.getNext(ae.newCAS());
+        hasNext = cr.hasNext();
+        assert(hasNext);
+
+        cr.getNext(ae.newCAS());
+        hasNext = cr.hasNext();
+        assert(hasNext);
+
+        /** Batch 2 **/
+        cr.getNext(ae.newCAS());
+        hasNext = cr.hasNext();
+        assert(hasNext);
+
+        cr.getNext(ae.newCAS());
+
+        /** Empty batch **/
+        hasNext = cr.hasNext();
+        assert(!hasNext);
+    }
 }

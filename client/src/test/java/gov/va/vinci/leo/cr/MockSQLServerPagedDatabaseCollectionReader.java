@@ -16,6 +16,15 @@ public class MockSQLServerPagedDatabaseCollectionReader extends SQLServerPagedDa
         super(s, url, user, password, s1, id, note, i);
     }
 
+
+    public MockSQLServerPagedDatabaseCollectionReader(String s, String url, String user, String password, String s1, String id, String note, int i, int offset) {
+        super(s, url, user, password, s1, id, note, i, offset);
+    }
+
+    public MockSQLServerPagedDatabaseCollectionReader(String s, String url, String user, String password, String s1, String id, String note, int i, int offset, int maxOffset) {
+        super(s, url, user, password, s1, id, note, i, offset, maxOffset);
+    }
+
     public void setDataManager(DataManager dm) {
         this.dm = dm;
     }
