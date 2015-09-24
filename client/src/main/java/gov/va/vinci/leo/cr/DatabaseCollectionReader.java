@@ -187,7 +187,10 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
             if(index == noteIndex) {
                 item = null;
             } else {
-                item = row[index].toString();
+                if(row[index] != null)
+                    item=row[index].toString();
+                else
+                    item="";
             }
             rowArray.set(index, item);
         }
@@ -197,30 +200,41 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
 
     /**
      * @return true if and only if there are more elements available from this CollectionReader.
-     * @throws java.io.IOException
      * @throws org.apache.uima.collection.CollectionException
      */
     @Override
-    public boolean hasNext() throws IOException, CollectionException {
-        if(mRowIndex < 0) {
+    public boolean hasNext() throws CollectionException {
+        if(mRecordList == null || mRowIndex < 0) {
             //Execute the query to get the data from the database
-            try {
-                getData(query);
-                if(dataManager.getHandler().getColumnIndex(idColumn) < 0) {
-                    throw new CollectionException(
-                            "ID column name, " + idColumn + " was not found in the query: " + query,
-                            null);
-                }
-                if(dataManager.getHandler().getColumnIndex(noteColumn) < 0) {
-                    throw new CollectionException(
-                            "Note column name, " + noteColumn + " was not found in the query: " + query,
-                            null);
-                }
-            } catch (Exception e) {
-                throw new CollectionException(e);
-            }
+            getData(query);
         }
         return (mRowIndex < mRecordList.size());
+    }
+
+    /**
+     * Executes the query and saves the results internally to a <code>List of Object[]</code> to be retrieved when
+     * <code>getNext()</code> is called.  Validates the id and note column field names.
+     *
+     * @param query the sql query to run.
+     * @throws org.apache.uima.collection.CollectionException if there is an error in the query or with the id or column names
+     */
+    @Override
+    protected void getData(String query) throws CollectionException {
+        try {
+            super.getData(query);
+            if (dataManager.getHandler().getColumnIndex(idColumn) < 0) {
+                throw new CollectionException(
+                        "ID column name, " + idColumn + " was not found in the query: " + query,
+                        null);
+            }
+            if (dataManager.getHandler().getColumnIndex(noteColumn) < 0) {
+                throw new CollectionException(
+                        "Note column name, " + noteColumn + " was not found in the query: " + query,
+                        null);
+            }
+        } catch (Exception e) {
+            throw new CollectionException(e);
+        }
     }
 
     /**

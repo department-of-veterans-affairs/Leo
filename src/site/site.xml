@@ -70,9 +70,9 @@
 					<toc>top</toc>
 				</faq>
 				
-				<license>
+				<license_apache>
 					<highlightJs>false</highlightJs>
-				</license>
+				</license_apache>
 				<!-- Disable ToC for some Maven reports -->
 				<project-info>
 					<toc>true</toc>
@@ -94,7 +94,7 @@
 			<item name="Javadoc" href="apidocs/index.html"/>
 		</menu>
 		<menu name="Download" inherit="top">
-			<item name="License" href="license.html"/>
+			<item name="License" href="license_apache.html"/>
 			<item name="Download" href="download.html"/>
 		</menu>
 		<menu name="Contribute" inherit="bottom">
@@ -103,6 +103,6 @@
 			<item name="Fork on GitHub" href="http://github.com/andriusvelykis/reflow-maven-skin/"/>
 			<item name="Donate" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=QWKNRFZH52828"/>
 		</menu>
-		<menu name="Maven documentation" ref="reports" inherit="bottom"/>
+		<!-- <menu name="Maven documentation" ref="reports" inherit="bottom"/> -->
 	</body>
 </project>

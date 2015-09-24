@@ -66,7 +66,7 @@ public abstract class BaseDatabaseListener extends BaseListener {
      */
     protected int batchSize = 1;
     /**
-     * List for holding a batch until batchSize is reached and the batch is committed.
+     * List for holding a batch until pageSize is reached and the batch is committed.
      */
     protected List<Object[]> batch = new ArrayList<Object[]>();
     /**

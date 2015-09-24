@@ -57,7 +57,7 @@ public class BatchDatabaseCollectionReaderTest {
         Connection conn = dataManager.getDataSource().getConnection();
         try {
             conn.createStatement().execute("CREATE TABLE PUBLIC.notes (id INTEGER NOT NULL, note VARCHAR(1000), PRIMARY KEY (id))");
-            for(int i = 0; i < TEST_CORPUS_SIZE; i++) {
+            for(int i = 10; i < (TEST_CORPUS_SIZE+10); i++) {
                 conn.createStatement().execute("INSERT INTO PUBLIC.notes (id, note) VALUES (" + i + ", '" + new BigInteger(130, new SecureRandom()).toString(32) + "')");
             }
         } catch(Exception e) {
@@ -106,14 +106,15 @@ public class BatchDatabaseCollectionReaderTest {
         FSIterator<AnnotationFS> csiIterator;
         CSI csi;
         //Iterate through the collection
-        for(int i = 0; i < TEST_CORPUS_SIZE; i++) {
+        for(int i = 10; i < (TEST_CORPUS_SIZE+10); i++) {
             mockCas = ae.newCAS();
-            if(reader.hasNext())
+            if(reader.hasNext()) {
                 reader.getNext(mockCas);
-            csiIterator = mockCas.getAnnotationIndex(mockCas.getTypeSystem().getType(CSI.class.getCanonicalName())).iterator();
-            assertTrue(csiIterator.hasNext());
-            csi = (CSI) csiIterator.next();
-            assertEquals("Expected : " + i + ", but got: " + csi.getID(), csi.getID(), "" + i);
+                csiIterator = mockCas.getAnnotationIndex(mockCas.getTypeSystem().getType(CSI.class.getCanonicalName())).iterator();
+                assertTrue(csiIterator.hasNext());
+                csi = (CSI) csiIterator.next();
+                assertEquals("Expected : " + i + ", but got: " + csi.getID(), csi.getID(), "" + i);
+            }
         }
     }
 }

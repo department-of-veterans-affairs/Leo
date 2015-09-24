@@ -360,6 +360,16 @@ public class Client extends LeoProperties {
     }//run method with CAS object as input
 
     /**
+     * Get the list of listeners that have been registered with the client.  If no listeners have been registered then an
+     * empty list will be returned.
+     *
+     * @return List of registered listeners
+     */
+    public List getListeners() {
+        return mUAEngine.getListeners();
+    }
+
+    /**
      * Get the performance report stored after the last "run" invocation in this client object.
      *
      * @return UAEngine performance report as a String object

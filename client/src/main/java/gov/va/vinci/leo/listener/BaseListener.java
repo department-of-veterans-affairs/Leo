@@ -85,6 +85,13 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
      */
     protected Logger LOG = Logger.getLogger(this.getClass());
 
+
+    /**
+     * If true, the base listener will log errors via log4j.
+     */
+    protected boolean logErrors = false;
+
+
     /**
      * the annotation types to filter on. If annotation types are included,
      * sub-classes can call hasFilteredAnnotation on this class to determine
@@ -336,39 +343,27 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
      */
     protected boolean checkForError(CAS aCas, EntityProcessStatus aStatus) {
         if (aStatus != null && aStatus.isException()) {
-            LOG.error("Exceptions thrown on getMeta call to remote service...");
             List<Exception> exceptions = aStatus.getExceptions();
             String errors = "";
             this.lastException = "";
             for (Exception exception : exceptions) {
-                LOG.error(exception.getMessage(), exception);
                 Writer result = new StringWriter();
                 PrintWriter printWriter = new PrintWriter(result);
                 exception.printStackTrace(printWriter);
+                errors += result.toString() + "\n";
                 errors += exception.toString() + "\n---\n";
-                errors += result.toString() + "\n\n";
+
             }// for
 
             this.lastException = errors;
 
             // Write exception out to file if the output directory is set.
-            if (mOutputDir != null) {
-                BufferedWriter s = null;
+            if (logErrors) {
                 try {
-                    File errorOutFile = new File(mOutputDir,
-                            this.getReferenceLocation(aCas.getJCas()) + ".err");
-                    s = new BufferedWriter(new FileWriter(errorOutFile));
-                    s.write(errors);
-                } catch (Exception e) {
-                    LOG.error("Error writing to stream: " + e);
-                } finally {
-                    try {
-                        s.close();
-                    } catch (Exception e) {
-                        /** Ignore this exception, we are just closing here **/
-                        LOG.warn("Error closing write: " + e);
-                    }
-                }// finally
+                    LOG.error("ERROR processing CAS: "+ this.getReferenceLocation(aCas.getJCas()) + "\n" + errors);
+                } catch (CASException e) {
+                    e.printStackTrace();
+                }
             }// if
 
             return true;
@@ -394,6 +389,22 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
      */
     public void setAnnotationTypeFilter(String[] annotationTypeFilter) {
         this.annotationTypeFilter = annotationTypeFilter;
+    }
+
+    /**
+     * If true, when the service returns an error status, it is logged via log4j.
+     * @return true if errors from the service are logged via log4j, false if they are not.
+     */
+    public boolean isLogErrors() {
+        return logErrors;
+    }
+
+
+    /**
+     * Set whether or not to log errors to log4j. If true, when the service returns an error status, it is logged via log4j.
+     */
+    public void setLogErrors(boolean logErrors) {
+        this.logErrors = logErrors;
     }
 
     /**
