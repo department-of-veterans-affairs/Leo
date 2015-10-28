@@ -135,7 +135,7 @@ public class ServiceTest {
         //Test default values with Example annotator
         Service s = new Service();
         s.mUAEngine = EasyMock.createMock(UimaAsynchronousEngine.class);
-        s.deploy(new Example2Annotator("gov.va.vinci.leo.types.myOutputType").setName("Example"));
+        s.deploy(new Example2Annotator("gov.va.vinci.leo.types.myOutputType").setName("Example").getLeoAEDescriptor());
         assertTrue(StringUtils.isNotBlank(s.getAggregateDescriptorFile()));
         assertNotNull(s.mAppCtx);
 
