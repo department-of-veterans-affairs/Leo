@@ -46,7 +46,6 @@ public class ClientTest {
 
     String rootDirectory = "";
 
-
     @Before
     public void setTestString() throws IOException {
         String path = new File(".").getCanonicalPath();
@@ -54,7 +53,6 @@ public class ClientTest {
             rootDirectory = "client/";
         }
     }
-
 
     @Test
 	public void emptyConstructor() throws Exception {

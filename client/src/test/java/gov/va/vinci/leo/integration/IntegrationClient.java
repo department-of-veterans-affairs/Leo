@@ -60,6 +60,11 @@ public class IntegrationClient {
             default:
                 dataDir = REMOTE_DATA_DIR;
         }
+
+        //Test xml retrieval
+        String typeSystemDesc = Client.getServiceTypeSystemDescriptionXml(serviceBrokerURL, serviceQueueName);
+        System.out.println("Type System Description = [\n" + typeSystemDesc + "\n]");
+
         //Init the client and process the data
         FileCollectionReader cr = new FileCollectionReader(dataDir, true);
 
@@ -67,6 +72,11 @@ public class IntegrationClient {
         myClient.setBrokerURL(serviceBrokerURL);
         myClient.setServiceName(serviceQueueName);
         myClient.setInputQueueName(serviceQueueName);
+
+        //Double check type system retrieval before running
+        String tsd = myClient.getServiceTypeSystemDescriptionXml();
+        System.out.println("Descriptions Match: " + tsd.equals(typeSystemDesc));
+
         try {
             myClient.run(cr);
         } catch (Exception e) {

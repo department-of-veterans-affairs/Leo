@@ -28,6 +28,7 @@ import gov.va.vinci.leo.listener.BaseListener;
 import gov.va.vinci.leo.tools.LeoProperties;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
@@ -383,14 +384,46 @@ public class Client extends LeoProperties {
      * Calls the service to determine the TypeSystemDescription it is using,
      * and returns it.
      *
+     * @param brokerURL URL of the broker where the service resides.
+     * @param inputQueueName Name of the endpoint, or input queue for the service to query.
+     * @return the TypeSystemDescription for the remote service.
+     * @throws Exception if there is an exception getting the type system from the engine.
+     */
+    public static TypeSystemDescription getServiceTypeSystemDescription(String brokerURL, String inputQueueName) throws Exception {
+        Map<String, Object> ctx = new HashMap<String, Object>();
+        if(StringUtils.isBlank(brokerURL) || StringUtils.isBlank(inputQueueName))
+            throw new IllegalArgumentException("brokerURL and InputQueue must both be set, brokerURL: " + brokerURL + ", InputQueue: " + inputQueueName);
+        ctx.put(UimaAsynchronousEngine.ServerUri, brokerURL);
+        ctx.put(UimaAsynchronousEngine.ENDPOINT, inputQueueName);
+        UimaAsynchronousEngine engine = new BaseUIMAAsynchronousEngine_impl();
+        engine.initialize(ctx);
+        return engine.getMetaData().getTypeSystem();
+    }
+
+    /**
+     * Calls the service to determine the TypeSystemDescription it is using,
+     * and returns it.
+     *
      * @return the TypeSystemDescription for the remote service.
      * @throws Exception if there is an exception getting the type system from the engine.
      */
     public TypeSystemDescription getServiceTypeSystemDescription() throws Exception {
-        init((UimaAsBaseCallbackListener[]) null);
-        UimaAsynchronousEngine engine = new BaseUIMAAsynchronousEngine_impl();
-        engine.initialize(mAppCtx);
-        return engine.getMetaData().getTypeSystem();
+        return getServiceTypeSystemDescription(mBrokerURL, mEndpoint);
+    }
+
+    /**
+     * Returns the remote service TypeSystemDescription in xml. Typically for being
+     * written out to a file for other tools such as the UIMA annotation viewer to use.
+     *
+     * @param brokerURL URL of the broker where the service resides.
+     * @param inputQueueName Name of the endpoint, or input queue for the service to query.
+     * @return the type system description in xml format.
+     * @throws Exception if there is an exception getting the type system from the engine.
+     */
+    public static String getServiceTypeSystemDescriptionXml(String brokerURL, String inputQueueName) throws Exception {
+        StringWriter sw = new StringWriter();
+        getServiceTypeSystemDescription(brokerURL, inputQueueName).toXML(sw);
+        return sw.toString();
     }
 
     /**
@@ -401,9 +434,7 @@ public class Client extends LeoProperties {
      * @throws Exception if there is an exception getting the type system from the engine.
      */
     public String getServiceTypeSystemDescriptionXml() throws Exception {
-        StringWriter sw = new StringWriter();
-        getServiceTypeSystemDescription().toXML(sw);
-        return sw.toString();
+        return getServiceTypeSystemDescriptionXml(mBrokerURL, mEndpoint);
     }
 
     /**
