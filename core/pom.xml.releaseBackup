@@ -7,12 +7,12 @@
     <artifactId>leo-core</artifactId>
     <packaging>jar</packaging>
     <name>Leo Core</name>
-    <version>2014.07.10-SNAPSHOT</version>
+    <version>2015.10.0-SNAPSHOT</version>
 
     <parent>
         <groupId>gov.va.vinci</groupId>
         <artifactId>leo</artifactId>
-        <version>2014.07.10-SNAPSHOT</version>
+        <version>2015.10.0-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -46,22 +46,17 @@
 
         <dependency>
             <groupId>org.apache.uima</groupId>
-            <artifactId>uimaj-as-core</artifactId>
-            <version>${uima-as-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.uima</groupId>
             <artifactId>uimaj-core</artifactId>
             <version>${uima-as-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.uima</groupId>
-            <artifactId>uimaj-as-activemq</artifactId>
+            <artifactId>uimaj-tools</artifactId>
             <version>${uima-as-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.uima</groupId>
-            <artifactId>uimaj-tools</artifactId>
+            <artifactId>uimaj-as-activemq</artifactId>
             <version>${uima-as-version}</version>
         </dependency>
         <dependency>
@@ -110,8 +105,6 @@
         </dependency>
 
         <!--  Testing deps. below here. -->
-
-
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -134,18 +127,6 @@
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>sqljdbc4</artifactId>
             <version>4.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>gov.va.vinci</groupId>
-            <artifactId>whitespaceTokenizer</artifactId>
-            <version>2013.10.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>gov.va.vinci</groupId>
-            <artifactId>regexAnnotator</artifactId>
-            <version>2013.11.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
