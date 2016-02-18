@@ -22,7 +22,6 @@ package gov.va.vinci.leo.ae;
 
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.descriptors.TypeDescriptionBuilder;
-import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.uima.UimaContext;
@@ -31,7 +30,6 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -72,10 +70,27 @@ public class ExampleWhitespaceTokenizer extends LeoBaseAnnotator {
 
     private boolean filterStopWords = false;
 
-    //Parameter settings
+    /**
+     * The output type for tokens. This is the full type name, including package.
+     */
+    @LeoAnnotatorParameter(mandatory = true)
     protected String tokenOutputType = null;
-    protected String tokenOutputTypeFeature = null;
+
+
+    @LeoAnnotatorParameter(mandatory = true)
+    protected String tokenOutputTypeFeature;
+
+    /**
+     * The output type for words. This is the full type name, including package.
+     */
+    @LeoAnnotatorParameter(mandatory = true)
     protected String wordOutputType = null;
+
+    /**
+     * The full path to a stop words file. Words in the stop word file are not annotated as word token if found
+     * in the document.
+     */
+    @LeoAnnotatorParameter
     protected String stopWordsFile = null;
 
     protected final static Logger logger = Logger.getLogger(ExampleWhitespaceTokenizer.class.getCanonicalName());
@@ -318,42 +333,4 @@ public class ExampleWhitespaceTokenizer extends LeoBaseAnnotator {
         return ftsd;
     }
 
-    public static class Param  {
-        /**
-         * The output type for tokens. This is the full type name, including package.
-         */
-        public static ConfigurationParameter TOKEN_OUTPUT_TYPE = new ConfigurationParameterImpl("tokenOutputType", "tokenOutputType", "String", true, false, new String[] {});
-
-        /**
-         * The feature on output type to set the token type (
-         *          TK_SPECIAL 		= 0;
-         *          TK_NUMBER  		= 1;
-         *          TK_LETTER  		= 2;
-         *          TK_WORD    		= 3;
-         *          TK_WHITESPACE 	= 4;
-         *          TK_PUNCTUATION	= 5;
-         *          TK_NEWLINE		= 6;
-         *          TK_CONTROL		= 7;
-         *          TK_IDENTIFIER	= 8;
-         *          TK_INVALID		= -1;
-         *          TK_UNKNOWN      = -2;
-         *   )
-         *
-         */
-        public static ConfigurationParameter TOKEN_OUTPUT_TYPE_FEATURE = new ConfigurationParameterImpl("tokenOutputTypeFeature", "tokenOutputTypeFeature", "Integer", true, false, new String[] {});
-
-        /**
-         * The output type for words. This is the full type name, including package.
-         */
-        public static ConfigurationParameter WORD_OUTPUT_TYPE = new ConfigurationParameterImpl("wordOutputType", "wordOutputType", "String", true, false, new String[] {});
-
-
-        /**
-         * The full path to a stop words file. Words in the stop word file are not annotated as word token if found
-         * in the document.
-         */
-        public static ConfigurationParameter STOP_WORDS_FILE = new ConfigurationParameterImpl("stopWordsFile", "stopWordsFile", "String", false, false, new String[] {});
-
-
-    }
 }

@@ -21,18 +21,13 @@ package gov.va.vinci.leo.ae;
  */
 
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
-import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ExampleAnnotator extends LeoBaseAnnotator {
-
+    @LeoAnnotatorParameter(description="My Param")
     protected String myParam = null;
-
+    @LeoAnnotatorParameter(description="My Required Param",mandatory=true)
     protected String myParamRequired = null;
 
     public ExampleAnnotator() {
@@ -52,21 +47,6 @@ public class ExampleAnnotator extends LeoBaseAnnotator {
     @Override
     public LeoTypeSystemDescription getLeoTypeSystemDescription() {
         return new LeoTypeSystemDescription();
-    }
-
-    public static class Param extends LeoBaseAnnotator.Param {
-        public static ConfigurationParameterImpl MY_PARAM
-                = new ConfigurationParameterImpl("myParam", "myParam", ConfigurationParameter.TYPE_STRING, false, false, new String[]{});
-        public static ConfigurationParameter MY_PARAM_REQUIRED
-                =  new ConfigurationParameterImpl("myParamRequired", "myParamRequired", ConfigurationParameter.TYPE_STRING, true, false, new String[]{});
-
-        public static ConfigurationParameter[] values() {
-            List<ConfigurationParameter> results = new ArrayList<ConfigurationParameter>();
-            results.add(MY_PARAM);
-            results.add(MY_PARAM_REQUIRED);
-            return results.toArray(new ConfigurationParameter[results.size()]);
-        }
-
     }
 
 }

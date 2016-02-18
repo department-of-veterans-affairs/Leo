@@ -61,9 +61,5 @@ public class Example2Annotator extends LeoBaseAnnotator
         return typeSystemDescription;
     }
 
-    public static class Param extends ExampleAnnotator.Param {
-
-    }
-
 }
 

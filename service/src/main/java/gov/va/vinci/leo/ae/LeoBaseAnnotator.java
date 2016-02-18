@@ -43,6 +43,7 @@ import org.apache.uima.resource.metadata.ConfigurationParameter;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 /**
@@ -56,18 +57,36 @@ import java.util.*;
 public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements LeoAnnotator {
 
     /**
-     * logging object.
+     * Logger object for messaging.
      */
-    protected static Logger logger = Logger.getLogger(LeoBaseAnnotator.class.getCanonicalName());
+    private static Logger  logger = Logger.getLogger(LeoBaseAnnotator.class.getCanonicalName());
+
+    /**
+     * Map of Java type strings to UIMA configuration parameter types.
+     */
+    public static final Map<String, String> javaTypeToUimaType = new HashMap<String, String>();
+    static {
+        javaTypeToUimaType.put(Boolean.class.getName(), ConfigurationParameter.TYPE_BOOLEAN);
+        javaTypeToUimaType.put(Float.class.getName(), ConfigurationParameter.TYPE_FLOAT);
+        javaTypeToUimaType.put(Double.class.getName(), ConfigurationParameter.TYPE_FLOAT);
+        javaTypeToUimaType.put(Integer.class.getName(), ConfigurationParameter.TYPE_INTEGER);
+        javaTypeToUimaType.put(String.class.getName(), ConfigurationParameter.TYPE_STRING);
+        javaTypeToUimaType.put("boolean", ConfigurationParameter.TYPE_BOOLEAN);
+        javaTypeToUimaType.put("float", ConfigurationParameter.TYPE_FLOAT);
+        javaTypeToUimaType.put("double", ConfigurationParameter.TYPE_FLOAT);
+        javaTypeToUimaType.put("int", ConfigurationParameter.TYPE_INTEGER);
+    }
 
     /**
      * The types of annotations to use as "anchors".
      */
+    @LeoAnnotatorParameter
     protected String[] inputTypes = null;
 
     /**
      * The output type that will be created for each matching window.
      */
+    @LeoAnnotatorParameter
     protected String outputType = null;
 
     /**
@@ -86,7 +105,7 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     protected String name = null;
 
     /**
-     * Type system description of this annotator.
+     * Type system for this annotator, defaults to an empty type system.
      */
     protected LeoTypeSystemDescription typeSystemDescription = new LeoTypeSystemDescription();
 
@@ -168,7 +187,6 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
         return (T) this;
     }
 
-    @Override
     /**
      * Initialize this annotator.
      *
@@ -177,6 +195,7 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      * @see org.apache.uima.analysis_component.JCasAnnotator_ImplBase#initialize(org.apache.uima.UimaContext)
      *
      */
+    @Override
     public void initialize(UimaContext aContext)
             throws ResourceInitializationException {
         try {
@@ -569,31 +588,51 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      * @return  the annotator parameters this annotator can accept.
      * @throws IllegalAccessException  if there is an exception trying to get annotator parameters via reflection.
      */
-    protected ConfigurationParameter[] getAnnotatorParams() throws IllegalAccessException {
-        ConfigurationParameter params[] = null;
+    protected ConfigurationParameter[] getAnnotatorParams() throws IllegalAccessException, InstantiationException {
+        List<ConfigurationParameter> parameterList = new ArrayList<ConfigurationParameter>();
 
+        //Get annotated fields as parameters
+        for(Class cls = this.getClass(); cls != null; cls = cls.getSuperclass()) {
+            //Get the list of declared fields in this class and check for our Annotation
+            for(Field field : cls.getDeclaredFields()) {
+                if(!field.isAnnotationPresent(LeoAnnotatorParameter.class))
+                    continue;
+                ConfigurationParameter param = new ConfigurationParameterImpl();
+                for(java.lang.annotation.Annotation a : field.getAnnotations()) {
+                    if(a instanceof LeoAnnotatorParameter) {
+                        LeoAnnotatorParameter annotation = (LeoAnnotatorParameter) a;
+                        if (annotation.name().equals(LeoAnnotatorParameter.FIELD_NAME)) {
+                            param.setName(field.getName());
+                        } else {
+                            param.setName(annotation.name());
+                        }
+                        param.setDescription(annotation.description());
+                        param.setMandatory(annotation.mandatory());
+                        getParameterTypeFromField(field, param);
+                        parameterList.add(param);
+                        break;
+                    }
+                }
+            }
+        }
+
+        //Get parameters declared the old fashioned way
         for (Class c : this.getClass().getDeclaredClasses()) {
             if (c.isEnum() && Arrays.asList(c.getInterfaces()).contains(ConfigurationParameter.class)) {
-                params = new ConfigurationParameter[EnumSet.allOf(c).size()];
-                int counter = 0;
-                for (Object o : EnumSet.allOf(c)) {
-                    params[counter] = ((ConfigurationParameter) o);
-                    counter++;
-                }
+                parameterList.addAll(EnumSet.allOf(c));
                 break;
             } else if (c.getCanonicalName().endsWith(".Param")) {
                 Field[] fields = c.getFields();
-                List<ConfigurationParameter> paramList = new ArrayList<ConfigurationParameter>();
 
                 for (Field f : fields) {
                     if (ConfigurationParameter.class.isAssignableFrom(f.getType())) {
-                        paramList.add((ConfigurationParameter) f.get(null));
+                        parameterList.add((ConfigurationParameter) f.get(null));
                     }
                 }
-                params = paramList.toArray(new ConfigurationParameter[paramList.size()]);
             }
         }
-        return params;
+
+        return parameterList.toArray(new ConfigurationParameter[parameterList.size()]);
     }
 
     /**
@@ -604,6 +643,7 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      */
     protected Map<ConfigurationParameter, Object> getParametersToValuesMap() {
         Map<ConfigurationParameter, Object> parameterObjectMap = new HashMap<ConfigurationParameter, Object>();
+
         ConfigurationParameter[] params;
         try {
             params = this.getAnnotatorParams();
@@ -634,30 +674,55 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     }
 
     /**
-     * A set of default parameters for the base annotation.
+     * Get the multivalued and type parameter information from the field object. Collections are supported types for fields
+     * but only collections with a single generic type parameter that can return an array.  If no type is matched then
+     * the type is set to {@code ConfigurationParamter.TYPE_STRING}.
      *
-     * Extending annotators may use persist parameters from a parent class by extending the inner Param from the parent as in:
-     * <code>public static class Param extends LeoBaseAnnotator.param {}</code>
-     *
-     * Each field represents an annotation parameter and utilizes the UIMA ConfigurationParameter as in the declaration:
-     * <p>
-     * <code>public static ConfigurationParameter PARAMETER_NAME = new ConfigurationParameterImpl("name", "description", "type", isMandatory, isMultivalued, new String[]{});</code>
+     * @param field field object from which class information can be retrieved.
+     * @param param ConfigurationParameter to store type and multi-value information.
      */
-    public static class Param {
-        /**
-         * The type output by this annotator.
-         */
-        public static ConfigurationParameter OUTPUT_TYPE
-                = new ConfigurationParameterImpl(
-                    "outputType", "outputType", "String", false, false, new String[] {}
-                );
-        /**
-         * the type of annotation to be searched. Default is uima.tcas.DocumentAnnotation. This is an array of strings,
-         * and can contain multiple types.
-         */
-        public static ConfigurationParameter INPUT_TYPE
-                = new ConfigurationParameterImpl(
-                    "inputTypes", "inputType", "String", false, true, new String[] {}
-                );
+    protected void getParameterTypeFromField(Field field, ConfigurationParameter param) {
+        Class<?> fieldClass = field.getType();
+        if(fieldClass.isArray()) {  //Array Type
+            param.setMultiValued(true);
+            param.setType(javaTypeToUimaType.get(fieldClass.getComponentType().getName()));
+        } else if(Collection.class.isAssignableFrom(fieldClass)) { // Collection
+            param.setMultiValued(true);
+            param.setType(javaTypeToUimaType.get(((Class<?>)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0]).getName()));
+        } else {
+            param.setType(javaTypeToUimaType.get(fieldClass.getName()));
+        }
+        if(StringUtils.isBlank(param.getType())) {
+            logger.warn("An appropriate type mapping for " + field.getName() + " could not be found." +
+                            "May be an invalid annotator param type, setting to ConfigurationParameter.TYPE_STRING");
+            param.setType(ConfigurationParameter.TYPE_STRING);
+        }
     }
+
+}/**
+ * A set of default parameters for the base annotation.
+ *
+ * Extending annotators may use persist parameters from a parent class by extending the inner Param from the parent as in:
+ * <code>public static class Param extends LeoBaseAnnotator.param {}</code>
+ *
+ * Each field represents an annotation parameter and utilizes the UIMA ConfigurationParameter as in the declaration:
+ * <p>
+ * <code>public static ConfigurationParameter PARAMETER_NAME = new ConfigurationParameterImpl("name", "description", "type", isMandatory, isMultivalued, new String[]{});</code>
+ */
+public static class Param {
+    /**
+     * The type output by this annotator.
+     */
+    public static ConfigurationParameter OUTPUT_TYPE
+            = new ConfigurationParameterImpl(
+            "outputType", "outputType", "String", false, false, new String[] {}
+    );
+    /**
+     * the type of annotation to be searched. Default is uima.tcas.DocumentAnnotation. This is an array of strings,
+     * and can contain multiple types.
+     */
+    public static ConfigurationParameter INPUT_TYPE
+            = new ConfigurationParameterImpl(
+            "inputTypes", "inputType", "String", false, true, new String[] {}
+    );
 }

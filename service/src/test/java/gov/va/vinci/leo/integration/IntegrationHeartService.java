@@ -20,11 +20,6 @@ package gov.va.vinci.leo.integration;
  * #L%
  */
 
-import gov.va.vinci.leo.Service;
-import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
-import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
-import gov.va.vinci.leo.regex.ae.RegexAnnotator;
-
 /**
  * User: Thomas Ginter
  * Date: 12/6/13
@@ -40,7 +35,7 @@ public class IntegrationHeartService {
     public static final String AU_ANNOTATION_TYPE = "gov.va.vinci.leo.types.AuHearts";
     public static final String AU_NEG_ANNOTATION_TYPE = "gov.va.vinci.leo.types.AuNegHearts";
     public static final String TOOL_ANNOTATION_TYPE = "gov.va.vinci.leo.types.ToolHearts";
-
+    /**
     public void run(boolean generateTypes) throws Exception {
         //Deploy Remote Service
         Service heartService = new Service();
@@ -99,5 +94,5 @@ public class IntegrationHeartService {
             e.printStackTrace();
         }
     }
-
+     **/
 }

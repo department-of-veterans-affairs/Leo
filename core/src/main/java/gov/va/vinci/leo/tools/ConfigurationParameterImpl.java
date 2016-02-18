@@ -33,6 +33,13 @@ import org.apache.uima.resource.metadata.impl.ConfigurationParameter_impl;
 public class ConfigurationParameterImpl  extends ConfigurationParameter_impl{
 
     /**
+     * Default constructor.
+     */
+    public ConfigurationParameterImpl() {
+        super();
+    }
+
+    /**
      * Initialize the configuration parameter with the input values provided, rather than using setters only.
      *
      * @param name Name of the parameter.
