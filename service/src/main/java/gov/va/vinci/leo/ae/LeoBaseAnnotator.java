@@ -110,14 +110,6 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     protected LeoTypeSystemDescription typeSystemDescription = new LeoTypeSystemDescription();
 
     /**
-     * A map of parameters that is loaded during the initialization of this annotator.
-     */
-    @Deprecated
-    protected Map<ConfigurationParameter, Object> parameters
-            = new HashMap<ConfigurationParameter, Object>();
-
-
-    /**
      * Default constructor for initialization by the UIMA Framework.
      */
     public LeoBaseAnnotator() { /** Do Nothing Here **/ }
@@ -143,6 +135,24 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     public LeoBaseAnnotator(int numInstances, String outputType, String...inputTypes) {
         this(outputType, inputTypes);
         this.numInstances = numInstances;
+    }
+
+    public String[] getInputTypes() {
+        return inputTypes;
+    }
+
+    public <T extends LeoBaseAnnotator> T setInputTypes(String[] inputTypes) {
+        this.inputTypes = inputTypes;
+        return (T) this;
+    }
+
+    public String getOutputType() {
+        return outputType;
+    }
+
+    public <T extends LeoBaseAnnotator> T setOutputType(String outputType) {
+        this.outputType = outputType;
+        return (T) this;
     }
 
     /**
@@ -234,8 +244,6 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
                         throw new ResourceInitializationException(new IllegalArgumentException("Required parameter: " + param.getName() + " cannot be blank."));
                     }
                 }
-
-                parameters.put(param, aContext.getConfigParameterValue(param.getName()));
 
                 /** Set the parameter value in the class field variable **/
                 try {
@@ -428,8 +436,9 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      *
      * @param numberOfCASesProcessed  the number of documents this annotator has processed.
      */
-    public void setNumberOfCASesProcessed(long numberOfCASesProcessed) {
+    public <T extends LeoBaseAnnotator> T setNumberOfCASesProcessed(long numberOfCASesProcessed) {
         this.numberOfCASesProcessed = numberOfCASesProcessed;
+        return (T) this;
     }
 
     /**
@@ -662,18 +671,6 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     }
 
     /**
-     * Get a map of parameters and their values.  Parameter list is retrieved from the inner Param class.  Values are
-     * retrieved by matching the name of the ConfigurationParameter to the name of a variable set in the class.
-     *
-     * @return a map of parameters and their values that is created during initialization.
-     * @deprecated This method has been replaced with LeoBaseAnnotator#getParametersToValuesMap
-     */
-    @Deprecated
-    public Map<ConfigurationParameter, Object> getParameters() {
-        return parameters;
-    }
-
-    /**
      * Get the multivalued and type parameter information from the field object. Collections are supported types for fields
      * but only collections with a single generic type parameter that can return an array.  If no type is matched then
      * the type is set to {@code ConfigurationParamter.TYPE_STRING}.
@@ -699,30 +696,19 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
         }
     }
 
-}/**
- * A set of default parameters for the base annotation.
- *
- * Extending annotators may use persist parameters from a parent class by extending the inner Param from the parent as in:
- * <code>public static class Param extends LeoBaseAnnotator.param {}</code>
- *
- * Each field represents an annotation parameter and utilizes the UIMA ConfigurationParameter as in the declaration:
- * <p>
- * <code>public static ConfigurationParameter PARAMETER_NAME = new ConfigurationParameterImpl("name", "description", "type", isMandatory, isMultivalued, new String[]{});</code>
- */
-public static class Param {
     /**
-     * The type output by this annotator.
+     * A set of default parameters for the base annotation.
+     *
+     * Extending annotators may use persist parameters from a parent class by extending the inner Param from the parent as in:
+     * <code>public static class Param extends LeoBaseAnnotator.param {}</code>
+     *
+     * Each field represents an annotation parameter and utilizes the UIMA ConfigurationParameter as in the declaration:
+     * <p>
+     * <code>public static ConfigurationParameter PARAMETER_NAME = new ConfigurationParameterImpl("name", "description", "type", isMandatory, isMultivalued, new String[]{});</code>
      */
-    public static ConfigurationParameter OUTPUT_TYPE
-            = new ConfigurationParameterImpl(
-            "outputType", "outputType", "String", false, false, new String[] {}
-    );
-    /**
-     * the type of annotation to be searched. Default is uima.tcas.DocumentAnnotation. This is an array of strings,
-     * and can contain multiple types.
-     */
-    public static ConfigurationParameter INPUT_TYPE
-            = new ConfigurationParameterImpl(
-            "inputTypes", "inputType", "String", false, true, new String[] {}
-    );
+    @Deprecated
+    public static class Param {
+        /** Parameters for this class are now defined using annotations **/
+    }
+
 }
