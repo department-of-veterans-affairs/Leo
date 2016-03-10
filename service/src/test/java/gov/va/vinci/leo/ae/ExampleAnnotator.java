@@ -20,14 +20,15 @@ package gov.va.vinci.leo.ae;
  * #L%
  */
 
+import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 
 public class ExampleAnnotator extends LeoBaseAnnotator {
-    @LeoAnnotatorParameter(description="My Param")
+    @LeoConfigurationParameter(description="My Param")
     protected String myParam = null;
-    @LeoAnnotatorParameter(description="My Required Param",mandatory=true)
+    @LeoConfigurationParameter(description="My Required Param",mandatory=true)
     protected String myParamRequired = null;
 
     public ExampleAnnotator() {

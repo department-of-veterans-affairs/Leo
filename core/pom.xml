@@ -85,6 +85,12 @@
             <version>2.3.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.uima</groupId>
+            <artifactId>uimafit-core</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
         <!--
             Logging Dependencies
          -->

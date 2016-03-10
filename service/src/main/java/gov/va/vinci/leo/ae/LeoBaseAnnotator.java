@@ -21,6 +21,7 @@ package gov.va.vinci.leo.ae;
  */
 
 import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
+import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.descriptors.LeoDelegate;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
@@ -54,9 +55,8 @@ import java.util.*;
  * string output type in the uima parameters to know what input types to use and
  * what output type to create.
  *
- * TODO Investigate UIMA-FIT annotations and possiblity of using them instead of our own
  * TODO Add a private field unit test to see if it is visible in the extending class
- * TODO Perhaps rename the LeoAnnotatorParameter annotation to something more generic and use it for both CollectionReaders and Annotators
+ * TODO Perhaps rename the LeoConfigurationParameter annotation to something more generic and use it for both CollectionReaders and Annotators
  */
 public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements LeoAnnotator {
 
@@ -84,13 +84,13 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     /**
      * The types of annotations to use as "anchors".
      */
-    @LeoAnnotatorParameter
+    @LeoConfigurationParameter
     protected String[] inputTypes = null;
 
     /**
      * The output type that will be created for each matching window.
      */
-    @LeoAnnotatorParameter
+    @LeoConfigurationParameter
     protected String outputType = null;
 
     /**
@@ -608,13 +608,13 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
         for(Class cls = this.getClass(); cls != null; cls = cls.getSuperclass()) {
             //Get the list of declared fields in this class and check for our Annotation
             for(Field field : cls.getDeclaredFields()) {
-                if(!field.isAnnotationPresent(LeoAnnotatorParameter.class))
+                if(!field.isAnnotationPresent(LeoConfigurationParameter.class))
                     continue;
                 ConfigurationParameter param = new ConfigurationParameterImpl();
                 for(java.lang.annotation.Annotation a : field.getAnnotations()) {
-                    if(a instanceof LeoAnnotatorParameter) {
-                        LeoAnnotatorParameter annotation = (LeoAnnotatorParameter) a;
-                        if (annotation.name().equals(LeoAnnotatorParameter.FIELD_NAME)) {
+                    if(a instanceof LeoConfigurationParameter) {
+                        LeoConfigurationParameter annotation = (LeoConfigurationParameter) a;
+                        if (annotation.name().equals(LeoConfigurationParameter.FIELD_NAME)) {
                             param.setName(field.getName());
                         } else {
                             param.setName(annotation.name());

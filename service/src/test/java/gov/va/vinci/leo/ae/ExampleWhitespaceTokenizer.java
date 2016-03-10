@@ -20,6 +20,7 @@ package gov.va.vinci.leo.ae;
  * #L%
  */
 
+import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.descriptors.TypeDescriptionBuilder;
 import org.apache.commons.lang.StringUtils;
@@ -73,24 +74,24 @@ public class ExampleWhitespaceTokenizer extends LeoBaseAnnotator {
     /**
      * The output type for tokens. This is the full type name, including package.
      */
-    @LeoAnnotatorParameter(mandatory = true)
+    @LeoConfigurationParameter(mandatory = true)
     protected String tokenOutputType = null;
 
 
-    @LeoAnnotatorParameter(mandatory = true)
+    @LeoConfigurationParameter(mandatory = true)
     protected String tokenOutputTypeFeature;
 
     /**
      * The output type for words. This is the full type name, including package.
      */
-    @LeoAnnotatorParameter(mandatory = true)
+    @LeoConfigurationParameter(mandatory = true)
     protected String wordOutputType = null;
 
     /**
      * The full path to a stop words file. Words in the stop word file are not annotated as word token if found
      * in the document.
      */
-    @LeoAnnotatorParameter
+    @LeoConfigurationParameter
     protected String stopWordsFile = null;
 
     protected final static Logger logger = Logger.getLogger(ExampleWhitespaceTokenizer.class.getCanonicalName());

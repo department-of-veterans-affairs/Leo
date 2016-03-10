@@ -1,4 +1,4 @@
-package gov.va.vinci.leo.ae;
+package gov.va.vinci.leo.descriptors;
 
 import java.lang.annotation.*;
 
@@ -15,7 +15,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
 @Inherited
-public @interface LeoAnnotatorParameter {
+public @interface LeoConfigurationParameter {
     /**
      * The default name value if one is not set.
      */
