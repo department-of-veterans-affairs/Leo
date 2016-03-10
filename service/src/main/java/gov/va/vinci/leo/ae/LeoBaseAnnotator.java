@@ -20,10 +20,7 @@ package gov.va.vinci.leo.ae;
  * #L%
  */
 
-import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
-import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
-import gov.va.vinci.leo.descriptors.LeoDelegate;
-import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
+import gov.va.vinci.leo.descriptors.*;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
@@ -64,22 +61,6 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      * Logger object for messaging.
      */
     private static Logger  logger = Logger.getLogger(LeoBaseAnnotator.class.getCanonicalName());
-
-    /**
-     * Map of Java type strings to UIMA configuration parameter types.
-     */
-    public static final Map<String, String> javaTypeToUimaType = new HashMap<String, String>();
-    static {
-        javaTypeToUimaType.put(Boolean.class.getName(), ConfigurationParameter.TYPE_BOOLEAN);
-        javaTypeToUimaType.put(Float.class.getName(), ConfigurationParameter.TYPE_FLOAT);
-        javaTypeToUimaType.put(Double.class.getName(), ConfigurationParameter.TYPE_FLOAT);
-        javaTypeToUimaType.put(Integer.class.getName(), ConfigurationParameter.TYPE_INTEGER);
-        javaTypeToUimaType.put(String.class.getName(), ConfigurationParameter.TYPE_STRING);
-        javaTypeToUimaType.put("boolean", ConfigurationParameter.TYPE_BOOLEAN);
-        javaTypeToUimaType.put("float", ConfigurationParameter.TYPE_FLOAT);
-        javaTypeToUimaType.put("double", ConfigurationParameter.TYPE_FLOAT);
-        javaTypeToUimaType.put("int", ConfigurationParameter.TYPE_INTEGER);
-    }
 
     /**
      * The types of annotations to use as "anchors".
@@ -213,7 +194,7 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     public void initialize(UimaContext aContext)
             throws ResourceInitializationException {
         try {
-            initialize(aContext, this.getAnnotatorParams());
+            initialize(aContext, ConfigurationParameterUtils.getParams(this.getClass()));
         } catch (Exception e) {
             throw new ResourceInitializationException(e);
         }
@@ -463,30 +444,11 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     }
 
     /**
-     * Returns a LeoAEDescriptor based on Param defined in the Annotator either via an Enum
-     * that implements AnnotatorParam, or a static class named Param with static AnnotatorParam object.
-     * <p/>
-     * For Example:
-     * <p/>
-     * <pre>
-     * {@code
-     * public enum Param implements AnnotatorParam {
-     *      RESOURCE("resource", true, false, "String"),
-     *      ...
-     * }
-     * }</pre>
+     * Generate a descriptor from this annotator object.  Parameters are grabbed from class variables and values with
+     * LeoConfigurationParameter annotations.
      *
-     * or
-     *
-     * <pre>
-     * {@code
-     * public static class Param {
-     *      public static ConfigurationParameter PARAMETER_NAME = new ConfigurationParameterImpl("name", "description", "type", isMandatory, isMultivalued, new String[]{});
-     * }
-     * }</pre>
-     *
-     * @return  the descriptor for this annotator.
-     * @throws Exception if there is an error getting the descriptor.
+     * @return descriptor for this annotator
+     * @throws Exception if there is an error getting the descriptor
      */
     public LeoDelegate getDescriptor() throws Exception {
         String annotatorName = (StringUtils.isBlank(name))? this.getClass().getSimpleName() : name;
@@ -494,8 +456,8 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
         descriptor.setNumberOfInstances(this.numInstances);
         descriptor.setTypeSystemDescription(getLeoTypeSystemDescription());
         //Add and set parameter values based on the map for this object
-        Map<ConfigurationParameter, Object> parameterMap = this.getParametersToValuesMap();
-        for(ConfigurationParameter parameter : parameterMap.keySet()) {
+        Map<ConfigurationParameterImpl, Object> parameterMap = ConfigurationParameterUtils.getParamsToValuesMap(this);
+        for(ConfigurationParameterImpl parameter : parameterMap.keySet()) {
             descriptor.addParameterSetting(
                     parameter.getName(),
                     parameter.isMandatory(),
@@ -508,40 +470,11 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     }
 
     /**
-     * Returns a LeoAEDescriptor a static class named Param with static ConfigurationParameter objects.  Descriptor
-     * generation is further facilitated by creating a class variable to store the parameter value whose name is the
-     * same as the parameter name set in the ConfigurationParameter object.
-     * <p/>
-     * For Example:
-     * <p/>
-     * <pre>
-     * {@code
-     * protected String parameterName = "parameter value";
+     * Generate a descriptor from this annotator object.  Parameters are grabbed from class variables with
+     * LeoConfigurationParameter annotations.
      *
-     * public static class Param {
-     *      public static ConfigurationParameter PARAMETER_NAME
-     *          = new ConfigurationParameterImpl(
-     *              "parameterName", "Description", "String", false, true, new String[] {}
-     *          );
-     * }
-     * }</pre>
-     *
-     * Parameters from parent classes can be used, including those from the LeoBaseAnnotator, by extending the parent
-     * class Params.
-     *
-     * <p>
-     * For Example:
-     * </p>
-     * <pre>
-     * {@code
-     * public static class Param extends LeoBaseAnnotator.Param {
-     *     ...
-     * }
-     * }
-     * </pre>
-     *
-     * @return  the descriptor for this annotator.
-     * @throws Exception if there is an error getting the descriptor.
+     * @return  the descriptor for this annotator
+     * @throws Exception if there is an error getting the descriptor
      */
     public LeoAEDescriptor getLeoAEDescriptor() throws Exception {
         return (LeoAEDescriptor) this.getDescriptor();
@@ -579,125 +512,6 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     public <T extends LeoBaseAnnotator> T setLeoTypeSystemDescription(LeoTypeSystemDescription typeSystemDescription) {
         this.typeSystemDescription = typeSystemDescription;
         return (T) this;
-    }
-
-    /**
-     * Returns parameters defined in a static class named Param with static ConfigurationParameter objects.
-     * <p/>
-     * For Example:
-     * <p/>
-     * <pre>
-     * {@code
-     * protected String parameterName = "parameter value";
-     *
-     * public static class Param {
-     *      public static ConfigurationParameter PARAMETER_NAME
-     *          = new ConfigurationParameterImpl(
-     *              "parameterName", "Description", "String", false, true, new String[] {}
-     *          );
-     * }
-     * }</pre>
-     *
-     * @return  the annotator parameters this annotator can accept.
-     * @throws IllegalAccessException  if there is an exception trying to get annotator parameters via reflection.
-     */
-    protected ConfigurationParameter[] getAnnotatorParams() throws IllegalAccessException, InstantiationException {
-        List<ConfigurationParameter> parameterList = new ArrayList<ConfigurationParameter>();
-
-        //Get annotated fields as parameters
-        for(Class cls = this.getClass(); cls != null; cls = cls.getSuperclass()) {
-            //Get the list of declared fields in this class and check for our Annotation
-            for(Field field : cls.getDeclaredFields()) {
-                if(!field.isAnnotationPresent(LeoConfigurationParameter.class))
-                    continue;
-                ConfigurationParameter param = new ConfigurationParameterImpl();
-                for(java.lang.annotation.Annotation a : field.getAnnotations()) {
-                    if(a instanceof LeoConfigurationParameter) {
-                        LeoConfigurationParameter annotation = (LeoConfigurationParameter) a;
-                        if (annotation.name().equals(LeoConfigurationParameter.FIELD_NAME)) {
-                            param.setName(field.getName());
-                        } else {
-                            param.setName(annotation.name());
-                        }
-                        param.setDescription(annotation.description());
-                        param.setMandatory(annotation.mandatory());
-                        getParameterTypeFromField(field, param);
-                        parameterList.add(param);
-                        break;
-                    }
-                }
-            }
-        }
-
-        //Get parameters declared the old fashioned way
-        for (Class c : this.getClass().getDeclaredClasses()) {
-            if (c.isEnum() && Arrays.asList(c.getInterfaces()).contains(ConfigurationParameter.class)) {
-                parameterList.addAll(EnumSet.allOf(c));
-                break;
-            } else if (c.getCanonicalName().endsWith(".Param")) {
-                Field[] fields = c.getFields();
-
-                for (Field f : fields) {
-                    if (ConfigurationParameter.class.isAssignableFrom(f.getType())) {
-                        parameterList.add((ConfigurationParameter) f.get(null));
-                    }
-                }
-            }
-        }
-
-        return parameterList.toArray(new ConfigurationParameter[parameterList.size()]);
-    }
-
-    /**
-     * Get a map of parameters and their values.  Parameter list is retrieved from the inner Param class. Values are
-     * retrieved by matching the name of the ConfigurationParameter to the name of a variable set in the class.
-     *
-     * @return  a map of parameters and their values that is created during initialization.
-     */
-    protected Map<ConfigurationParameter, Object> getParametersToValuesMap() {
-        Map<ConfigurationParameter, Object> parameterObjectMap = new HashMap<ConfigurationParameter, Object>();
-
-        ConfigurationParameter[] params;
-        try {
-            params = this.getAnnotatorParams();
-            for(ConfigurationParameter parameter : params) {
-                try {
-                    Field field = FieldUtils.getField(this.getClass(), parameter.getName(), true);
-                    parameterObjectMap.put(parameter, FieldUtils.readField(field, this, true));
-                } catch (Exception eField) {
-                    parameterObjectMap.put(parameter, null);
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return parameterObjectMap;
-    }
-
-    /**
-     * Get the multivalued and type parameter information from the field object. Collections are supported types for fields
-     * but only collections with a single generic type parameter that can return an array.  If no type is matched then
-     * the type is set to {@code ConfigurationParamter.TYPE_STRING}.
-     *
-     * @param field field object from which class information can be retrieved.
-     * @param param ConfigurationParameter to store type and multi-value information.
-     */
-    protected void getParameterTypeFromField(Field field, ConfigurationParameter param) {
-        Class<?> fieldClass = field.getType();
-        if(fieldClass.isArray()) {  //Array Type
-            param.setMultiValued(true);
-            param.setType(javaTypeToUimaType.get(fieldClass.getComponentType().getName()));
-        } else if(Collection.class.isAssignableFrom(fieldClass)) { // Collection
-            param.setMultiValued(true);
-            param.setType(javaTypeToUimaType.get(((Class<?>)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0]).getName()));
-        } else {
-            param.setType(javaTypeToUimaType.get(fieldClass.getName()));
-        }
-        if(StringUtils.isBlank(param.getType())) {
-            logger.warn("An appropriate type mapping for " + field.getName() + " could not be found." +
-                            "May be an invalid annotator param type, setting to ConfigurationParameter.TYPE_STRING");
-            param.setType(ConfigurationParameter.TYPE_STRING);
-        }
     }
 
     /**

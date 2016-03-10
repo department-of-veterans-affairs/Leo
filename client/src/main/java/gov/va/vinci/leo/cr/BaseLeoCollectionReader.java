@@ -23,6 +23,8 @@ package gov.va.vinci.leo.cr;
  * #L%
  */
 
+import gov.va.vinci.leo.descriptors.ConfigurationParameterUtils;
+import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import gov.va.vinci.leo.tools.LeoUtils;
@@ -64,6 +66,9 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
      */
     protected List<TextFilter> filters = null;
 
+    @LeoConfigurationParameter(description = "TextFilter classes that will be used to filter the text")
+    protected String[] textFilters = null;
+
     /**
      * Log file handler.
      */
@@ -78,10 +83,9 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
     @Override
     public void initialize() throws ResourceInitializationException {
         super.initialize();
-        String[] text_filters = (String[]) getConfigParameterValue(Param.TEXT_FILTERS.getName());
         this.addFilters(new XmlFilter());
         try {
-            this.addFilterList(text_filters);
+            this.addFilters(textFilters);
         } catch (ClassNotFoundException e) {
             throw new ResourceInitializationException(e);
         } catch (IllegalAccessException e) {
@@ -109,19 +113,19 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
     public abstract boolean hasNext() throws IOException, CollectionException;
 
     /**
-     * Add the list of filters classes from a String list.  Typically this list is coming from the
+     * Add the list of textFilters classes from a String list.  Typically this list is coming from the
      * Configuration Parameter input.
      *
-     * @param filterList List of class names, each of which is a TextFilter
+     * @param textFilters List of class names, each of which is a TextFilter
      * @throws  java.lang.ClassNotFoundException if one of the filter classes cannot be found
      * @throws java.lang.IllegalAccessException if the filter class cannot be accessed
      * @throws java.lang.InstantiationException if the filter class cannot be instantiated.
      */
-    public void addFilterList(String[] filterList) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        if (filterList == null) {
-            return;
+    public <T> T addFilters(String...textFilters) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        if (textFilters == null) {
+            return (T) this;
         }
-        for (String filterName : filterList) {
+        for (String filterName : textFilters) {
             if (StringUtils.isBlank(filterName))
                 continue;
             Class<?> subclass;
@@ -129,8 +133,8 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
             subclass = (Class<?>) Class.forName(filterName.trim());
             tf = (TextFilter) subclass.newInstance();
             this.addFilters(tf);
-
         }//for
+        return (T) this;
     }//addFilterlist method
 
     /**
@@ -139,12 +143,24 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
      *
      * @param textFilters One or more filters to be added to the list
      */
-    public void addFilters(TextFilter... textFilters) {
-        if (textFilters == null) return;
+    public <T> T addFilters(TextFilter... textFilters) {
+        if (textFilters == null) return (T) this;
         if (filters == null) filters = new ArrayList<TextFilter>();
         //Add each filters to the list
         filters.addAll(Arrays.asList(textFilters));
+        //reset the text names
+        this.textFilters = (String[]) filters.toArray();
+        return (T) this;
     }//setFilters method
+
+    /**
+     * Return the list of filters for this reader.
+     *
+     * @return list of filters
+     */
+    public List<TextFilter> getFilters() {
+        return filters;
+    }
 
     /**
      * @see org.apache.uima.collection.base_cpm.BaseCollectionReader#close()
@@ -155,60 +171,40 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
 
     }
 
-    /**
-     * Returns a CollectionReader which has been initialized by the framework using the parameter settings provided.
-     *
-     * @param configurationParameters set of ConfigurationParameters to add to the descriptor.
-     * @param parameterValues Map of parameter names to values to set in the descriptor.
-     * @return initialized CollectionReader object.
-     * @throws ResourceInitializationException if there is an error initializing the CollectionReader.
-     */
-    protected CollectionReader produceCollectionReader( Set<ConfigurationParameter> configurationParameters, Map<String, ?> parameterValues) throws ResourceInitializationException {
-        //creating a blank CollectionReaderDescription object
+    public CollectionReader produceCollectionReader() throws ResourceInitializationException {
         CollectionReaderDescription crDesc = new CollectionReaderDescription_impl();
-        //setting the meta-data for the SuperReaderDescription
+
+        //Set the initial metadata for the descriptor
         crDesc.setFrameworkImplementation(Constants.JAVA_FRAMEWORK_NAME);
-        String implementationName= this.getClass().getCanonicalName();
-        crDesc.setImplementationName(implementationName);
+        crDesc.setImplementationName(this.getClass().getCanonicalName());
         ProcessingResourceMetaData md = crDesc.getCollectionReaderMetaData();
         md.setName(this.getClass().getCanonicalName());
-        md.setDescription("Descriptor for " + implementationName + " collection reader");
+        md.setDescription("Descriptor for " + this.getClass().getCanonicalName() + " collection reader");
         md.setVersion("1.0");
-
-        LeoTypeSystemDescription desc = new LeoTypeSystemDescription(TypeLibrarian.getCSITypeSystemDescription());
-        md.setTypeSystem(desc.getTypeSystemDescription());
-
-        md.getConfigurationParameterDeclarations().setConfigurationParameters(configurationParameters.toArray(new ConfigurationParameter[configurationParameters.size()]));
+        md.setTypeSystem(new LeoTypeSystemDescription(TypeLibrarian.getCSITypeSystemDescription()).getTypeSystemDescription());
 
         //setting the OperationalProperties
         OperationalProperties opProps = new OperationalProperties_impl();
         opProps.setModifiesCas(true);
         opProps.setMultipleDeploymentAllowed(false);
         opProps.setOutputsNewCASes(true);
-
         md.setOperationalProperties(opProps);
+
+        //Get the configuration parameters map
+        Map<ConfigurationParameterImpl, Object> configMap = ConfigurationParameterUtils.getParamsToValuesMap(this);
+
+        //Add the configuration parameter settings
+        md.getConfigurationParameterDeclarations().setConfigurationParameters(configMap.keySet().toArray(new ConfigurationParameter[configMap.size()]));
+
+        //Set the parameter values
         ConfigurationParameterSettings confSettings = crDesc.getMetaData().getConfigurationParameterSettings();
-
-        for (String key : parameterValues.keySet()) {
-            confSettings.setParameterValue(key, parameterValues.get(key));
-
+        for(ConfigurationParameterImpl parameter : configMap.keySet()) {
+            confSettings.setParameterValue(parameter.getName(), configMap.get(parameter));
         }
-
-        //resetting the parameters in the description
         crDesc.getMetaData().getConfigurationParameterSettings().setParameterSettings(confSettings.getParameterSettings());
-        return UIMAFramework.produceCollectionReader(crDesc);       //creating a CollectionReader object with the new parameters set.
-    }
 
-    /**
-     * Static inner class for holding parameter information.
-     */
-    public static class Param {
-        /**
-         * Text filters to apply to reader text.
-         */
-        public static ConfigurationParameter TEXT_FILTERS =
-                new ConfigurationParameterImpl("TextFilters", "Text filters to apply to the text",
-                        ConfigurationParameter.TYPE_STRING, false, true, new String[]{});
+        //Return the generated CollectionReader
+        return UIMAFramework.produceCollectionReader(crDesc);
     }
 
 }//SuperReader class
