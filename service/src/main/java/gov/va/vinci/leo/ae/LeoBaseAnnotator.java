@@ -53,6 +53,10 @@ import java.util.*;
  * Note: This base class assumes a string[] parameter of input types and a
  * string output type in the uima parameters to know what input types to use and
  * what output type to create.
+ *
+ * TODO Investigate UIMA-FIT annotations and possiblity of using them instead of our own
+ * TODO Add a private field unit test to see if it is visible in the extending class
+ * TODO Perhaps rename the LeoAnnotatorParameter annotation to something more generic and use it for both CollectionReaders and Annotators
  */
 public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements LeoAnnotator {
 
