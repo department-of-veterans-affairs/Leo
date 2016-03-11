@@ -64,15 +64,11 @@ public class FileCollectionReader extends BaseFileCollectionReader {
     public static final String fileExtensionString = ".txt";
 
     /**
-     * The file name suffix filter to limit the list of files returned by the search.  Defaults to *.txt.
-     */
-    private SuffixFileFilter filenameFilter = new SuffixFileFilter(fileExtensionString);
-
-    /**
      * Default constructor used during UIMA initialization.
      */
     public FileCollectionReader() {
-
+        //Use a SuffixFileFilter by default
+        this.setFilenameFilter(new SuffixFileFilter(fileExtensionString));
     }
 
     /**
@@ -80,38 +76,11 @@ public class FileCollectionReader extends BaseFileCollectionReader {
      *
      * @param inputDirectory Path to the input directory to be read.
      * @param recurse        If true then recursively search sub-directories for files to process.
-     * @param filterList     List of TextFilter objects to apply to the text before it is set in the CAS.
      */
-    public FileCollectionReader(File inputDirectory, boolean recurse, TextFilter... filterList) {
-        this(inputDirectory, null, recurse, new SuffixFileFilter(fileExtensionString), filterList);
-    }
-
-    /**
-     * Constructor that takes an input directory path and recurse flag as inputs.
-     *
-     * @param inputDirectory      Path to the input directory to be read.
-     * @param recurse             If true then recursively search sub-directories for files to process.
-     * @param fileExtension       The file extension to limit to, ie = ".txt" or ".doc"
-     * @param filterList          List of TextFilter objects to apply to the text before it is set in the CAS.
-     */
-    public FileCollectionReader(File inputDirectory, boolean recurse, SuffixFileFilter fileExtension, TextFilter...filterList) {
-        this(inputDirectory, null, recurse, fileExtension, filterList);
-    }
-
-    /**
-     * Constructor that takes an input directory path and recurse flag as inputs.
-     *
-     * @param inputDirectory      Path to the input directory to be read.
-     * @param encoding            Encoding format for processing string input data.
-     * @param recurse             If true then recursively search sub-directories for files to process.
-     * @param fileExtension       The file extension to limit to, ie = ".txt" or ".doc"
-     * @param filterList          List of TextFilter objects to apply to the text before it is set in the CAS.
-     */
-    public FileCollectionReader(File inputDirectory, String encoding, boolean recurse, SuffixFileFilter fileExtension, TextFilter...filterList) {
-        super(inputDirectory, encoding, recurse, fileExtension);
-        if(filterList != null) {
-            this.addFilters(filterList);
-        }
+    public FileCollectionReader(File inputDirectory, boolean recurse) {
+        super(inputDirectory, recurse);
+        //Use a SuffixFileFilter by default
+        this.setFilenameFilter(new SuffixFileFilter(fileExtensionString));
     }
 
     /**
@@ -139,14 +108,6 @@ public class FileCollectionReader extends BaseFileCollectionReader {
         csi.setID(next.getName());
         csi.setLocator(next.toURI().getPath());
         csi.addToIndexes();
-    }
-
-
-    /**
-     * Collection reader params. Currently it just uses the same params as BaseFileCollectionReader.
-     */
-    public static class Param extends BaseFileCollectionReader.Param {
-
     }
 
 }//FileSubReader class

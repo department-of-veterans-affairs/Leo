@@ -20,24 +20,19 @@ package gov.va.vinci.leo.cr;
  * #L%
  */
 
+import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
-import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import gov.va.vinci.leo.tools.LeoUtils;
 import gov.va.vinci.leo.tools.db.DataManager;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionException;
-import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.util.Progress;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Retrieves rows from a database and returns them one at a time for extending readers to handle. Assumes there is one
@@ -51,22 +46,26 @@ public abstract class BaseDatabaseCollectionReader extends BaseLeoCollectionRead
     /**
      * Driver to be used for the database connection.
      */
-    protected String mDriver = null;
+    @LeoConfigurationParameter(mandatory = true)
+    protected String driver = null;
 
     /**
      * Connection URL for the database to be accessed.
      */
-    protected String mURL = null;
+    @LeoConfigurationParameter(mandatory = true)
+    protected String url = null;
 
     /**
      * Username for this database.
      */
-    protected String mUsername = null;
+    @LeoConfigurationParameter
+    protected String username = null;
 
     /**
      * Password for this database.
      */
-    protected String mPassword = null;
+    @LeoConfigurationParameter
+    protected String password = null;
 
     /**
      * Index of the current analyte being processed, -1 if the query has not yet been executed.
@@ -100,10 +99,10 @@ public abstract class BaseDatabaseCollectionReader extends BaseLeoCollectionRead
         if(databaseConnectionInformation == null) {
             throw new IllegalArgumentException("DatabaseConnectionInformation parameter cannot be null!");
         }
-        this.mDriver   = databaseConnectionInformation.getDriver();
-        this.mURL      = databaseConnectionInformation.getUrl();
-        this.mPassword = databaseConnectionInformation.getPassword();
-        this.mUsername = databaseConnectionInformation.getUsername();
+        this.driver = databaseConnectionInformation.getDriver();
+        this.url = databaseConnectionInformation.getUrl();
+        this.password = databaseConnectionInformation.getPassword();
+        this.username = databaseConnectionInformation.getUsername();
     }
 
     /**
@@ -115,24 +114,90 @@ public abstract class BaseDatabaseCollectionReader extends BaseLeoCollectionRead
      * @param password password of the database access user.
      */
     public BaseDatabaseCollectionReader(String driver, String url, String username, String password) {
-        this.mDriver = driver;
-        this.mURL = url;
-        this.mUsername = username;
-        this.mPassword = password;
+        this.driver = driver;
+        this.url = url;
+        this.username = username;
+        this.password = password;
     }
 
     /**
-     * This method is called during initialization. Subclasses should override it to perform one-time startup logic.
-     *
-     * @throws org.apache.uima.resource.ResourceInitializationException if a failure occurs during initialization.
+     * Get the Driver text string.
+     * 
+     * @return driver string
      */
-    @Override
-    public void initialize() throws ResourceInitializationException {
-        super.initialize();
-        mDriver = (String) getConfigParameterValue(Param.DRIVER.getName());
-        mURL = (String) getConfigParameterValue(Param.URL.getName());
-        mUsername = (String) getConfigParameterValue(Param.USERNAME.getName());
-        mPassword = (String) getConfigParameterValue(Param.PASSWORD.getName());
+    public String getDriver() {
+        return driver;
+    }
+
+    /**
+     * Set the driver name for this reader.
+     * 
+     * @param driver driver string
+     * @return reference to this reader instance
+     */
+    public <T> T setDriver(String driver) {
+        this.driver = driver;
+        return (T) this;
+    }
+
+    /**
+     * Database connection URL.
+     * 
+     * @return connection URL String
+     */
+    public String getURL() {
+        return url;
+    }
+
+    /**
+     * Set the driver URL.
+     * 
+     * @param url driver URL.
+     * @return reference to this reader instance
+     */
+    public <T> T setURL(String url) {
+        this.url = url;
+        return (T) this;
+    }
+
+    /**
+     * Return the database username.
+     * 
+     * @return database username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Set the database username.
+     * 
+     * @param username database username
+     * @return reference to this reader instance
+     */
+    public <T> T setUsername(String username) {
+        this.username = username;
+        return (T) this;
+    }
+
+    /**
+     * Get the database password.
+     * 
+     * @return database password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Set the database password.
+     * 
+     * @param password database password
+     * @return reference to this reader instance
+     */
+    public <T> T setPassword(String password) {
+        this.password = password;
+        return (T) this;
     }
 
     /**
@@ -198,65 +263,7 @@ public abstract class BaseDatabaseCollectionReader extends BaseLeoCollectionRead
      * @throws ClassNotFoundException
      */
     protected DataManager getDataManager() throws SQLException, ClassNotFoundException {
-        return new DataManager(mDriver, mURL, mUsername, mPassword);
+        return new DataManager(driver, url, username, password);
     }
 
-    /**
-     * Sets columns to "".
-     * @param rows  The rows to process.
-     * @param skipColumns  The columns in each row to set to "". Zero based.
-     * @return   the rows with specified columns set to "".
-     */
-    protected static ArrayList<String> removeUnneededColumns(ArrayList<String> rows, int... skipColumns) {
-        // See of this one needs skipped.
-        for (int toSkip : skipColumns) {
-            rows.set(toSkip, "");
-        }
-        return rows;
-    }
-
-    /**
-     * Create the base set of parameters for DatabaseCollectionReaders to use.
-     *
-     * @return Map of parameter names and values.
-     * @throws org.apache.uima.resource.ResourceInitializationException if there is an error initializing the reader.
-     */
-    protected Map<String, Object> produceBaseDatabaseCollectionReaderParams() throws ResourceInitializationException {
-        Map<String, Object> parameterValues = new HashMap<String, Object>();
-        parameterValues.put(Param.DRIVER.getName(),   mDriver);
-        parameterValues.put(Param.URL.getName(),      mURL);
-        parameterValues.put(Param.USERNAME.getName(), mUsername);
-        parameterValues.put(Param.PASSWORD.getName(), mPassword);
-        return parameterValues;
-    }
-
-    /**
-     * Static inner class for parameter definitions.
-     */
-    public static class Param extends BaseLeoCollectionReader.Param {
-        /**
-         * JDBC Driver to use for the connection.
-         */
-        public static ConfigurationParameter DRIVER =
-                new ConfigurationParameterImpl("Driver", "JDBC Driver String",
-                        ConfigurationParameter.TYPE_STRING, true, false, new String[] {} );
-        /**
-         * Database connection url (ie "jdbc:mysql://hostname:port/dbname").
-         */
-        public static ConfigurationParameter URL =
-                new ConfigurationParameterImpl("URL", "Database connection URL (ie 'jdbc:mysql://hostname:port/dbname'",
-                        ConfigurationParameter.TYPE_STRING, true, false, new String[] {});
-        /**
-         * Database username if required.
-         */
-        public static ConfigurationParameter USERNAME =
-                new ConfigurationParameterImpl("Username", "Optional, Username for the database connection authentication",
-                        ConfigurationParameter.TYPE_STRING, false, false, new String[] {});
-        /**
-         * Database password if required.
-         */
-        public static ConfigurationParameter PASSWORD =
-                new ConfigurationParameterImpl("Password", "Optional, Password for the database connection authentication",
-                        ConfigurationParameter.TYPE_STRING, false, false, new String[] {});
-    }
 }

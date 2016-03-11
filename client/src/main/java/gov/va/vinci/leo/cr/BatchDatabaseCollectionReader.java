@@ -20,6 +20,7 @@ package gov.va.vinci.leo.cr;
  * #L%
  */
 
+import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.model.DataQueryInformation;
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
@@ -45,18 +46,22 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
     /**
      * Min record ID.
      */
+    @LeoConfigurationParameter(mandatory = true)
     protected int minRecordNumber = -1;
     /**
      * Max record ID.
      */
+    @LeoConfigurationParameter(mandatory = true)
     protected int maxRecordNumber = -1;
     /**
      * Size of each batch to pull.
      */
+    @LeoConfigurationParameter(mandatory = true)
     protected int batchSize = -1;
     /**
      * Number of random batches to pull.
      */
+    @LeoConfigurationParameter
     protected int randomBatches = 0;
     /**
      * Query template that will be filled in with min and max values for each batch .
@@ -89,7 +94,8 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
     public BatchDatabaseCollectionReader() { /** Do Nothing **/ }
 
     /**
-     * Initialize the reader using the database connection and query information provided, including the size of each batch.
+     * Initialize the reader using the database connection and query information provided, including the size of each
+     * batch and optionally the number of random batches to execute.
      *
      * @param databaseConnectionInformation database connection information to use.
      * @param dataQueryInformation database query for retrieving results, assumes one record per row.
@@ -102,52 +108,10 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
                                          int minRecordNumber,
                                          int maxRecordNumber,
                                          int batchSize) {
-        this(databaseConnectionInformation, dataQueryInformation, minRecordNumber, maxRecordNumber, batchSize, 0);
-    }
-
-    /**
-     * Initialize the reader using the database connection and query information provided, including the size of each
-     * batch and optionally the number of random batches to execute.
-     *
-     * @param databaseConnectionInformation database connection information to use.
-     * @param dataQueryInformation database query for retrieving results, assumes one record per row.
-     * @param minRecordNumber starting row number for record retrieval.
-     * @param maxRecordNumber ending row number for record retrieval.
-     * @param batchSize size of each batch to retrieve at a time.  Optimal size will vary with the database environment.
-     * @param randomBatches number of random batches to execute, rather then accessing the data sequentially.  Setting
-     *                      this parameter to a value less than one will cause the reader to produce no random batches.
-     */
-    public BatchDatabaseCollectionReader(DatabaseConnectionInformation databaseConnectionInformation,
-                                         DataQueryInformation dataQueryInformation,
-                                         int minRecordNumber,
-                                         int maxRecordNumber,
-                                         int batchSize,
-                                         int randomBatches) {
         this(databaseConnectionInformation.getDriver(), databaseConnectionInformation.getUrl(),
                 databaseConnectionInformation.getUsername(), databaseConnectionInformation.getPassword(),
                 dataQueryInformation.getQuery(), dataQueryInformation.getIdColumn(),
-                dataQueryInformation.getNoteColumn(), minRecordNumber, maxRecordNumber, batchSize, randomBatches);
-    }
-
-    /**
-     * Initialize the reader using the provided connection and query information, including the size of each batch.
-     *
-     * @param driver JDBC driver class
-     * @param url JDBC connection URL
-     * @param username database user name.
-     * @param password database user password.
-     * @param query SQL query used to retrieve the data, one record per row of results.
-     * @param idColumn name of the ID column in the SQL query. Assumes only one column to use as the record ID.
-     *                 Additional ID fields are propagated through the row results String array of the CSI annotation.
-     * @param noteColumn name of the note column in the SQL query. Assumes only one note column.
-     * @param minRecordNumber starting row number for record retrieval.
-     * @param maxRecordNumber ending row number for record retrieval.
-     * @param batchSize size of each batch to retrieve at a time.  Optimal size will vary with the database environment.
-     */
-    public BatchDatabaseCollectionReader(String driver, String url, String username, String password, String query,
-                                         String idColumn, String noteColumn,
-                                         int minRecordNumber, int maxRecordNumber, int batchSize) {
-        this(driver, url, username, password, query, idColumn, noteColumn, minRecordNumber, maxRecordNumber, batchSize, 0);
+                dataQueryInformation.getNoteColumn(), minRecordNumber, maxRecordNumber, batchSize);
     }
 
     /**
@@ -165,19 +129,53 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
      * @param minRecordNumber starting row number for record retrieval.
      * @param maxRecordNumber ending row number for record retrieval.
      * @param batchSize size of each batch to retrieve at a time.  Optimal size will vary with the database environment.
-     * @param randomBatches number of random batches to execute, rather then accessing the data sequentially.  Setting
-     *                      this parameter to a value less than one will cause the reader to produce no random batches.
      */
     public BatchDatabaseCollectionReader(String driver, String url, String username, String password, String query,
                                          String idColumn, String noteColumn,
-                                         int minRecordNumber, int maxRecordNumber, int batchSize, int randomBatches) {
+                                         int minRecordNumber, int maxRecordNumber, int batchSize) {
         super(driver, url, username, password, query, idColumn, noteColumn);
         validateParams(minRecordNumber, maxRecordNumber, batchSize);
         this.minRecordNumber = minRecordNumber;
         this.maxRecordNumber = maxRecordNumber;
         this.batchSize = batchSize;
-        this.randomBatches = randomBatches;
         this.baseQuery = this.query;
+    }
+
+    //TODO Add comments to getters and setters for this and the SQLServerPagedDatabaseCollectionReader
+    public int getMinRecordNumber() {
+        return minRecordNumber;
+    }
+
+    public BatchDatabaseCollectionReader setMinRecordNumber(int minRecordNumber) {
+        this.minRecordNumber = minRecordNumber;
+        return this;
+    }
+
+    public int getMaxRecordNumber() {
+        return maxRecordNumber;
+    }
+
+    public BatchDatabaseCollectionReader setMaxRecordNumber(int maxRecordNumber) {
+        this.maxRecordNumber = maxRecordNumber;
+        return this;
+    }
+
+    public int getBatchSize() {
+        return batchSize;
+    }
+
+    public BatchDatabaseCollectionReader setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+        return this;
+    }
+
+    public int getRandomBatches() {
+        return randomBatches;
+    }
+
+    public BatchDatabaseCollectionReader setRandomBatches(int randomBatches) {
+        this.randomBatches = randomBatches;
+        return this;
     }
 
     /**
@@ -207,12 +205,6 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
     @Override
     public void initialize() throws ResourceInitializationException {
         super.initialize();
-        this.minRecordNumber = (Integer) getConfigParameterValue(Param.MINIMUM_RECORD_NUMBER.getName());
-        this.maxRecordNumber = (Integer) getConfigParameterValue(Param.MAXIMUM_RECORD_NUMBER.getName());
-        this.batchSize = (Integer) getConfigParameterValue(Param.BATCH_SIZE.getName());
-        if(getConfigParameterValue(Param.RANDOM_BATCHES.getName()) != null) {
-            this.randomBatches = (Integer) getConfigParameterValue(Param.RANDOM_BATCHES.getName());
-        }
         //Calculate the total number of batches
         int length = (this.maxRecordNumber - this.minRecordNumber);
         if(length < 0) {
@@ -285,52 +277,4 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
         return this.baseQuery.replaceAll("\\{min\\}", "" + startRecord).replaceAll("\\{max\\}", "" + endRecord);
     }
 
-    /**
-     * Generate the UIMA Collection reader with resources.
-     *
-     * @return a uima collection reader.
-     * @throws org.apache.uima.resource.ResourceInitializationException
-     */
-    @Override
-    public CollectionReader produceCollectionReader() throws ResourceInitializationException {
-        Map<String, Object> parameterValues = produceBaseDatabaseCollectionReaderParams();
-        parameterValues.put(Param.QUERY.getName(), query);
-        parameterValues.put(Param.ID_COLUMN.getName(), idColumn);
-        parameterValues.put(Param.NOTE_COLUMN.getName(), noteColumn);
-        parameterValues.put(Param.MINIMUM_RECORD_NUMBER.getName(), minRecordNumber);
-        parameterValues.put(Param.MAXIMUM_RECORD_NUMBER.getName(), maxRecordNumber);
-        parameterValues.put(Param.BATCH_SIZE.getName(), batchSize);
-        parameterValues.put(Param.RANDOM_BATCHES.getName(), randomBatches);
-        return produceCollectionReader(LeoUtils.getStaticConfigurationParameters(Param.class), parameterValues);
-    }
-
-    /**
-     * Static inner class for holding parameters information.
-     */
-    public static class Param extends DatabaseCollectionReader.Param {
-        /**
-         * Minimum record ID.
-         */
-        public static ConfigurationParameter MINIMUM_RECORD_NUMBER =
-                new ConfigurationParameterImpl("MinimumRecordNumber", "Minimum record id",
-                        ConfigurationParameter.TYPE_INTEGER, true, false, new String[] {} );
-        /**
-         * Maximum record ID.
-         */
-        public static ConfigurationParameter MAXIMUM_RECORD_NUMBER =
-                new ConfigurationParameterImpl("MaximumRecordNumber", "Maximum record id",
-                        ConfigurationParameter.TYPE_INTEGER, true, false, new String[] {} );
-        /**
-         * Number of records to retrieve in each batch.
-         */
-        public static ConfigurationParameter BATCH_SIZE =
-                new ConfigurationParameterImpl("BatchSize", "Number of records to retrieve in each batch",
-                        ConfigurationParameter.TYPE_INTEGER, true, false, new String[] {} );
-        /**
-         * Number of random batches to pull from the total set.
-         */
-        public static ConfigurationParameter RANDOM_BATCHES =
-                new ConfigurationParameterImpl("RandomBatches", "Number of random batches to pull from the total set",
-                        ConfigurationParameter.TYPE_INTEGER, false, false, new String[] {});
-    }
 }

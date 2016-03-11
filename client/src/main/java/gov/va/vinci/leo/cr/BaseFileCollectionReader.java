@@ -24,10 +24,12 @@ package gov.va.vinci.leo.cr;
  */
 
 import com.google.gson.Gson;
+import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.tools.LeoUtils;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionException;
@@ -54,16 +56,38 @@ import java.util.Map;
  * @author thomasginter
  */
 public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
+
     /**
-     * Input Directory File object to be searched for available files.
+     * Path to the input directory.  This variable is used to pass the value from the reader object to the CollectionReader
+     * descriptor for initialization.  The mInDir will be created from this path.
      */
-    protected File mInDir = null;
+    @LeoConfigurationParameter(description = "Path to the input directory", mandatory = true)
+    protected String inputDirectoryPath = null;
 
     /**
      * Recurse flag we will search recursively in sub-directories if true.
      * Defaults to false.
      */
+    @LeoConfigurationParameter(description = "If true then recurse in subdirectories, defaults to false.")
     protected boolean mRecurse = false;
+
+    /**
+     * Encoding type for the files being read in. Defaults to system default.
+     */
+    @LeoConfigurationParameter
+    protected String mEncoding = null;
+
+    /**
+     * JSON representation of the filename filter used to pass this object to the CollectionReader descriptor for
+     * initialization.
+     */
+    @LeoConfigurationParameter(description = "JSON representation of the filename filter.")
+    protected String fileNameFilterJSON = null;
+
+    /**
+     * Input Directory File object to be searched for available files.
+     */
+    protected File mInDir = null;
 
     /**
      * Index of the next file to be processed.
@@ -76,31 +100,9 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
     protected ArrayList<File> mFileCollection = new ArrayList<File>();
 
     /**
-     * Encoding type for the files being read in. Defaults to system default.
-     */
-    protected String mEncoding = null;
-
-    /**
      * Filters out the files found by filename extension.
      */
     protected FilenameFilter filenameFilter = null;
-
-    /**
-     * Name of the input Directory Parameter.
-     */
-    public final static String inputDirectoryParam = "inputDirectory";
-    /**
-     * Name of the recurse flag Parameter.
-     */
-    public final static String recurseParam = "find_recurse";
-    /**
-     * Name of the encoding parameter.
-     */
-    public final static String encodingParam = "encoding";
-    /**
-     * One or more file name extensions for filtering input files.
-     */
-    public final static String filterParam = "fileExtensionsFilter";
 
     /**
      * Logger for class.
@@ -122,41 +124,12 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
      * @param recurse        Recurse flag will descend into subdirectories if true, defaults to false.
      */
     public BaseFileCollectionReader(File inputDirectory, boolean recurse) {
-        this(inputDirectory, recurse, null);
-    }//Constructor with inputDirectory and recurse flag input params
-
-    /**
-     * Initialize with the input directory to be searched, recurse flag for parsing into subdirectories,
-     * and file name filter to be used.
-     *
-     * @param inputDirectory Input directory to be searched
-     * @param recurse        Recurse flag will descend into subdirectories if true, defaults to false
-     * @param filter         FileName extention filter to use, if null defaults to <code>.txt</code>
-     */
-    public BaseFileCollectionReader(File inputDirectory, boolean recurse, SuffixFileFilter filter) {
-        this(inputDirectory, null, recurse, filter);
-    }
-
-    /**
-     * Initialize with the input directory to be searched, recurse flag for parsing into subdirectories,
-     * and file name filter to be used.
-     *
-     * @param inputDirectory Input directory to be searched
-     * @param encoding       Encoding format to use when reading in the data
-     * @param recurse        Recurse flag will descend into subdirectories if true, defaults to false
-     * @param filter         FileName extention filter to use, if null defaults to <code>.txt</code>
-     */
-    public BaseFileCollectionReader(File inputDirectory, String encoding,  boolean recurse, SuffixFileFilter filter) {
         if (inputDirectory == null || !inputDirectory.isDirectory()) {
             throw new IllegalArgumentException("Input Directory must not be null, and must point to an existing directory. ('" + inputDirectory + "')");
         }
-
-        filenameFilter = filter;
-        setInputDirectory(inputDirectory);
-        setRecurseFlag(recurse);
-        mFileIndex = 0;
-        this.mEncoding = encoding;
-    }
+        this.setInputDirectory(inputDirectory);
+        this.mRecurse = recurse;
+    }//Constructor with inputDirectory and recurse flag input params
 
     /**
      * This method is called during initialization, and does nothing by default. Subclasses should override it to perform one-time startup logic.
@@ -164,32 +137,80 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
     @Override
     public void initialize() throws ResourceInitializationException {
         super.initialize();
-        mInDir = new File((String)getConfigParameterValue(inputDirectoryParam));
 
-        if (getConfigParameterValue(recurseParam) != null) {
-            Boolean tmpValue = (Boolean) getConfigParameterValue(recurseParam);
-            if (tmpValue) {
-                mRecurse = true;
-            }//if tmpValue == TRUE
-        }//if recurseParam
+        mInDir = new File(inputDirectoryPath);
+        if(mInDir == null || !mInDir.exists() || !mInDir.isDirectory())
+            throw new ResourceInitializationException("Input Directory does not exist or is not a directory!", null);
 
-        if (getConfigParameterValue(encodingParam) != null) {
-            mEncoding = (String) getConfigParameterValue(encodingParam);
-        } else {
-            mEncoding = Charset.defaultCharset().displayName();
-        }
+        if(StringUtils.isNotBlank(fileNameFilterJSON))
+            filenameFilter = new Gson().fromJson(fileNameFilterJSON, FilenameFilter.class);
 
-        if (getConfigParameterValue(filterParam) != null) {
-            filenameFilter = new Gson().fromJson((String) getConfigParameterValue(filterParam), SuffixFileFilter.class);
-        }
-
-        //Initialize the collection
-        if (mInDir != null) {
-            findFiles(mInDir);
-        }//if mInDir != null
-
+        findFiles(mInDir);
         mFileIndex = 0;
     }//initialize method
+
+    /**
+     * Return the encoding format that this CollectionReader will use for the source data.
+     *
+     * @return encoding format String.
+     */
+    public String getEncoding() {
+        return mEncoding;
+    }
+
+    /**
+     * Set the file encoding from the encoding string provided.  Determines the kind of encoding to use when reading in
+     * source data.
+     *
+     * @param encoding encoding format to use.
+     */
+    public <T> T setEncoding(String encoding) {
+        this.mEncoding = encoding;
+        return (T) this;
+    }
+
+    /**
+     * Return the input directory this reader will search for files.
+     *
+     * @return File object pointing to the input directory
+     */
+    public File getInputDirectory() {
+        return mInDir;
+    }
+
+    /**
+     * Set the inputDirectory for this FileSubReader object.
+     *
+     * @param inputDirectory the input directory to load files from.
+     */
+    public <T> T setInputDirectory(File inputDirectory) {
+        this.mInDir = inputDirectory;
+        this.inputDirectoryPath = mInDir.getAbsolutePath();
+        return (T) this;
+    }//setInputDirectory method
+
+    /**
+     * Get the filename filter that will be used to filter files found in the input directory.
+     *
+     * @return FilenameFilter
+     */
+    public FilenameFilter getFilenameFilter() {
+        return filenameFilter;
+    }
+
+    /**
+     * Set the FilenameFilter that this object will use to filter the files found in the input directory.
+     *
+     * @param filenameFilter FilenameFilter
+     * @param <T> Type of the reader instance to return
+     * @return reference to this reader instance
+     */
+    public <T> T setFilenameFilter(FilenameFilter filenameFilter) {
+        this.filenameFilter = filenameFilter;
+        if(filenameFilter != null)
+            this.fileNameFilterJSON = new Gson().toJson(filenameFilter);
+        return (T) this;
+    }
 
     /**
      * Find the list of files that meet the requirements.
@@ -220,15 +241,6 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
             }//else if mRecurse
         }//for
     }//findFiles method
-
-    /**
-     * Set the inputDirectory for this FileSubReader object.
-     *
-     * @param inputDirectory the input directory to load files from.
-     */
-    public void setInputDirectory(File inputDirectory) {
-        mInDir = inputDirectory;
-    }//setInputDirectory method
 
     /**
      * Set the recurse flag for this property.  The recurse flag controls whether or not this
@@ -265,6 +277,7 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
      * @throws org.apache.uima.collection.CollectionException if retrieval of the next file fails
      */
     public boolean hasNext() throws IOException, CollectionException {
+        LOG.debug("Progress: " + mFileIndex + " of " + mFileCollection.size());
         return (mFileIndex < mFileCollection.size());
     }//hasNext method
 
@@ -288,73 +301,4 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
                 Progress.ENTITIES)};
     }//getProgress method
 
-    /**
-     * Return the encoding format that this CollectionReader will use for the source data.
-     *
-     * @return encoding format String.
-     */
-    public String getEncoding() {
-        return mEncoding;
-    }
-
-    /**
-     * Set the file encoding from the encoding string provided.  Determines the kind of encoding to use when reading in
-     * source data.
-     *
-     * @param encoding encoding format to use.
-     */
-    public void setEncoding(String encoding) {
-        this.mEncoding = encoding;
-    }
-
-    /**
-     * Create a map of parameter names and values from the parameters in the static inner Param class as well as class
-     * field variables.  Then return a CollectionReader which has been initialized by the framework using the
-     * parameter settings provided.
-     *
-     * @return CollectionReader object.
-     * @throws ResourceInitializationException if there is an error initializing the CollectionReader.
-     */
-    public CollectionReader produceCollectionReader() throws ResourceInitializationException {
-        Map<String, Object> parameterValues = new HashMap<String, Object>();
-        parameterValues.put(Param.ENCODING.getName(), mEncoding);
-        if (filenameFilter != null) {
-            parameterValues.put(Param.FILE_EXTENSIONS_FILTER.getName(), new Gson().toJson(filenameFilter));
-        }
-        parameterValues.put(Param.FIND_RECURSE.getName(), mRecurse);
-        parameterValues.put(Param.INPUT_DIRECTORY.getName(), mInDir.getAbsolutePath());
-        return produceCollectionReader(LeoUtils.getStaticConfigurationParameters(Param.class), parameterValues);
-    }
-
-    /**
-     * Static inner class for holding parameter information.
-     */
-    public static class Param extends BaseLeoCollectionReader.Param {
-        /**
-         * Input directory to read from.
-         */
-        public static ConfigurationParameter INPUT_DIRECTORY =
-                new ConfigurationParameterImpl("inputDirectory", "The directory to use for reading in files",
-                        ConfigurationParameter.TYPE_STRING, true, false, new String[] {});
-        /**
-         * Determine if inputDirectory is searched resursively or not.
-         */
-        public static ConfigurationParameter FIND_RECURSE =
-                new ConfigurationParameterImpl("find_recurse", "If true, the directory is recursively searched.",
-                        ConfigurationParameter.TYPE_BOOLEAN, false, false, new String[] {});
-
-        /**
-         * The document encoding. (ie UTF-8)
-         */
-        public static ConfigurationParameter ENCODING =
-                new ConfigurationParameterImpl("encoding", "The text encoding used in the file.",
-                        ConfigurationParameter.TYPE_STRING, false, false, new String[] {});
-
-        /**
-         * A file extension filter to only return documents matching a certain file extension.
-         */
-        public static ConfigurationParameter FILE_EXTENSIONS_FILTER =
-            new ConfigurationParameterImpl("fileExtensionsFilter", "A file extension filter to only return documents matching a certain file extension.",
-                    ConfigurationParameter.TYPE_STRING, false, false, new String[] {});
-    }
 }//FileSubReader class
