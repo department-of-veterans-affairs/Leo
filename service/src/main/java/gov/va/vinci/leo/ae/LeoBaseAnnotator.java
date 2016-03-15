@@ -193,56 +193,9 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     @Override
     public void initialize(UimaContext aContext)
             throws ResourceInitializationException {
-        try {
-            initialize(aContext, ConfigurationParameterUtils.getParams(this.getClass()));
-        } catch (Exception e) {
-            throw new ResourceInitializationException(e);
-        }
-    }// initialize method
-
-    /**
-     * Initialize this annotator.
-     *
-     * @param aContext the UimaContext to initialize with.
-     * @param params the annotator params to load from the descriptor.
-     *
-     * @see org.apache.uima.analysis_component.JCasAnnotator_ImplBase#initialize(org.apache.uima.UimaContext)
-     * @param aContext
-     * @param params
-     * @throws ResourceInitializationException  if any exception occurs during initialization.
-     */
-    public void initialize(UimaContext aContext, ConfigurationParameter[] params)
-            throws ResourceInitializationException {
         super.initialize(aContext);
-
-        if (params != null) {
-            for (ConfigurationParameter param : params) {
-                if (param.isMandatory()) {
-                    /** Check for null value **/
-                    if (aContext.getConfigParameterValue(param.getName()) == null) {
-                        throw new ResourceInitializationException(new IllegalArgumentException("Required parameter: " + param.getName() + " not set."));
-                    }
-                    /** Check for empty as well if it is a plain string. */
-                    if (    ConfigurationParameter.TYPE_STRING.equals(param.getType()) &&
-                            !param.isMultiValued() &&
-                            GenericValidator.isBlankOrNull((String) aContext.getConfigParameterValue(param.getName()))) {
-                        throw new ResourceInitializationException(new IllegalArgumentException("Required parameter: " + param.getName() + " cannot be blank."));
-                    }
-                }
-
-                /** Set the parameter value in the class field variable **/
-                try {
-                    Field field = FieldUtils.getField(this.getClass(), param.getName(), true);
-                    if(field != null) {
-                        FieldUtils.writeField(field, this, aContext.getConfigParameterValue(param.getName()), true);
-                    }
-                } catch (IllegalAccessException e) {
-                    logger.warn("Could not set field (" + param.getName() + "). Field not found on annotator class to reflectively set.");
-                }
-            }
-        }
+        ConfigurationParameterUtils.initParameterValues(this, aContext);
     }// initialize method
-
 
     /**
      * Gets a resource as an input stream.
@@ -456,7 +409,7 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
         descriptor.setNumberOfInstances(this.numInstances);
         descriptor.setTypeSystemDescription(getLeoTypeSystemDescription());
         //Add and set parameter values based on the map for this object
-        Map<ConfigurationParameterImpl, Object> parameterMap = ConfigurationParameterUtils.getParamsToValuesMap(this);
+        Map<ConfigurationParameterImpl, ?> parameterMap = ConfigurationParameterUtils.getParamsToValuesMap(this);
         for(ConfigurationParameterImpl parameter : parameterMap.keySet()) {
             descriptor.addParameterSetting(
                     parameter.getName(),

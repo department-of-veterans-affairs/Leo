@@ -1,6 +1,8 @@
 package gov.va.vinci.leo.cr;
 
+import gov.va.vinci.leo.descriptors.ConfigurationParameterUtils;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
+import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import gov.va.vinci.leo.tools.TextFilter;
 import gov.va.vinci.leo.types.TypeLibrarian;
 import org.apache.commons.io.FileUtils;
@@ -24,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * This is a file reader that generates a descriptor file for testing importing external readers from descriptors.
+ *
  * User: Thomas Ginter
  * Date: 10/31/14
  * Time: 13:03
@@ -43,80 +47,57 @@ public class ExternalFileCollectionReader extends FileCollectionReader {
      *
      * @param inputDirectory Path to the input directory to be read.
      * @param recurse        If true then recursively search sub-directories for files to process.
-     * @param filterList
      */
-    public ExternalFileCollectionReader(File descriptor, File inputDirectory, boolean recurse, TextFilter... filterList) {
-        super(inputDirectory, recurse, filterList);
+    public ExternalFileCollectionReader(File descriptor, File inputDirectory, boolean recurse) {
+        super(inputDirectory, recurse);
         this.descriptor = descriptor;
     }
 
-    /**
-     * Constructor that takes an input directory path and recurse flag as inputs.
-     *
-     * @param inputDirectory Path to the input directory to be read.
-     * @param recurse        If true then recursively search sub-directories for files to process.
-     * @param fileExtension  The file extension to limit to, ie = ".txt" or ".doc"
-     * @param filterList
-     */
-    public ExternalFileCollectionReader(File descriptor, File inputDirectory, boolean recurse, SuffixFileFilter fileExtension, TextFilter... filterList) {
-        super(inputDirectory, recurse, fileExtension, filterList);
-        this.descriptor = descriptor;
-    }
-
-    /**
-     * Constructor that takes an input directory path and recurse flag as inputs.
-     *
-     * @param inputDirectory Path to the input directory to be read.
-     * @param encoding
-     * @param recurse        If true then recursively search sub-directories for files to process.
-     * @param fileExtension  The file extension to limit to, ie = ".txt" or ".doc"
-     * @param filterList
-     */
-    public ExternalFileCollectionReader(File descriptor, File inputDirectory, String encoding, boolean recurse, SuffixFileFilter fileExtension, TextFilter... filterList) {
-        super(inputDirectory, encoding, recurse, fileExtension, filterList);
-        this.descriptor = descriptor;
-    }
-
-    protected CollectionReader produceCollectionReader( Set<ConfigurationParameter> configurationParameters, Map<String, ?> parameterValues) throws ResourceInitializationException {
-        //creating a blank CollectionReaderDescription object
+    @Override
+    public CollectionReader produceCollectionReader() throws ResourceInitializationException {
         CollectionReaderDescription crDesc = new CollectionReaderDescription_impl();
-        //setting the meta-data for the SuperReaderDescription
+
+        //Set the initial metadata for the descriptor
         crDesc.setFrameworkImplementation(Constants.JAVA_FRAMEWORK_NAME);
-        String implementationName= this.getClass().getCanonicalName();
-        crDesc.setImplementationName(implementationName);
+        crDesc.setImplementationName(this.getClass().getCanonicalName());
         ProcessingResourceMetaData md = crDesc.getCollectionReaderMetaData();
         md.setName(this.getClass().getCanonicalName());
-        md.setDescription("Descriptor for " + implementationName + " collection reader");
+        md.setDescription("Descriptor for " + this.getClass().getCanonicalName() + " collection reader");
         md.setVersion("1.0");
-
-        LeoTypeSystemDescription desc = new LeoTypeSystemDescription(TypeLibrarian.getCSITypeSystemDescription());
-        md.setTypeSystem(desc.getTypeSystemDescription());
-
-        md.getConfigurationParameterDeclarations().setConfigurationParameters(configurationParameters.toArray(new ConfigurationParameter[configurationParameters.size()]));
+        md.setTypeSystem(new LeoTypeSystemDescription(TypeLibrarian.getCSITypeSystemDescription()).getTypeSystemDescription());
 
         //setting the OperationalProperties
         OperationalProperties opProps = new OperationalProperties_impl();
         opProps.setModifiesCas(true);
         opProps.setMultipleDeploymentAllowed(false);
         opProps.setOutputsNewCASes(true);
-
         md.setOperationalProperties(opProps);
+
+        //Get the configuration parameters map
+        Map<ConfigurationParameterImpl, ?> configMap = ConfigurationParameterUtils.getParamsToValuesMap(this);
+
+        //Add the configuration parameter settings
+        md.getConfigurationParameterDeclarations().setConfigurationParameters(configMap.keySet().toArray(new ConfigurationParameter[configMap.size()]));
+
+        //Set the parameter values
         ConfigurationParameterSettings confSettings = crDesc.getMetaData().getConfigurationParameterSettings();
-
-        for (String key : parameterValues.keySet()) {
-            confSettings.setParameterValue(key, parameterValues.get(key));
-
+        for(ConfigurationParameterImpl parameter : configMap.keySet()) {
+            if(configMap.get(parameter) != null)
+                confSettings.setParameterValue(parameter.getName(), configMap.get(parameter));
         }
-
-        //resetting the parameters in the description
         crDesc.getMetaData().getConfigurationParameterSettings().setParameterSettings(confSettings.getParameterSettings());
-        try {
-            crDesc.toXML(FileUtils.openOutputStream(descriptor));
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        //Write the descriptor out to a file
+        if(descriptor != null) {
+            try {
+                crDesc.toXML(FileUtils.openOutputStream(descriptor));
+            } catch (Exception e) {
+                throw new ResourceInitializationException(e);
+            }
         }
-        return UIMAFramework.produceCollectionReader(crDesc);       //creating a CollectionReader object with the new parameters set.
+
+        //Return the generated CollectionReader
+        return UIMAFramework.produceCollectionReader(crDesc);
     }
+
 }

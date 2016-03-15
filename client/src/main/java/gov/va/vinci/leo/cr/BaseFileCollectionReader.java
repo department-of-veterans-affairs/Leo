@@ -27,6 +27,7 @@ import com.google.gson.Gson;
 import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.tools.LeoUtils;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
+import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionException;
 import org.apache.uima.collection.CollectionReader;
+import org.apache.uima.pear.util.StringUtil;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.util.Progress;
@@ -83,6 +85,12 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
      */
     @LeoConfigurationParameter(description = "JSON representation of the filename filter.")
     protected String fileNameFilterJSON = null;
+
+    /**
+     * Class name of the file name filter this reader is using.
+     */
+    @LeoConfigurationParameter(description = "Cannonical name of the filename filter")
+    protected String fileNameFilterName = null;
 
     /**
      * Input Directory File object to be searched for available files.
@@ -142,8 +150,14 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
         if(mInDir == null || !mInDir.exists() || !mInDir.isDirectory())
             throw new ResourceInitializationException("Input Directory does not exist or is not a directory!", null);
 
-        if(StringUtils.isNotBlank(fileNameFilterJSON))
-            filenameFilter = new Gson().fromJson(fileNameFilterJSON, FilenameFilter.class);
+        if(StringUtils.isNotBlank(fileNameFilterJSON) && StringUtils.isNotBlank(fileNameFilterName)) {
+            try {
+                Class<?> filterClass = Class.forName(fileNameFilterName);
+                filenameFilter = new Gson().fromJson(fileNameFilterJSON, (Class<? extends AbstractFileFilter>) filterClass);
+            } catch (ClassNotFoundException e) {
+                throw new ResourceInitializationException(e);
+            }
+        }
 
         findFiles(mInDir);
         mFileIndex = 0;
@@ -207,8 +221,10 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
      */
     public <T> T setFilenameFilter(FilenameFilter filenameFilter) {
         this.filenameFilter = filenameFilter;
-        if(filenameFilter != null)
+        if(filenameFilter != null) {
             this.fileNameFilterJSON = new Gson().toJson(filenameFilter);
+            this.fileNameFilterName = filenameFilter.getClass().getCanonicalName();
+        }
         return (T) this;
     }
 

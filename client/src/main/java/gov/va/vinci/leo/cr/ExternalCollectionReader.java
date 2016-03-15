@@ -53,18 +53,6 @@ public class ExternalCollectionReader implements LeoCollectionReaderInterface {
     }
 
     /**
-     * Set the reader from the CollectionReader referenced in the File object specified.
-     *
-     * @param collectionReaderDescriptor CollectionReader descriptor to use.
-     * @throws IOException if there is an error reading the descriptor.
-     * @throws InvalidXMLException if there is an error in the XML of the descriptor.
-     * @throws ResourceInitializationException if the CollectionReader cannot be initialized by the framework.
-     */
-    public ExternalCollectionReader(File collectionReaderDescriptor) throws IOException, InvalidXMLException, ResourceInitializationException {
-        setCollectionReader(collectionReaderDescriptor);
-    }
-
-    /**
      * Set the reader from the path to the descriptor.  The path should be preceded by file: or classpath: to distinguish
      * between explicit file system paths and classpath resources.
      *
@@ -74,22 +62,19 @@ public class ExternalCollectionReader implements LeoCollectionReaderInterface {
      * @throws InvalidXMLException if the CollectionReader cannot be initialized by the framework.
      */
     public ExternalCollectionReader(String collectionReaderDescriptorPath) throws ResourceInitializationException, IOException, InvalidXMLException {
-        setCollectionReader(collectionReaderDescriptorPath);
+        this(new File(collectionReaderDescriptorPath));
     }
 
     /**
-     * Load a resource object from the path to the CollectionReader descriptor then use the framework to initialize the reader.
+     * Set the reader from the CollectionReader referenced in the File object specified.
      *
-     * @param collectionReaderDescriptor Path to the CollectionReader descriptor.
-     * @throws ResourceInitializationException if there is an error reading the descriptor.
-     * @throws IOException if there is an error in the XML of the descriptor.
-     * @throws InvalidXMLException if the CollectionReader cannot be initialized by the framework.
+     * @param collectionReaderDescriptor CollectionReader descriptor to use.
+     * @throws IOException if there is an error reading the descriptor.
+     * @throws InvalidXMLException if there is an error in the XML of the descriptor.
+     * @throws ResourceInitializationException if the CollectionReader cannot be initialized by the framework.
      */
-    private void setCollectionReader(String collectionReaderDescriptor) throws IOException, InvalidXMLException, ResourceInitializationException {
-        ClassLoader cl = ClassLoader.getSystemClassLoader();
-        DefaultResourceLoader loader = new DefaultResourceLoader(cl);
-        Resource resource = loader.getResource(collectionReaderDescriptor);
-        setCollectionReader(resource.getFile());
+    public ExternalCollectionReader(File collectionReaderDescriptor) throws IOException, InvalidXMLException, ResourceInitializationException {
+        setCollectionReader(collectionReaderDescriptor);
     }
 
     /**

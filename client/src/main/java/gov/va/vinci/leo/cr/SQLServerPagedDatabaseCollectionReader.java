@@ -182,28 +182,61 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
         this.maxOffset = maxOffset;
     }
 
+    /**
+     * Get the page size.
+     *
+     * @return page size
+     */
     public int getPageSize() {
         return pageSize;
     }
 
+    /**
+     * Set the page size.
+     *
+     * @param pageSize page size
+     * @return reference to this reader instance
+     */
     public SQLServerPagedDatabaseCollectionReader setPageSize(int pageSize) {
         this.pageSize = pageSize;
         return this;
     }
 
+    /**
+     * Get the first row offset.
+     *
+     * @return first offset
+     */
     public int getFirstOffset() {
         return firstOffset;
     }
 
+    /**
+     * Set the first row offset.
+     *
+     * @param firstOffset first row offset
+     * @return reference to this reader instance
+     */
     public SQLServerPagedDatabaseCollectionReader setFirstOffset(int firstOffset) {
         this.firstOffset = firstOffset;
         return this;
     }
 
+    /**
+     * Get the max offset.
+     *
+     * @return max offset
+     */
     public int getMaxOffset() {
         return maxOffset;
     }
 
+    /**
+     * Set the max offset.
+     *
+     * @param maxOffset max offset
+     * @return reference to this reader instance
+     */
     public SQLServerPagedDatabaseCollectionReader setMaxOffset(int maxOffset) {
         this.maxOffset = maxOffset;
         return this;

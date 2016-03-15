@@ -141,38 +141,81 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
         this.baseQuery = this.query;
     }
 
-    //TODO Add comments to getters and setters for this and the SQLServerPagedDatabaseCollectionReader
+    /**
+     * Return the minumum row number.
+     *
+     * @return minimum row number
+     */
     public int getMinRecordNumber() {
         return minRecordNumber;
     }
 
+    /**
+     * Set the minimum row number.
+     *
+     * @param minRecordNumber minimum row number
+     * @return reference to this reader instance
+     */
     public BatchDatabaseCollectionReader setMinRecordNumber(int minRecordNumber) {
         this.minRecordNumber = minRecordNumber;
         return this;
     }
 
+    /**
+     * Return the maximum row number.
+     *
+     * @return maximum row number
+     */
     public int getMaxRecordNumber() {
         return maxRecordNumber;
     }
 
+    /**
+     * Set the maximum row number.
+     *
+     * @param maxRecordNumber max row number
+     * @return reference to this reader instance
+     */
     public BatchDatabaseCollectionReader setMaxRecordNumber(int maxRecordNumber) {
         this.maxRecordNumber = maxRecordNumber;
         return this;
     }
 
+    /**
+     * Get the batch size.
+     *
+     * @return batch size
+     */
     public int getBatchSize() {
         return batchSize;
     }
 
+    /**
+     * Set the batch size.
+     *
+     * @param batchSize batch size
+     * @return reference to this reader instance
+     */
     public BatchDatabaseCollectionReader setBatchSize(int batchSize) {
         this.batchSize = batchSize;
         return this;
     }
 
+    /**
+     * Get the number of random batches, defaults to zero.
+     *
+     * @return number of random batches
+     */
     public int getRandomBatches() {
         return randomBatches;
     }
 
+    /**
+     * Set the number of random batches.
+     *
+     * @param randomBatches number of random batches
+     * @return reference to this reader instance
+     */
     public BatchDatabaseCollectionReader setRandomBatches(int randomBatches) {
         this.randomBatches = randomBatches;
         return this;

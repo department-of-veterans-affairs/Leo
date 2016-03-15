@@ -68,15 +68,10 @@ public class BatchDatabaseCollectionReaderTest {
 
     @Test
     public void testInitialization() throws Exception {
-        BatchDatabaseCollectionReader reader =
-                (BatchDatabaseCollectionReader) new BatchDatabaseCollectionReader(
-                        dbConnectionInfo,
-                        new DataQueryInformation(query, "note", "id"),
-                        0,
-                        TEST_CORPUS_SIZE,
-                        10,
-                        4)
-                        .produceCollectionReader();
+        BatchDatabaseCollectionReader reader = (BatchDatabaseCollectionReader) new BatchDatabaseCollectionReader(dbConnectionInfo,
+                    new DataQueryInformation(query, "note", "id"), 0, TEST_CORPUS_SIZE, 10)
+                    .setRandomBatches(4)
+                    .produceCollectionReader();
         assertNotNull(reader);
         assertTrue(query.equals(reader.baseQuery));
         assertTrue(reader.noteColumn.equals("note"));
@@ -89,13 +84,8 @@ public class BatchDatabaseCollectionReaderTest {
 
     @Test
     public void testBatchProcessing() throws Exception{
-        BatchDatabaseCollectionReader reader =
-                (BatchDatabaseCollectionReader) new BatchDatabaseCollectionReader(
-                        dbConnectionInfo,
-                        new DataQueryInformation(query, "note", "id"),
-                        0,
-                        TEST_CORPUS_SIZE,
-                        10)
+        BatchDatabaseCollectionReader reader = (BatchDatabaseCollectionReader) new BatchDatabaseCollectionReader(dbConnectionInfo,
+                        new DataQueryInformation(query, "note", "id"), 0, TEST_CORPUS_SIZE, 10)
                         .produceCollectionReader();
         assertNotNull(reader);
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(

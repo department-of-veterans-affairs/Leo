@@ -47,6 +47,7 @@ import org.apache.uima.resource.metadata.ConfigurationParameterSettings;
 import org.apache.uima.resource.metadata.OperationalProperties;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.resource.metadata.impl.OperationalProperties_impl;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.*;
@@ -83,6 +84,9 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
     @Override
     public void initialize() throws ResourceInitializationException {
         super.initialize();
+
+        ConfigurationParameterUtils.initParameterValues(this, null);
+
         this.addFilters(new XmlFilter());
         try {
             this.addFilters(textFilters);
@@ -146,10 +150,14 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
     public <T> T addFilters(TextFilter... textFilters) {
         if (textFilters == null) return (T) this;
         if (filters == null) filters = new ArrayList<TextFilter>();
-        //Add each filters to the list
+        ArrayList<String> filterNames = new ArrayList<>(textFilters.length);
+        //Add filters to the list
         filters.addAll(Arrays.asList(textFilters));
+        for(TextFilter filter : filters) {
+            filterNames.add(filter.getClass().getCanonicalName());
+        }
         //reset the text names
-        this.textFilters = (String[]) filters.toArray();
+        this.textFilters = filterNames.toArray(new String[filterNames.size()]);
         return (T) this;
     }//setFilters method
 
@@ -191,7 +199,7 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
         md.setOperationalProperties(opProps);
 
         //Get the configuration parameters map
-        Map<ConfigurationParameterImpl, Object> configMap = ConfigurationParameterUtils.getParamsToValuesMap(this);
+        Map<ConfigurationParameterImpl, ?> configMap = ConfigurationParameterUtils.getParamsToValuesMap(this);
 
         //Add the configuration parameter settings
         md.getConfigurationParameterDeclarations().setConfigurationParameters(configMap.keySet().toArray(new ConfigurationParameter[configMap.size()]));
@@ -199,7 +207,8 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
         //Set the parameter values
         ConfigurationParameterSettings confSettings = crDesc.getMetaData().getConfigurationParameterSettings();
         for(ConfigurationParameterImpl parameter : configMap.keySet()) {
-            confSettings.setParameterValue(parameter.getName(), configMap.get(parameter));
+            if(configMap.get(parameter) != null)
+                confSettings.setParameterValue(parameter.getName(), configMap.get(parameter));
         }
         crDesc.getMetaData().getConfigurationParameterSettings().setParameterSettings(confSettings.getParameterSettings());
 

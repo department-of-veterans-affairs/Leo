@@ -70,7 +70,7 @@ public class XmiFileCollectionReaderTest {
         assertNotNull(xmiFileSubReader);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = ResourceInitializationException.class)
     public void testBadInitialize() throws NullPointerException, IllegalAccessException, ResourceInitializationException {
         HashMap<String, String> params = new HashMap<String, String>();
         XmiFileCollectionReader xmiFileSubReader = new XmiFileCollectionReader();
@@ -79,9 +79,6 @@ public class XmiFileCollectionReaderTest {
     }
 
     public void testInitialize() throws Exception {
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put(XmiFileCollectionReader.inputDirectoryParam ,xmiTestCorpus.getCanonicalPath());
-        params.put(XmiFileCollectionReader.recurseParam ,"true");
         XmiFileCollectionReader xmiFileCollectionReader =
                 (XmiFileCollectionReader) new XmiFileCollectionReader(xmiTestCorpus, true).produceCollectionReader();
         assertNotNull(xmiFileCollectionReader);

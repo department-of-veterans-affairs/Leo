@@ -5,7 +5,11 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
+import org.apache.commons.validator.GenericValidator;
 import org.apache.log4j.Logger;
+import org.apache.uima.UimaContext;
+import org.apache.uima.collection.CollectionReader_ImplBase;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 
 import java.lang.reflect.Field;
@@ -40,7 +44,7 @@ public class ConfigurationParameterUtils {
         javaTypeToUimaType.put("int", ConfigurationParameter.TYPE_INTEGER);
     }
 
-    public static <T> Map<ConfigurationParameterImpl, Object> getParamsToValuesMap(T paramObject) {
+    public static <T> Map<ConfigurationParameterImpl, ?> getParamsToValuesMap(T paramObject) {
         Map<ConfigurationParameterImpl, Object> parameterObjectMap = new HashMap<>();
 
         try {
@@ -99,6 +103,57 @@ public class ConfigurationParameterUtils {
         }
 
         return parameterList.toArray(new ConfigurationParameterImpl[parameterList.size()]);
+    }
+
+    public static <T> void initParameterValues(T configObj, UimaContext context) throws ResourceInitializationException {
+        try {
+            ConfigurationParameterImpl[] parameters = getParams(configObj.getClass());
+            if(parameters == null) return;
+            for(ConfigurationParameterImpl parameter : parameters) {
+                /** Make sure mandatory values have been set **/
+                if(parameter.isMandatory()) {
+                    if(getParameterValue(configObj, parameter.getName(), context) == null ||
+                        (ConfigurationParameter.TYPE_STRING.equals(parameter.getType())) &&
+                            !parameter.isMultiValued() &&
+                                GenericValidator.isBlankOrNull((String) getParameterValue(configObj, parameter.getName(), context))) {
+                        throw new ResourceInitializationException(
+                                new IllegalArgumentException("Required Parameter: " + parameter.getName() + " is not set.")
+                        );
+                    }
+                }
+                /** Set the parameter value in the class field variable **/
+                try {
+                    Field field = FieldUtils.getField(configObj.getClass(), parameter.getName(), true);
+                    if(field != null) {
+                        FieldUtils.writeField(field, configObj, getParameterValue(configObj, parameter.getName(), context), true);
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new ResourceInitializationException(e);
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw new ResourceInitializationException(e);
+        }
+    }
+
+    /**
+     * Return the value set in the configuration for the parameter named.  Gets the value from the UimaContext if
+     * provided.  If configObj is a reader then gets the UimaContext from the getUimaContext method.  If no context or
+     * the parameter is not set then a null value is returned.
+     *
+     * @param configObj object whose parameter value will be discovered
+     * @param paramName name of the parameter
+     * @param context UimaContext with the parameter values
+     * @param <T> Type of the configuration Object
+     * @param <V> Type of the value that is returned
+     * @return parameter value or null
+     */
+    public static <T, V> V getParameterValue(T configObj, String paramName, UimaContext context) {
+        if(context == null && CollectionReader_ImplBase.class.isAssignableFrom(configObj.getClass()))
+            context = ((CollectionReader_ImplBase) configObj).getUimaContext();
+        if(context != null)
+            return (V) context.getConfigParameterValue(paramName);
+        return null;
     }
 
     /**
