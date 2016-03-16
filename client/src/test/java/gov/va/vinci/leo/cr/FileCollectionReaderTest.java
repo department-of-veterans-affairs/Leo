@@ -37,13 +37,13 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class FileCollectionReaderTest{
-	
-	/**
-	 * Array of File objects being processed.
-	 */
-	protected ArrayList<File> mFileCollection = null;
-	private static String RESULTS = "this is a test";
+public class FileCollectionReaderTest {
+
+    /**
+     * Array of File objects being processed.
+     */
+    protected ArrayList<File> mFileCollection = null;
+    private static String RESULTS = "this is a test";
     String rootDirectory = "";
 
 
@@ -56,30 +56,30 @@ public class FileCollectionReaderTest{
     }
 
     @Test
-	public void testEmptyConstructor() {
-		FileCollectionReader fsr = new FileCollectionReader();
-		assertNotNull(fsr);
-	}
-	
-	@Test
-	public void testConstructor(){
-		FileCollectionReader fsr = new FileCollectionReader(new File(rootDirectory + "src/test/resources/inputDirectory"),true);
-		assertNotNull(fsr);				
-	}
-	
-	@Test
-	public void testRecurseFlag() throws Exception{
-		FileCollectionReader fsr =
-                (FileCollectionReader) new FileCollectionReader(new File(rootDirectory + "src/test/resources/inputDirectory"),false)
+    public void testEmptyConstructor() {
+        FileCollectionReader fsr = new FileCollectionReader();
+        assertNotNull(fsr);
+    }
+
+    @Test
+    public void testConstructor() {
+        FileCollectionReader fsr = new FileCollectionReader(new File(rootDirectory + "src/test/resources/inputDirectory"), true);
+        assertNotNull(fsr);
+    }
+
+    @Test
+    public void testRecurseFlag() throws Exception {
+        FileCollectionReader fsr =
+                (FileCollectionReader) new FileCollectionReader(new File(rootDirectory + "src/test/resources/inputDirectory"), false)
                         .produceCollectionReader();
-		assertNotNull(fsr);
-		assertTrue(fsr.getCollectionSize() == 1);
-		FileCollectionReader fsr2 =
+        assertNotNull(fsr);
+        assertTrue(fsr.getCollectionSize() == 1);
+        FileCollectionReader fsr2 =
                 (FileCollectionReader) new FileCollectionReader(new File(rootDirectory + "src/test/resources/inputDirectory"), true)
                         .produceCollectionReader();
-		assertNotNull(fsr);
-		assertTrue(fsr2.getCollectionSize() == 2);
-	}
+        assertNotNull(fsr);
+        assertTrue(fsr2.getCollectionSize() == 2);
+    }
 
     @Test
     public void testInitialize() throws IllegalAccessException, ResourceInitializationException {
@@ -88,25 +88,25 @@ public class FileCollectionReaderTest{
                         .produceCollectionReader();
         assertEquals(1, fileCollectionReader.getCollectionSize(), 2);
     }
-	
-	@Test(expected = IllegalArgumentException.class)
-	public void testEmptyFilePathConstructor()throws Exception{
-		FileCollectionReader fsr = new FileCollectionReader(null,true);
-	}
- 
-	@Test(expected=IllegalArgumentException.class)
-	public void testBadConstructor()throws Exception{
-		FileCollectionReader fsr = new FileCollectionReader(new File(rootDirectory + "src/test/resources/badDirectory"),true);
-	}
 
-	@Test
-	public void testGetNext() throws Exception{
-		FileCollectionReader fsr =
-                (FileCollectionReader) new FileCollectionReader(new File(rootDirectory + "src/test/resources/inputDirectory"),false)
+    @Test(expected = IllegalArgumentException.class)
+    public void testEmptyFilePathConstructor() throws Exception {
+        FileCollectionReader fsr = new FileCollectionReader(null, true);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testBadConstructor() throws Exception {
+        FileCollectionReader fsr = new FileCollectionReader(new File(rootDirectory + "src/test/resources/badDirectory"), true);
+    }
+
+    @Test
+    public void testGetNext() throws Exception {
+        FileCollectionReader fsr =
+                (FileCollectionReader) new FileCollectionReader(new File(rootDirectory + "src/test/resources/inputDirectory"), false)
                         .produceCollectionReader();
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(SampleService
-                                                                        .simpleServiceDefinition()
-                                                                        .getAnalysisEngineDescription());
+                .simpleServiceDefinition()
+                .getAnalysisEngineDescription());
         CAS mockCas = ae.newCAS();
         fsr.getNext(mockCas);
         FSIterator<AnnotationFS> csiIterator = mockCas.getAnnotationIndex(mockCas.getTypeSystem().getType(CSI.class.getCanonicalName())).iterator();
@@ -118,6 +118,6 @@ public class FileCollectionReaderTest{
         assertNull(csi.getPropertiesKeys());
         assertNull(csi.getRowData());
         assertTrue(RESULTS.equals(mockCas.getDocumentText()));
-	}
+    }
 
 }

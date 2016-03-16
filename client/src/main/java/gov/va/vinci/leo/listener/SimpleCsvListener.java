@@ -23,8 +23,7 @@ package gov.va.vinci.leo.listener;
 import org.apache.uima.cas.*;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,40 +50,51 @@ public class SimpleCsvListener extends BaseCsvListener {
     protected boolean includeFeatures = false;
 
     /**
-     * Constructor that sets the initial outputFile, annotation type name for output, and includeFeatures flag.
+     * Constructor with File parameter.
      *
-     * @param outputFile      File to which the annotation information will be output.
-     * @param typeName        Name of the annotation type that will be output to the file. At least one type name is
-     *                        required.
-     * @throws java.io.IOException if there is an error writing to the file.
+     * @param file The printwriter to write to.
+     * @throws FileNotFoundException if the file is not found or can't be written to.
      */
-    public SimpleCsvListener(File outputFile, String... typeName) throws IOException {
-        this(outputFile, true, '\t', false, typeName);
+    public SimpleCsvListener(File file) throws FileNotFoundException {
+        super(file);
     }
 
     /**
-     * Constructor that sets the initial outputFile, annotation type name for output, and includeFeatures flag.
+     * Constructor with an OutputStream parameter.
      *
-     * @param outputFile      File to which the annotation information will be output.
-     * @param includeHeaders  If true, a header line will be written out first.
-     * @param delimeter       the csv delimeter (comma, tab, etc...)
-     * @param includeFeatures If true then include the features that need to be added.
-     * @param typeName        Name of the annotation type that will be output to the file. At least one type name is
-     *                        required.
-     * @throws java.io.IOException if there is an error writing to the file.
+     * @param stream The stream to write to.
      */
-    public SimpleCsvListener(File outputFile, boolean includeHeaders, char delimeter, boolean includeFeatures, String... typeName) throws IOException {
-        super(outputFile, delimeter);
+    public SimpleCsvListener(OutputStream stream) {
+        super(stream);
+    }
 
-        if (includeHeaders) {
-            this.writeHeaders();
-        }
+    /**
+     * Constructor with a Writer parameter.
+     *
+     * @param writer The writerBuilder to use for output
+     */
+    public SimpleCsvListener(Writer writer) {
+        super(writer);
+    }
 
-        if (typeName == null || typeName.length < 1) {
-            throw new IllegalArgumentException("Type name is required.");
-        }
-        this.typeNames = Arrays.asList(typeName);
+    /**
+     * Get the includeFeatures flag value, if true then include feature values in the output.
+     *
+     * @return includeFeatures flag value
+     */
+    public boolean isIncludeFeatures() {
+        return includeFeatures;
+    }
+
+    /**
+     * Set the includeFeatures flag value, if true then include feature values in the output.
+     *
+     * @param includeFeatures if true include annotation features in output
+     * @return reference to this listener instance
+     */
+    public <T extends SimpleCsvListener> T setIncludeFeatures(boolean includeFeatures) {
         this.includeFeatures = includeFeatures;
+        return (T) this;
     }
 
     @Override

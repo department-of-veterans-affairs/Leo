@@ -125,7 +125,7 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
      * @throws java.lang.IllegalAccessException if the filter class cannot be accessed
      * @throws java.lang.InstantiationException if the filter class cannot be instantiated.
      */
-    public <T> T addFilters(String...textFilters) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public <T extends BaseLeoCollectionReader> T addFilters(String...textFilters) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (textFilters == null) {
             return (T) this;
         }
@@ -147,7 +147,7 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
      *
      * @param textFilters One or more filters to be added to the list
      */
-    public <T> T addFilters(TextFilter... textFilters) {
+    public <T extends BaseLeoCollectionReader> T addFilters(TextFilter... textFilters) {
         if (textFilters == null) return (T) this;
         if (filters == null) filters = new ArrayList<TextFilter>();
         ArrayList<String> filterNames = new ArrayList<>(textFilters.length);

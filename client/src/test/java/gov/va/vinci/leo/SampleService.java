@@ -47,10 +47,10 @@ public class SampleService {
 	 * @throws Exception
 	 */
 	public static LeoAEDescriptor simpleServiceDefinition () throws Exception {
-        LeoAEDescriptor ae = new WhitespaceTokenizer().getLeoAEDescriptor()
-                .setParameterSetting("tokenOutputType", Token.class.getCanonicalName())
-                .setParameterSetting("wordOutputType", WordToken.class.getCanonicalName())
-                .setParameterSetting("tokenOutputTypeFeature", 1)
+		LeoAEDescriptor ae = new WhitespaceTokenizer().getLeoAEDescriptor()
+                .setParameterSetting(WhitespaceTokenizer.Param.TOKEN_OUTPUT_TYPE.getName(), Token.class.getCanonicalName())
+                .setParameterSetting(WhitespaceTokenizer.Param.WORD_OUTPUT_TYPE.getName(), WordToken.class.getCanonicalName())
+                .setParameterSetting(WhitespaceTokenizer.Param.TOKEN_OUTPUT_TYPE_FEATURE.getName(), "TokenType")
                 .setTypeSystemDescription(new WhitespaceTokenizer().getLeoTypeSystemDescription());
         ae.addType(TypeLibrarian.getCSITypeSystemDescription());
 		ae.setIsAsync(true);

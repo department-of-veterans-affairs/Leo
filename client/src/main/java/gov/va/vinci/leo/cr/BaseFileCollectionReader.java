@@ -178,7 +178,7 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
      *
      * @param encoding encoding format to use.
      */
-    public <T> T setEncoding(String encoding) {
+    public <T extends BaseFileCollectionReader> T setEncoding(String encoding) {
         this.mEncoding = encoding;
         return (T) this;
     }
@@ -197,7 +197,7 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
      *
      * @param inputDirectory the input directory to load files from.
      */
-    public <T> T setInputDirectory(File inputDirectory) {
+    public <T extends BaseFileCollectionReader> T setInputDirectory(File inputDirectory) {
         this.mInDir = inputDirectory;
         this.inputDirectoryPath = mInDir.getAbsolutePath();
         return (T) this;
@@ -216,10 +216,10 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
      * Set the FilenameFilter that this object will use to filter the files found in the input directory.
      *
      * @param filenameFilter FilenameFilter
-     * @param <T> Type of the reader instance to return
+     * @param <T extends BaseFileCollectionReader> Type of the reader instance to return
      * @return reference to this reader instance
      */
-    public <T> T setFilenameFilter(FilenameFilter filenameFilter) {
+    public <T extends BaseFileCollectionReader> T setFilenameFilter(FilenameFilter filenameFilter) {
         this.filenameFilter = filenameFilter;
         if(filenameFilter != null) {
             this.fileNameFilterJSON = new Gson().toJson(filenameFilter);

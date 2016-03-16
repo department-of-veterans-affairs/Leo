@@ -110,49 +110,11 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
     protected String previousReferenceId = "NONE";
 
     /**
-     * Default Constructor, defaults the exitOnError flag to false.
-     *
-     * @param filter the annotation types to filter on. If annotation types are included, sub classes can call
-     *               hasFilteredAnnotation on this class to determine if the cas has one or more of
-     *               the filter annotation types.
+     * Default Constructor.
      */
-    public BaseListener(String... filter) {
-        this.annotationTypeFilter = filter;
+    public BaseListener() {
+        /** No Initialization **/
     }// default constructor
-
-    /**
-     * Constructor that allows user to specify whether or not the
-     * entityProcessComplete method should exit when an error is received.
-     *
-     * @param isExitOnError If true then exit when an error is received from the CAS
-     *                      process complete event
-     * @param filter        the annotation types to filter on. If annotation types are included, sub classes can call
-     *                      hasFilteredAnnotation on this class to determine if the cas has one or more of
-     *                      the filter annotation types.
-     */
-    public BaseListener(boolean isExitOnError, String... filter) {
-        this(filter);
-        exitOnError = isExitOnError;
-    }// constructor
-
-    /**
-     * Set the output directory and whether or not the entityProcessComplete
-     * method should exit when an error is received.
-     *
-     * @param aOutputDir    Path to the output directory. This must be a directory.
-     * @param isExitOnError True if the entityProcessComplete event should exit when an
-     *                      error is received
-     * @param filter        the annotation types to filter on. If annotation types are included, sub classes can call
-     *                      hasFilteredAnnotation on this class to determine if the cas has one or more of
-     *                      the filter annotation types.
-     */
-    public BaseListener(File aOutputDir, boolean isExitOnError, String... filter) {
-        this(isExitOnError, filter);
-        if (aOutputDir == null || !aOutputDir.isDirectory()) {
-            throw new IllegalArgumentException("Output directory must be a directory.");
-        }
-        mOutputDir = aOutputDir;
-    }// constructor
 
     /**
      * Called once client initialization is complete.
@@ -237,6 +199,26 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
     }// collectionProcessComplete method
 
     /**
+     * Return the output directory File object for this listener.
+     *
+     * @return Output Directory File object
+     */
+    public File getOutputDir() {
+        return mOutputDir;
+    }
+
+    /**
+     * Set the output directory for this listener.
+     *
+     * @param mOutputDir output directory
+     * @return reference to this listener instance
+     */
+    public <T extends BaseListener> T setOutputDir(File mOutputDir) {
+        this.mOutputDir = mOutputDir;
+        return (T) this;
+    }
+
+    /**
      * The number of CAS objects sent to the service.
      *
      * @return number of CAS objects sent up to the service
@@ -268,8 +250,9 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
      *
      * @param exitOnError value to set.
      */
-    public void setExitOnError(boolean exitOnError) {
+    public <T extends BaseListener> T setExitOnError(boolean exitOnError) {
         this.exitOnError = exitOnError;
+        return (T) this;
     }
 
     /**
@@ -387,8 +370,9 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
      *
      * @param annotationTypeFilter  a list of annotation types. Type is the string name, ie: gov.va.vinci.uima.type.Token
      */
-    public void setAnnotationTypeFilter(String[] annotationTypeFilter) {
+    public <T extends BaseListener> T setAnnotationTypeFilter(String...annotationTypeFilter) {
         this.annotationTypeFilter = annotationTypeFilter;
+        return (T) this;
     }
 
     /**

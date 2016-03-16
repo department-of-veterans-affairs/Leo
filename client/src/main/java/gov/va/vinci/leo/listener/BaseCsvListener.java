@@ -21,6 +21,10 @@ package gov.va.vinci.leo.listener;
  */
 
 import au.com.bytecode.opencsv.CSVWriter;
+import gov.va.vinci.leo.tools.CSVWriterBuilder;
+import gov.va.vinci.leo.tools.LeoUtils;
+import org.apache.log4j.Logger;
+import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.EntityProcessStatus;
 
@@ -38,14 +42,24 @@ import java.util.List;
 public abstract class BaseCsvListener extends BaseListener {
 
     /**
-     * CSV Writer for writing data out.
+     * CSVWriterBuilder used to create the CSVWriter.
+     */
+    protected CSVWriterBuilder writerBuilder = null;
+
+    /**
+     * CSVWriter that will format and write the output.
      */
     protected CSVWriter writer = null;
 
     /**
-     * Printwriter the CSVWriter will use for output.
+     * Include a header row at the start of the output file.
      */
-    protected PrintWriter pw = null;
+    protected boolean includeHeader = false;
+
+    /**
+     * Log file handler.
+     */
+    private final static Logger LOG = Logger.getLogger(LeoUtils.getRuntimeClass().toString());
 
     /**
      * Given a cas, return one or more rows of data.
@@ -66,182 +80,167 @@ public abstract class BaseCsvListener extends BaseListener {
 
 
     /**
-     * Constructor with a Writer.
+     * Constructor with File parameter.
      *
      * @param file The printwriter to write to.
      * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
      */
     public BaseCsvListener(File file) throws FileNotFoundException {
-        pw = new PrintWriter(file);
-        writer = new CSVWriter(pw);
-    }
-
-
-    /**
-     * Constructor with a Writer, specifying a separator.
-     *
-     * @param file        The printwriter to write to.
-     * @param separator the character to use as a separator in the csv.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
-     */
-    public BaseCsvListener(File file, char separator) throws FileNotFoundException {
-        pw = new PrintWriter(file);
-        writer = new CSVWriter(pw, separator);
+        this(new PrintWriter(file));
     }
 
     /**
-     * Constructor with a Writer, specifying a separator and quote character.
-     *
-     * @param file        The printwriter to write to.
-     * @param separator the character to use as a separator in the csv.
-     * @param quotechar the character to quote values with.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
-     */
-    public BaseCsvListener(File file, char separator, char quotechar) throws FileNotFoundException {
-        pw = new PrintWriter(file);
-        writer = new CSVWriter(pw, separator, quotechar);
-    }
-
-    /**
-     * Constructor with a Writer, specifying a separator, quote character, and escape character.
-     *
-     * @param file         The printwriter to write to.
-     * @param separator  the character to use as a separator in the csv.
-     * @param quotechar  the character to quote values with.
-     * @param escapechar the character to escape quotechar in values.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
-     */
-    public BaseCsvListener(File file, char separator, char quotechar, char escapechar) throws FileNotFoundException {
-        pw = new PrintWriter(file);
-        writer = new CSVWriter(pw, separator, quotechar, escapechar);
-    }
-
-    /**
-     * Constructor with a Writer, specifying a separator, quote character, escape character, and line ending.
-     *
-     * @param file         The printwriter to write to.
-     * @param separator  the character to use as a separator in the csv.
-     * @param quotechar  the character to quote values with.
-     * @param escapechar the character to escape quotechar in values.
-     * @param lineend    the string to use as line endings.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
-     */
-    public BaseCsvListener(File file, char separator, char quotechar, char escapechar, String lineend) throws FileNotFoundException {
-        pw = new PrintWriter(file);
-        writer = new CSVWriter(pw, separator, quotechar, escapechar, lineend);
-    }
-
-
-    /**
-     * Constructor with a Writer, specifying a separator, quote character,  and line ending.
-     *
-     * @param file        The printwriter to write to.
-     * @param separator the character to use as a separator in the csv.
-     * @param quotechar the character to quote values with.
-     * @param lineend   the string to use as line endings.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
-     */
-    public BaseCsvListener(File file, char separator, char quotechar, String lineend) throws FileNotFoundException {
-        pw = new PrintWriter(file);
-        writer = new CSVWriter(pw, separator, quotechar, lineend);
-    }
-
-
-    /**
-     * Constructor with a Writer.
+     * Constructor with an OutputStream parameter.
      *
      * @param stream The stream to write to.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
      */
-    public BaseCsvListener(OutputStream stream) throws FileNotFoundException {
-        pw = new PrintWriter(stream);
-        writer = new CSVWriter(pw);
+    public BaseCsvListener(OutputStream stream) {
+        this(new PrintWriter(stream));
     }
 
-
     /**
-     * Constructor with a Writer, specifying a separator.
+     * Constructor with a Writer parameter.
      *
-     * @param stream        The stream to write to.
-     * @param separator the character to use as a separator in the csv.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
+     * @param writer The writer to use for output
      */
-    public BaseCsvListener(OutputStream stream, char separator) throws FileNotFoundException {
-        pw = new PrintWriter(stream);
-        writer = new CSVWriter(pw, separator);
+    public BaseCsvListener(Writer writer) {
+        this.writerBuilder = new CSVWriterBuilder(writer);
     }
 
     /**
-     * Constructor with a Writer, specifying a separator and quote character.
+     * Get the separator character.
      *
-     * @param stream        The stream to write to.
-     * @param separator the character to use as a separator in the csv.
-     * @param quotechar the character to quote values with.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
+     * @return separator character
      */
-    public BaseCsvListener(OutputStream stream, char separator, char quotechar) throws FileNotFoundException {
-        pw = new PrintWriter(stream);
-        writer = new CSVWriter(pw, separator, quotechar);
+    public char getSeparator() {
+        return writerBuilder.getSeparator();
     }
 
     /**
-     * Constructor with a Writer, specifying a separator, quote character, and escape character.
+     * Set the separator character.
      *
-     * @param stream         The stream to write to.
-     * @param separator  the character to use as a separator in the csv.
-     * @param quotechar  the character to quote values with.
-     * @param escapechar the character to escape quotechar in values.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
+     * @param separator separator charactor
+     * @return reference to this listener instance
      */
-    public BaseCsvListener(OutputStream stream, char separator, char quotechar, char escapechar) throws FileNotFoundException {
-        pw = new PrintWriter(stream);
-        writer = new CSVWriter(pw, separator, quotechar, escapechar);
+    public <T extends BaseCsvListener> T setSeparator(char separator) {
+        writerBuilder.setSeparator(separator);
+        return (T) this;
     }
 
     /**
-     * Constructor with a Writer, specifying a separator, quote character, escape character, and line ending.
+     * Get the quote character.
      *
-     * @param stream         The stream to write to.
-     * @param separator  the character to use as a separator in the csv.
-     * @param quotechar  the character to quote values with.
-     * @param escapechar the character to escape quotechar in values.
-     * @param lineend    the string to use as line endings.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
+     * @return quote character
      */
-    public BaseCsvListener(OutputStream stream, char separator, char quotechar, char escapechar, String lineend) throws FileNotFoundException {
-        pw = new PrintWriter(stream);
-        writer = new CSVWriter(pw, separator, quotechar, escapechar, lineend);
+    public char getQuotechar() {
+        return writerBuilder.getQuotechar();
     }
 
-
     /**
-     * Constructor with a Writer, specifying a separator, quote character,  and line ending.
+     * Set the quote character.
      *
-     * @param stream        The stream to write to.
-     * @param separator the character to use as a separator in the csv.
-     * @param quotechar the character to quote values with.
-     * @param lineend   the string to use as line endings.
-     * @throws java.io.FileNotFoundException if the file is not found or can't be written to.
+     * @param quotechar quote character
+     * @return reference to this listener instance
      */
-    public BaseCsvListener(OutputStream stream, char separator, char quotechar, String lineend) throws FileNotFoundException {
-        pw = new PrintWriter(stream);
-        writer = new CSVWriter(pw, separator, quotechar, lineend);
+    public <T extends BaseCsvListener> T setQuotechar(char quotechar) {
+        writerBuilder.setQuotechar(quotechar);
+        return (T) this;
     }
 
     /**
-     * Write out headers to the writer for this gov.va.vinci.leo.listener. The idea being this might
+     * Get the escape character.
+     *
+     * @return escape character
+     */
+    public char getEscapechar() {
+        return writerBuilder.getEscapechar();
+    }
+
+    /**
+     * Set the escape character.
+     *
+     * @param escapechar escape character
+     * @return reference to this listener instance
+     */
+    public <T extends BaseCsvListener> T setEscapechar(char escapechar) {
+        writerBuilder.setEscapechar(escapechar);
+        return (T) this;
+    }
+
+    /**
+     * Get the line ending string.
+     *
+     * @return line ending string
+     */
+    public String getLineEnd() {
+        return writerBuilder.getLineEnd();
+    }
+
+    /**
+     * Set the line ending.
+     *
+     * @param lineEnd line ending
+     * @return reference to this listener instance
+     */
+    public <T extends BaseCsvListener> T setLineEnd(String lineEnd) {
+        writerBuilder.setLineEnd(lineEnd);
+        return (T) this;
+    }
+
+    /**
+     * Return the flag value that if true will cause the listener to include a header row, defaults false.
+     *
+     * @return include header boolean
+     */
+    public boolean isIncludeHeader() {
+        return includeHeader;
+    }
+
+    /**
+     * Set the boolean flag that if true will cause the listener to include a header row.
+     *
+     * @param includeHeader boolean flag for header row
+     * @return reference to this listener instance
+     */
+    public <T extends BaseCsvListener> T setIncludeHeader(boolean includeHeader) {
+        this.includeHeader = includeHeader;
+        return (T) this;
+    }
+
+    /**
+     * Write out headers to the writerBuilder for this gov.va.vinci.leo.listener. The idea being this might
      * be called once before the process is started to write out column headers to the
      * csv file.
      *
      * @throws IOException  if the headers cannot be written.
      */
     public void writeHeaders() throws IOException {
+        if(writer == null)
+            writer = writerBuilder.buildCSVWriter();
         writer.writeNext(getHeaders());
         writer.flush();
     }
 
     /**
+     * Called once client initialization is complete.
+     *
+     * @param aStatus the status of the processing.
+     * @see UimaAsBaseCallbackListener#initializationComplete(EntityProcessStatus)
+     */
+    @Override
+    public void initializationComplete(EntityProcessStatus aStatus) {
+        super.initializationComplete(aStatus);
+        if(includeHeader)
+            try {
+                writeHeaders();
+            } catch (IOException e) {
+                LOG.error("Error writing the headers!", e);
+            }
+    }
+
+    /**
      * Called with a completely processed CAS.
+     *
      * @param aCas   the returned cas.
      * @param aStatus the status of the processing. This object contains a record of any Exception that occurred, as well as timing information.
      */
@@ -253,6 +252,8 @@ public abstract class BaseCsvListener extends BaseListener {
             return;
         }
 
+        if(writer == null)
+            writer = writerBuilder.buildCSVWriter();
         writer.writeAll(rows);
         try {
             writer.flush();
@@ -268,7 +269,11 @@ public abstract class BaseCsvListener extends BaseListener {
     @Override
     public void collectionProcessComplete(EntityProcessStatus aStatus) {
         super.collectionProcessComplete(aStatus);
-        pw.flush();
-        pw.close();
+        try {
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

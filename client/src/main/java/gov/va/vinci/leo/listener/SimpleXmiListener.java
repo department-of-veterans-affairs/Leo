@@ -66,7 +66,6 @@ public class SimpleXmiListener extends BaseListener {
      * @param outputDir             the directory to write the final xmi files to.
      */
     public SimpleXmiListener(File outputDir) {
-        super(outputDir, false);
         mOutputDir = outputDir;
     }//Constructor with String input param
 

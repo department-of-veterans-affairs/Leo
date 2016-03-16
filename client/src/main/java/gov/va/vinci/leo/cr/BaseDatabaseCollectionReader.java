@@ -135,7 +135,7 @@ public abstract class BaseDatabaseCollectionReader extends BaseLeoCollectionRead
      * @param driver driver string
      * @return reference to this reader instance
      */
-    public <T> T setDriver(String driver) {
+    public <T extends BaseDatabaseCollectionReader> T setDriver(String driver) {
         this.driver = driver;
         return (T) this;
     }
@@ -155,7 +155,7 @@ public abstract class BaseDatabaseCollectionReader extends BaseLeoCollectionRead
      * @param url driver URL.
      * @return reference to this reader instance
      */
-    public <T> T setURL(String url) {
+    public <T extends BaseDatabaseCollectionReader> T setURL(String url) {
         this.url = url;
         return (T) this;
     }
@@ -175,7 +175,7 @@ public abstract class BaseDatabaseCollectionReader extends BaseLeoCollectionRead
      * @param username database username
      * @return reference to this reader instance
      */
-    public <T> T setUsername(String username) {
+    public <T extends BaseDatabaseCollectionReader> T setUsername(String username) {
         this.username = username;
         return (T) this;
     }
@@ -195,7 +195,7 @@ public abstract class BaseDatabaseCollectionReader extends BaseLeoCollectionRead
      * @param password database password
      * @return reference to this reader instance
      */
-    public <T> T setPassword(String password) {
+    public <T extends BaseDatabaseCollectionReader> T setPassword(String password) {
         this.password = password;
         return (T) this;
     }

@@ -141,7 +141,7 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
      * @param query database query
      * @return reference to this reader instance
      */
-    public <T> T setQuery(String query) {
+    public <T extends DatabaseCollectionReader> T setQuery(String query) {
         this.query = query;
         return (T) this;
     }
@@ -161,7 +161,7 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
      * @param idColumn ID column name
      * @return reference to this reader instance
      */
-    public <T> T setIdColumn(String idColumn) {
+    public <T extends DatabaseCollectionReader> T setIdColumn(String idColumn) {
         this.idColumn = idColumn;
         return (T) this;
     }
@@ -181,7 +181,7 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
      * @param noteColumn note column name
      * @return reference to this reader instance
      */
-    public <T> T setNoteColumn(String noteColumn) {
+    public <T extends DatabaseCollectionReader> T setNoteColumn(String noteColumn) {
         this.noteColumn = noteColumn;
         return (T) this;
     }
