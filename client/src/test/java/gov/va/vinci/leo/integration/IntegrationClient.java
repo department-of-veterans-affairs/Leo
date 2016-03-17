@@ -89,12 +89,12 @@ public class IntegrationClient {
 
     protected UimaAsBaseCallbackListener[] getListeners() {
         //Setup the output directory
-        if(!OUT_DIR.mkdir())
+        if (!OUT_DIR.mkdir())
             throw new RuntimeException("Unable to create output directory: " + OUT_DIR.getAbsolutePath());
         OUT_DIR.deleteOnExit();
 
         UimaAsBaseCallbackListener[] list = new UimaAsBaseCallbackListener[1];
-        list[0] = new SimpleXmiListener(OUT_DIR, true) ;
+        list[0] = new SimpleXmiListener(OUT_DIR).setLaunchAnnotationViewer(true);
         return list;
     }
 

@@ -33,7 +33,12 @@ import org.apache.uima.examples.SourceDocumentInformation;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import java.io.*;
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -103,9 +108,8 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
     /**
      * Use to work around a bug in 2.4.2 where UIMA calls the  onBeforeMessageSend one extra time
      * on the last document.
-     *
+     * <p/>
      * https://issues.apache.org/jira/browse/UIMA-3581?jql=project%20%3D%20UIMA%20AND%20resolution%20%3D%20Unresolved%20AND%20assignee%20%3D%20cwiklik%20ORDER%20BY%20priority%20DESC
-     *
      */
     protected String previousReferenceId = "NONE";
 
@@ -119,8 +123,8 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
     /**
      * Called once client initialization is complete.
      *
+     * @param aStatus the status of the processing.
      * @see org.apache.uima.aae.client.UimaAsBaseCallbackListener#initializationComplete(org.apache.uima.collection.EntityProcessStatus)
-     * @param aStatus   the status of the processing.
      */
     @Override
     public void initializationComplete(EntityProcessStatus aStatus) {
@@ -138,8 +142,8 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
      * Called before sending a CAS to the pipeline, If we were timing each CAS individually this is where
      * we would want to capture individual start times.
      *
+     * @param status the status of the processing.
      * @see org.apache.uima.aae.client.UimaAsBaseCallbackListener#onBeforeMessageSend(org.apache.uima.aae.client.UimaASProcessStatus)
-     * @param status   the status of the processing.
      */
     @Override
     public void onBeforeMessageSend(UimaASProcessStatus status) {
@@ -153,9 +157,9 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
     }// onBeforeMessageSend method
 
     /**
+     * @param aCas    the CAS containing the processed entity and the analysis results
+     * @param aStatus the status of the processing. This object contains a record of any Exception that occurred, as well as timing information.
      * @see org.apache.uima.aae.client.UimaAsBaseCallbackListener#entityProcessComplete(org.apache.uima.cas.CAS, org.apache.uima.collection.EntityProcessStatus)
-     * @param aCas      the CAS containing the processed entity and the analysis results
-     * @param aStatus   the status of the processing. This object contains a record of any Exception that occurred, as well as timing information.
      */
     @Override
     public void entityProcessComplete(CAS aCas, EntityProcessStatus aStatus) {
@@ -174,8 +178,8 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
     }// entityProcessComplete
 
     /**
+     * @param aStatus the status of the processing. This object contains a record of any Exception that occurred, as well as timing information.
      * @see org.apache.uima.aae.client.UimaAsBaseCallbackListener#collectionProcessComplete(org.apache.uima.collection.EntityProcessStatus)
-     * @param aStatus   the status of the processing. This object contains a record of any Exception that occurred, as well as timing information.
      */
     @Override
     public void collectionProcessComplete(EntityProcessStatus aStatus) {
@@ -256,6 +260,26 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
     }
 
     /**
+     * Get the array of input type names this listener will use.
+     *
+     * @return input types array
+     */
+    public String[] getInputType() {
+        return inputType;
+    }
+
+    /**
+     * Set the array of input type names.  Extending listeners should only output annotations from this list.
+     *
+     * @param inputType input type name(s)
+     * @return reference to this listener instance
+     */
+    public <T extends BaseListener> T setInputType(String...inputType) {
+        this.inputType = inputType;
+        return (T) this;
+    }
+
+    /**
      * Return true if an exception was received from the service when the
      * entityProcessComplete event was thrown.
      *
@@ -271,7 +295,7 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
      *
      * @param jcas JCas object where the annotations are stored
      * @return String object containing the document ID or null if no ID is
-     *         found
+     * found
      */
     protected String getReferenceLocation(JCas jcas) {
         Iterator<Annotation> it = null;
@@ -305,6 +329,10 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
      * @return true if the CAS has ANY of the types, false if it does not
      */
     public boolean hasFilteredAnnotation(CAS aCas) {
+        //Return true if there is no filter set
+        if (this.annotationTypeFilter == null || this.annotationTypeFilter.length == 0)
+            return true;
+        //Check for one of the filter types
         for (String type : this.annotationTypeFilter) {
 
             Type uimaType = aCas.getTypeSystem().getType(type);
@@ -343,7 +371,7 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
             // Write exception out to file if the output directory is set.
             if (logErrors) {
                 try {
-                    LOG.error("ERROR processing CAS: "+ this.getReferenceLocation(aCas.getJCas()) + "\n" + errors);
+                    LOG.error("ERROR processing CAS: " + this.getReferenceLocation(aCas.getJCas()) + "\n" + errors);
                 } catch (CASException e) {
                     e.printStackTrace();
                 }
@@ -358,7 +386,7 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
      * gets the list of annotation types to be filtered on. A CAS can be checked via
      * hasFilteredAnnotation(CAS aCas) against this list.
      *
-     * @return   the list of annotation types to be filtered on. A CAS can be checked via
+     * @return the list of annotation types to be filtered on. A CAS can be checked via
      * hasFilteredAnnotation(CAS aCas) against this list.
      */
     public String[] getAnnotationTypeFilter() {
@@ -368,15 +396,16 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
     /**
      * Sets a list of annotation types. Type is the string name, ie: gov.va.vinci.uima.type.Token
      *
-     * @param annotationTypeFilter  a list of annotation types. Type is the string name, ie: gov.va.vinci.uima.type.Token
+     * @param annotationTypeFilter a list of annotation types. Type is the string name, ie: gov.va.vinci.uima.type.Token
      */
-    public <T extends BaseListener> T setAnnotationTypeFilter(String...annotationTypeFilter) {
+    public <T extends BaseListener> T setAnnotationTypeFilter(String... annotationTypeFilter) {
         this.annotationTypeFilter = annotationTypeFilter;
         return (T) this;
     }
 
     /**
      * If true, when the service returns an error status, it is logged via log4j.
+     *
      * @return true if errors from the service are logged via log4j, false if they are not.
      */
     public boolean isLogErrors() {
@@ -393,28 +422,42 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
 
     /**
      * See if the cas has any annotations of the input type (if input types are specified).
+     *
      * @param aCas the CAS to check
-     * @return  true if the CAS has any annotations of type in inputType, or true if no inputTypes are specified.
+     * @return true if the CAS has any annotations of type in inputType, or true if no inputTypes are specified.
      */
     protected boolean hasAnnotationsToProcess(CAS aCas) {
+        //If no input types are set then process all types
+        if (inputType == null || inputType.length == 0) {
+            List<String> typesList = getInputTypesList(aCas);
+            inputType = typesList.toArray(new String[typesList.size()]);
+        }
         // See if we are looking for specific types.
-        if (this.inputType != null && inputType.length > 0) {
-            boolean found = false;
-            for (String type : inputType) {
-                // For invalid types not in the CAS.
-                if (aCas.getTypeSystem().getType(type) == null) {
-                    continue;
-                }
-                if (aCas.getAnnotationIndex(aCas.getTypeSystem().getType(type)).size() > 0) {
-                    // Process this one.
-                    found = true;
-                }
-            }
-            if (!found) {
+        for (String type : inputType) {
+            Type uimaType = aCas.getTypeSystem().getType(type);
+
+            if (aCas.getAnnotationIndex(uimaType) != null && aCas.getAnnotationIndex(uimaType).size() > 0) {
                 return true;
             }
         }
         return false;
+    }
+
+    protected List<String> getInputTypesList(CAS cas) {
+        ArrayList<String> typesList = new ArrayList<>();
+        if(inputType != null && inputType.length > 0) {
+            typesList.addAll(Arrays.asList(inputType));
+        } else {
+            //Add all non uima types to the list since specific input types not set
+            Iterator<Type> typeIterator = cas.getTypeSystem().getTypeIterator();
+            while(typeIterator.hasNext()) {
+                String typeName = typeIterator.next().getName();
+                if(!typeName.startsWith("uima")) {
+                    typesList.add(typeName);
+                }
+            }
+        }
+        return typesList;
     }
 
 }// BaseListener class

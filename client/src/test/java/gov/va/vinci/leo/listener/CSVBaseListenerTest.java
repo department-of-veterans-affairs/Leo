@@ -21,6 +21,8 @@ package gov.va.vinci.leo.listener;
  */
 
 
+import gov.va.vinci.leo.SampleService;
+import gov.va.vinci.leo.types.CSI;
 import gov.va.vinci.leo.whitespace.ae.WhitespaceTokenizer;
 import gov.va.vinci.leo.whitespace.types.Token;
 import gov.va.vinci.leo.whitespace.types.WordToken;
@@ -41,24 +43,23 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class CSVBaseListenerTest {
-    CAS cas = null;
+    protected static CAS cas = null;
 
-
-    /**
-     * Setup an in-memory db to test against with a simple schema.
-     *
-     * @throws Exception
-     */
     @Before
     public void setup() throws Exception {
-        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(new WhitespaceTokenizer().getLeoAEDescriptor()
-                .setParameterSetting("tokenOutputType", Token.class.getCanonicalName())
-                .setParameterSetting("wordOutputType", WordToken.class.getCanonicalName())
-                .setParameterSetting("tokenOutputTypeFeature", new Integer(3))
-                .setTypeSystemDescription(new WhitespaceTokenizer().getLeoTypeSystemDescription())
-                .getAnalysisEngineDescription());
-        cas = CasCreationUtils.createCas(ae.getAnalysisEngineMetaData());
-
+        if(cas != null)
+            return;
+        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(
+                SampleService.simpleServiceDefinition().getAnalysisEngineDescription()
+        );
+        cas = ae.newCAS();
+        cas.setDocumentText("a b c");
+        CSI csi = new CSI(cas.getJCas());
+        csi.setID("1");
+        csi.setBegin(0);
+        csi.setEnd(29);
+        csi.addToIndexes();
+        ae.process(cas);
     }
 
     @Test
@@ -84,8 +85,8 @@ public class CSVBaseListenerTest {
     public void testCharSepraratorQuoteChar() throws IOException {
         File f = File.createTempFile("testCharSepraratorQuoteCharEscapeChar", "txt");
         TestCsvListener listener = new TestCsvListener(f)
-                .setSeparator('-');
-        listener.setQuotechar('\'');
+                .setSeparator('-')
+                .setQuotechar('\'');
         listener.entityProcessComplete(cas, null);
         String b = FileUtils.readFileToString(f).trim();
         assertEquals("\'a\'-\'b\'-\'\"\"c\'", b.toString());

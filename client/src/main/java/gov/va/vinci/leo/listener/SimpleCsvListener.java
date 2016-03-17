@@ -40,11 +40,6 @@ import java.util.List;
 public class SimpleCsvListener extends BaseCsvListener {
 
     /**
-     * The type name this annotation gov.va.vinci.leo.listener is limited to.
-     */
-    protected List<String> typeNames;
-
-    /**
      * Include features on the annotations or not.
      */
     protected boolean includeFeatures = false;
@@ -102,7 +97,7 @@ public class SimpleCsvListener extends BaseCsvListener {
 
         List<String[]> rows = new ArrayList<String[]>();
 
-        for (String singleType : typeNames) {
+        for (String singleType : inputType) {
             Type type = aCas.getTypeSystem().getType(singleType);
             FSIndex<?> index = aCas.getAnnotationIndex(type);
             FSIterator<?> iterator = index.iterator();
@@ -145,8 +140,10 @@ public class SimpleCsvListener extends BaseCsvListener {
                                 }
                                 featureValue += "] ";
                                 row.add(featureValue);
+                            } else if(f.getRange().getName().contains("Array")) {
+                                row.add("[" + f.getShortName() + " = null]");
                             } else {
-                                row.add("[ " + f.getShortName() + " = " + a.getFeatureValueAsString(f) + "]");
+                                row.add("[" + f.getShortName() + " = " + a.getFeatureValueAsString(f) + "]");
                             }
                         }
                     }

@@ -66,7 +66,7 @@ public abstract class BaseCsvListener extends BaseListener {
      *
      * @param cas the document cas to get results from
      * @return A list of rows of CSV data. Each row is an array of strings. If no data needs
-     *         to be written for this CAS, you should return an empty list.
+     * to be written for this CAS, you should return an empty list.
      */
     protected abstract List<String[]> getRows(CAS cas);
 
@@ -74,7 +74,7 @@ public abstract class BaseCsvListener extends BaseListener {
      * Returns the string list of the headers for a row.
      * ie ("col1", "id", "myValue");
      *
-     * @return   the string list of the headers for a row.
+     * @return the string list of the headers for a row.
      */
     protected abstract String[] getHeaders();
 
@@ -212,10 +212,10 @@ public abstract class BaseCsvListener extends BaseListener {
      * be called once before the process is started to write out column headers to the
      * csv file.
      *
-     * @throws IOException  if the headers cannot be written.
+     * @throws IOException if the headers cannot be written.
      */
     public void writeHeaders() throws IOException {
-        if(writer == null)
+        if (writer == null)
             writer = writerBuilder.buildCSVWriter();
         writer.writeNext(getHeaders());
         writer.flush();
@@ -230,7 +230,7 @@ public abstract class BaseCsvListener extends BaseListener {
     @Override
     public void initializationComplete(EntityProcessStatus aStatus) {
         super.initializationComplete(aStatus);
-        if(includeHeader)
+        if (includeHeader)
             try {
                 writeHeaders();
             } catch (IOException e) {
@@ -241,20 +241,21 @@ public abstract class BaseCsvListener extends BaseListener {
     /**
      * Called with a completely processed CAS.
      *
-     * @param aCas   the returned cas.
+     * @param aCas    the returned cas.
      * @param aStatus the status of the processing. This object contains a record of any Exception that occurred, as well as timing information.
      */
     @Override
     public void entityProcessComplete(CAS aCas, EntityProcessStatus aStatus) {
         super.entityProcessComplete(aCas, aStatus);
-        List<String[]> rows = getRows(aCas);
-        if (rows == null || rows.size() < 1) {
-            return;
-        }
 
-        if(writer == null)
+        if (writer == null)
             writer = writerBuilder.buildCSVWriter();
-        writer.writeAll(rows);
+        if (hasFilteredAnnotation(aCas) && hasAnnotationsToProcess(aCas)) {
+            List<String[]> rows = getRows(aCas);
+            if (rows == null || rows.size() < 1)
+                return;
+            writer.writeAll(rows);
+        }
         try {
             writer.flush();
         } catch (IOException e) {
@@ -263,8 +264,8 @@ public abstract class BaseCsvListener extends BaseListener {
     }
 
     /**
-     * @see org.apache.uima.aae.client.UimaAsBaseCallbackListener#collectionProcessComplete(org.apache.uima.collection.EntityProcessStatus)
      * @param aStatus the status of the processing. This object contains a record of any Exception that occurred, as well as timing information.
+     * @see org.apache.uima.aae.client.UimaAsBaseCallbackListener#collectionProcessComplete(org.apache.uima.collection.EntityProcessStatus)
      */
     @Override
     public void collectionProcessComplete(EntityProcessStatus aStatus) {

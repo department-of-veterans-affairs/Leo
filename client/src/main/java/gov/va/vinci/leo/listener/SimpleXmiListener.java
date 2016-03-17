@@ -49,12 +49,12 @@ public class SimpleXmiListener extends BaseListener {
     /**
      * Flag to launch annotation viewer when processing is complete.
      */
-    private boolean launchAnnotationViewer = false;
+    protected boolean launchAnnotationViewer = false;
 
     /**
-     * Path to the aggregate descriptor file for the service.
+     * Path to the type system descriptor or aggregate descriptor file for the service.
      */
-    private String mAggDesc = null;
+    protected File typeSystemDescriptor = null;
     /**
      * Logging object of output.
      */
@@ -70,37 +70,43 @@ public class SimpleXmiListener extends BaseListener {
     }//Constructor with String input param
 
     /**
-     * Constructor with output directory input.
+     * Get the type system or aggregate descriptor File reference that this listener will set in the viewer if launched.
      *
-     * @param outputDir              the directory to write the final xmi files to.
-     * @param launchAnnotationViewer launch the UIMA annotation viewer when complete.
+     * @return type system descriptor file reference
      */
-    public SimpleXmiListener(File outputDir, boolean launchAnnotationViewer) {
-        this(outputDir);
-        this.launchAnnotationViewer = launchAnnotationViewer;
-    }//Constructor with String input param
+    public File getTypeSystemDescriptor() {
+        return typeSystemDescriptor;
+    }
 
     /**
-     * Constructor with output directory input and aggDesc.
+     * Set the type system or aggregate descriptor File reference that this listener will set in the viewer if launched.
      *
-     * @param outputDir              the directory to write the final xmi files to.
-     * @param aggDesc               Path to the aggregate descriptor file for the service.
+     * @param typeSystemDescriptor type system descriptor file reference
+     * @return reference to this listener instance
      */
-    public SimpleXmiListener(File outputDir, String aggDesc) {
-        this(outputDir);
-        mAggDesc = aggDesc;
-    }//Constructor with String input param and aggDesc
+    public SimpleXmiListener setTypeSystemDescriptor(File typeSystemDescriptor) {
+        this.typeSystemDescriptor = typeSystemDescriptor;
+        return this;
+    }
 
     /**
-     * Constructor with output directory input and aggDesc.
-     *
-     * @param outputDir              the directory to write the final xmi files to.
-     * @param aggDesc               Path to the aggregate descriptor file for the service.
-     * @param launchAnnotationViewer launch the UIMA annotation viewer when complete.
+     * True if the annotation viewer should be launched after processing is complete, else false.
+     * @return     True if the annotation viewer should be launched after processing is complete, else false.
      */
-    public SimpleXmiListener(File outputDir, String aggDesc, boolean launchAnnotationViewer) {
-        this(outputDir, aggDesc);
+    public boolean isLaunchAnnotationViewer() {
+        return launchAnnotationViewer;
+    }
+
+    /**
+     * Set the value of launch annotation viewer. If true, when collectionProcessComplete is finished,
+     * the annotation view will be launched.
+     *
+     * @param launchAnnotationViewer   True if the annotation viewer should be launched after processing is complete, else false.
+     * @return reference to this listener instance
+     */
+    public SimpleXmiListener setLaunchAnnotationViewer(boolean launchAnnotationViewer) {
         this.launchAnnotationViewer = launchAnnotationViewer;
+        return this;
     }
 
     /**
@@ -206,9 +212,9 @@ public class SimpleXmiListener extends BaseListener {
      */
     protected void launchAnnotationViewer() {
         Preferences prefs = Preferences.userRoot().node("org/apache/uima/tools/AnnotationViewer");
-        if (mAggDesc != null) {
-            prefs.put("taeDescriptorFile", mAggDesc);
-        }//if mAggDesc != null
+        if (typeSystemDescriptor != null) {
+            prefs.put("taeDescriptorFile", typeSystemDescriptor.getAbsolutePath());
+        }//if typeSystemDescriptor != null
         if (mOutputDir != null) {
             try {
                 prefs.put("inDir", mOutputDir.getCanonicalPath());
@@ -220,24 +226,5 @@ public class SimpleXmiListener extends BaseListener {
         avm.setBounds(0, 0, 1000, 225);
         avm.setVisible(true);
     }
-
-    /**
-     * True if the annotation viewer should be launched after processing is complete, else false.
-     * @return     True if the annotation viewer should be launched after processing is complete, else false.
-     */
-    public boolean isLaunchAnnotationViewer() {
-        return launchAnnotationViewer;
-    }
-
-    /**
-     * Set the value of launch annotation viewer. If true, when collectionProcessComplete is finished,
-     * the annotation view will be launched.
-     *
-     * @param launchAnnotationViewer   True if the annotation viewer should be launched after processing is complete, else false.
-     */
-    public void setLaunchAnnotationViewer(boolean launchAnnotationViewer) {
-        this.launchAnnotationViewer = launchAnnotationViewer;
-    }
-
 
 }//XmiUABListener class

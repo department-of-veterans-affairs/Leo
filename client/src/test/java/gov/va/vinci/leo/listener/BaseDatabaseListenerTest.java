@@ -20,12 +20,13 @@ package gov.va.vinci.leo.listener;
  * #L%
  */
 
-import gov.va.vinci.leo.descriptors.AnalysisEngineFactory;
+import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
+import gov.va.vinci.leo.types.CSI;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.UIMAFramework;
+import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
-import org.apache.uima.util.CasCreationUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,150 +43,175 @@ import static org.junit.Assert.assertTrue;
 
 public class BaseDatabaseListenerTest {
 
-	String dbName = RandomStringUtils.randomAlphabetic(5);
+    String dbName = RandomStringUtils.randomAlphabetic(5);
 
-	DatabaseConnectionInformation dbConnectionInfo = new DatabaseConnectionInformation("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:" + dbName + "2112testdb;sql.enforce_strict_size=true", "sa", "");
-	
-	DatabaseConnectionInformation dbConnectionInfoWithValidation = new DatabaseConnectionInformation("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:" + dbName + "2112testdb;sql.enforce_strict_size=true", "sa", "", "select count(*) from dummy_table");
-	
-	Connection conn = null;
-	CAS cas = null;
+    DatabaseConnectionInformation dbConnectionInfo = new DatabaseConnectionInformation("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:" + dbName + "2112testdb;sql.enforce_strict_size=true", "sa", "");
+
+    DatabaseConnectionInformation dbConnectionInfoWithValidation = new DatabaseConnectionInformation("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:" + dbName + "2112testdb;sql.enforce_strict_size=true", "sa", "", "select count(*) from dummy_table");
+
+    Connection conn = null;
+    CAS cas = null;
     String rootDirectory = "";
 
 
     /**
-	 * Setup an in-memory db to test against with a simple schema.
-	 * @throws Exception
-	 */
-	@Before
-	public void setup() throws Exception {
+     * Setup an in-memory db to test against with a simple schema.
+     *
+     * @throws Exception
+     */
+    @Before
+    public void setup() throws Exception {
         String path = new File(".").getCanonicalPath();
         if (!path.endsWith("client")) {
             rootDirectory = "client/";
         }
 
         Class.forName(dbConnectionInfo.getDriver()).newInstance();
-		
-		conn = DriverManager.getConnection(dbConnectionInfo.getUrl(), dbConnectionInfo.getUsername(), dbConnectionInfo.getPassword());
-		conn.createStatement().execute("CREATE TABLE DUMMY_TABLE ( col1 varchar(100), col2 varchar(100), col3 varchar(100))");
-		AnalysisEngineDescription aed = AnalysisEngineFactory.generateAED(rootDirectory + "src/test/resources/desc/gov/va/vinci/leo/ae/WhitespaceTokenizerDescriptor.xml", false);
-		
-		cas = CasCreationUtils.createCas(aed);
-	}
-	
-	@Test
-	public void oneRecordSimpleTest() throws Exception {
-		TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfo, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)", 2, false);		
-		listener.onBeforeMessageSend(new MockUimaASProcessStatus());
-		listener.entityProcessComplete(cas,  null);
-		listener.collectionProcessComplete(null);
-		
-		ResultSet rs = conn.createStatement().executeQuery("select * from dummy_table");
-		assertTrue(rs.next());
-		assertEquals(rs.getString(1), "a");
-	}
 
-	@Test
-	public void batchFlushingTest() throws Exception {
-		TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfo, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)", 2, false);		
-		listener.onBeforeMessageSend(new MockUimaASProcessStatus());
-		listener.entityProcessComplete(cas,  null);
-		
-		listener.onBeforeMessageSend(new MockUimaASProcessStatus());
-		listener.entityProcessComplete(cas,  null);
-		
-		listener.onBeforeMessageSend(new MockUimaASProcessStatus());
-		listener.entityProcessComplete(cas,  null);
-		
-		/** Partial batch, should have only persisted 2 of the 3. **/
-		ResultSet rs = conn.createStatement().executeQuery("select count(*) from dummy_table");
-		assertTrue(rs.next());
-		assertEquals(rs.getInt(1), 2);
+        conn = DriverManager.getConnection(dbConnectionInfo.getUrl(), dbConnectionInfo.getUsername(), dbConnectionInfo.getPassword());
+        conn.createStatement().execute("CREATE TABLE DUMMY_TABLE ( col1 varchar(100), col2 varchar(100), col3 varchar(100))");
+        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(
+                SampleService.simpleServiceDefinition().getAnalysisEngineDescription()
+        );
+        cas = ae.newCAS();
+        cas.setDocumentText("a b c");
+        CSI csi = new CSI(cas.getJCas());
+        csi.setID("1");
+        csi.setBegin(0);
+        csi.setEnd(5);
+        csi.addToIndexes();
+        ae.process(cas);
+    }
 
-		listener.collectionProcessComplete(null);
-		/** Now the third one should be there. */
-		rs = conn.createStatement().executeQuery("select count(*) from dummy_table");
-		assertTrue(rs.next());
-		assertEquals(rs.getInt(1), 3);	
-	}
-	
-	@Test
-	public void validationTest() throws Exception {
-		TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfoWithValidation, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)", 2, true);		
-		listener.onBeforeMessageSend(new MockUimaASProcessStatus());
-		listener.entityProcessComplete(cas,  null);
-		
-		listener.onBeforeMessageSend(new MockUimaASProcessStatus());
-		listener.entityProcessComplete(cas,  null);
-		
-		listener.onBeforeMessageSend(new MockUimaASProcessStatus());
-		listener.entityProcessComplete(cas,  null);
-		
-		/** Partial batch, should have only persisted 2 of the 3. **/
-		ResultSet rs = conn.createStatement().executeQuery("select count(*) from dummy_table");
-		assertTrue(rs.next());
-		assertEquals(rs.getInt(1), 2);
+    @Test
+    public void oneRecordSimpleTest() throws Exception {
+        TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfo, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)")
+                .setBatchSize(2)
+                .setValidateConnectionEachBatch(false);
+        listener.onBeforeMessageSend(new MockUimaASProcessStatus());
+        listener.entityProcessComplete(cas, null);
+        listener.collectionProcessComplete(null);
 
-		listener.collectionProcessComplete(null);
-		/** Now the third one should be there. */
-		rs = conn.createStatement().executeQuery("select count(*) from dummy_table");
-		assertTrue(rs.next());
-		assertEquals(rs.getInt(1), 3);	
-	}
-	
-	
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void badConstructor1Test() {
-		TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfo, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)", -1, false);
-	}
+        ResultSet rs = conn.createStatement().executeQuery("select * from dummy_table");
+        assertTrue(rs.next());
+        assertEquals(rs.getString(1), "a");
+    }
 
-	@Test(expected=IllegalArgumentException.class)
-	public void badConstructor2Test() {
-		TestDatabaseListener listener = new TestDatabaseListener(null, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)", 1, false);
-	}
-	
-	@Test(expected=RuntimeException.class)
-	public void collectionProcessingCompleteExceptionTest() {
-		TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfo, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)", 2, false);		
-		
-		listener.onBeforeMessageSend(null);
-		listener.entityProcessComplete(cas,  null);
-		
-		listener.ps = null;
-		listener.collectionProcessComplete(null);
-	}
+    @Test
+    public void batchFlushingTest() throws Exception {
+        TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfo, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)")
+                .setBatchSize(2)
+                .setValidateConnectionEachBatch(false);
+        listener.onBeforeMessageSend(new MockUimaASProcessStatus());
+        listener.entityProcessComplete(cas, null);
 
-	@Test(expected=ClassNotFoundException.class)
-	public void badValidateConnectionTest() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-		TestDatabaseListener listener = new TestDatabaseListener(new DatabaseConnectionInformation("org.hsqldb.jdbcdfsgfdg Driver", "jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true", "", ""), "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)", 1, false);
-		listener.validateConnection();
-	}
+        listener.onBeforeMessageSend(new MockUimaASProcessStatus());
+        listener.entityProcessComplete(cas, null);
 
-	@Test(expected=SQLException.class)
-	public void badValidateConnection2Test() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-		TestDatabaseListener listener = new TestDatabaseListener(new DatabaseConnectionInformation("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true", "", "", "select * from DUMMY_TABLE"), "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)", 1, false);
-		listener.validateConnection();
-	}
-	
-	public class TestDatabaseListener extends BaseDatabaseListener {
+        listener.onBeforeMessageSend(new MockUimaASProcessStatus());
+        listener.entityProcessComplete(cas, null);
 
-		public TestDatabaseListener(
-				DatabaseConnectionInformation databaseConnectionInformation,
-				String preparedStatementSQL, int validateConnectionNumberOfCAS,
-				boolean validateAfterEachBatch) {
-			super(databaseConnectionInformation, preparedStatementSQL,
-					validateConnectionNumberOfCAS, validateAfterEachBatch);
-		}
+        /** Partial batch, should have only persisted 2 of the 3. **/
+        ResultSet rs = conn.createStatement().executeQuery("select count(*) from dummy_table");
+        assertTrue(rs.next());
+        assertEquals(rs.getInt(1), 2);
 
-		@Override
-		protected List<Object[]> getRows(CAS aCas) {
-			List<Object[]> results = new ArrayList<Object[]>();
-			results.add(new Object[] {"a", "b", "c"});
-			return results;
-		}
-		
-	}
+        listener.collectionProcessComplete(null);
+        /** Now the third one should be there. */
+        rs = conn.createStatement().executeQuery("select count(*) from dummy_table");
+        assertTrue(rs.next());
+        assertEquals(rs.getInt(1), 3);
+    }
+
+    @Test
+    public void validationTest() throws Exception {
+        TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfoWithValidation, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)")
+                .setBatchSize(2)
+                .setValidateConnectionEachBatch(true);
+        listener.onBeforeMessageSend(new MockUimaASProcessStatus());
+        listener.entityProcessComplete(cas, null);
+
+        listener.onBeforeMessageSend(new MockUimaASProcessStatus());
+        listener.entityProcessComplete(cas, null);
+
+        listener.onBeforeMessageSend(new MockUimaASProcessStatus());
+        listener.entityProcessComplete(cas, null);
+
+        /** Partial batch, should have only persisted 2 of the 3. **/
+        ResultSet rs = conn.createStatement().executeQuery("select count(*) from dummy_table");
+        assertTrue(rs.next());
+        assertEquals(rs.getInt(1), 2);
+
+        listener.collectionProcessComplete(null);
+        /** Now the third one should be there. */
+        rs = conn.createStatement().executeQuery("select count(*) from dummy_table");
+        assertTrue(rs.next());
+        assertEquals(rs.getInt(1), 3);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void badConstructor1Test() {
+        TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfo, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)")
+                .setBatchSize(-1)
+                .setValidateConnectionEachBatch(false);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void badConstructor2Test() {
+        TestDatabaseListener listener = new TestDatabaseListener(null, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)")
+                .setBatchSize(1)
+                .setValidateConnectionEachBatch(false);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void collectionProcessingCompleteExceptionTest() {
+        TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfo, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)")
+                .setBatchSize(2)
+                .setValidateConnectionEachBatch(false);
+
+        listener.onBeforeMessageSend(null);
+        listener.entityProcessComplete(cas, null);
+
+        listener.ps = null;
+        listener.collectionProcessComplete(null);
+    }
+
+    @Test(expected = ClassNotFoundException.class)
+    public void badValidateConnectionTest() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+        TestDatabaseListener listener = new TestDatabaseListener(new DatabaseConnectionInformation("org.hsqldb.jdbcdfsgfdg Driver", "jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true", "", ""),
+                "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)")
+                .setBatchSize(2)
+                .setValidateConnectionEachBatch(false);
+        listener.validateConnection();
+    }
+
+    @Test(expected = SQLException.class)
+    public void badValidateConnection2Test() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+        TestDatabaseListener listener = new TestDatabaseListener(
+                new DatabaseConnectionInformation("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true", "", "", "select * from DUMMY_TABLE"),
+                "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)"
+        )
+                .setBatchSize(2)
+                .setValidateConnectionEachBatch(false);
+        listener.validateConnection();
+    }
+
+    public class TestDatabaseListener extends BaseDatabaseListener {
+
+        public TestDatabaseListener(
+                DatabaseConnectionInformation databaseConnectionInformation, String preparedStatementSQL) {
+            super(databaseConnectionInformation, preparedStatementSQL);
+        }
+
+        @Override
+        protected List<Object[]> getRows(CAS aCas) {
+            List<Object[]> results = new ArrayList<Object[]>();
+            results.add(new Object[]{"a", "b", "c"});
+            return results;
+        }
+
+    }
 
 
 }
