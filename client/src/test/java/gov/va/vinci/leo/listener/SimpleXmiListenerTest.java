@@ -23,12 +23,22 @@ import static org.junit.Assert.assertTrue;
  */
 public class SimpleXmiListenerTest {
     protected static AnalysisEngine ae = null;
-    protected static File aggregateDescriptor = new File("client/src/test/resources/aggSimpleXmiListenerTest.xml");
-    protected static File outDir = new File("client/src/test/resources/xmi-listener-test-out");
-    protected static File inDir = new File("client/src/test/resources/inputDirectory");
+    protected static File aggregateDescriptor = new File("src/test/resources/aggSimpleXmiListenerTest.xml");
+    protected static File outDir = new File("src/test/resources/xmi-listener-test-out");
+    protected static File inDir = new File("src/test/resources/inputDirectory");
+    protected static String rootDirectory = "";
 
     @Before
     public void setup() throws Exception {
+        String path = new File(".").getCanonicalPath();
+        System.out.println(path);
+        if (!path.endsWith("client")) {
+            rootDirectory = "client/";
+            aggregateDescriptor = new File(rootDirectory + "src/test/resources/aggSimpleXmiListenerTest.xml");
+            outDir = new File(rootDirectory + "src/test/resources/xmi-listener-test-out");
+            inDir = new File(rootDirectory + "src/test/resources/inputDirectory");
+        }
+
         if (ae != null)
             return;
         LeoAEDescriptor aggDesc = SampleService.simpleServiceDefinition();

@@ -33,6 +33,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.cas.Type;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -51,9 +52,6 @@ import java.util.*;
  * Note: This base class assumes a string[] parameter of input types and a
  * string output type in the uima parameters to know what input types to use and
  * what output type to create.
- *
- * TODO Add a private field unit test to see if it is visible in the extending class
- * TODO Perhaps rename the LeoConfigurationParameter annotation to something more generic and use it for both CollectionReaders and Annotators
  */
 public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements LeoAnnotator {
 
@@ -95,6 +93,17 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     protected LeoTypeSystemDescription typeSystemDescription = new LeoTypeSystemDescription();
 
     /**
+     * Use this setting to filter a CAS for processing.
+     */
+    protected String[] typesFilter = null;
+
+    /**
+     * If true then only a CAS with one of the types filter annotations will be processed otherwise only a CAS
+     * without one of the types will be passed on for processing. Defaults to true.
+     */
+    protected boolean includeFilter = true;
+
+    /**
      * Default constructor for initialization by the UIMA Framework.
      */
     public LeoBaseAnnotator() { /** Do Nothing Here **/ }
@@ -108,18 +117,6 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     public LeoBaseAnnotator(String outputType, String...inputTypes) {
         this.outputType = outputType;
         this.inputTypes = inputTypes;
-    }
-
-    /**
-     * Constructor setting the initial values for the number of instances, inputTypes, and outputType parameters.
-     *
-     * @param numInstances Number of replication instances for this annotator in the pipeline
-     * @param outputType Annotation type to be used as output for this annotator
-     * @param inputTypes One or more annotation types on which processing will occur
-     */
-    public LeoBaseAnnotator(int numInstances, String outputType, String...inputTypes) {
-        this(outputType, inputTypes);
-        this.numInstances = numInstances;
     }
 
     public String[] getInputTypes() {
@@ -179,6 +176,47 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      */
     public <T extends LeoBaseAnnotator> T setName(String name) {
         this.name = name;
+        return (T) this;
+    }
+
+    /**
+     * Return the types filter array of type names.  Null if not set.
+     *
+     * @return list of type names to filter on
+     */
+    public String[] getTypesFilter() {
+        return typesFilter;
+    }
+
+    /**
+     * Set one or more types to filter on.
+     *
+     * @param typesFilterNames One or more type names to filter on
+     * @return reference to this annotation instance
+     */
+    public <T extends LeoBaseAnnotator> T setTypesFilter(String...typesFilterNames) {
+        this.typesFilter = typesFilterNames;
+        return (T) this;
+    }
+
+    /**
+     * Return the value of the include filter flag.
+     *
+     * @return true if includeFilter is true, false otherwise
+     */
+    public boolean isIncludeFilter() {
+        return includeFilter;
+    }
+
+    /**
+     * Set the includeFilter flag value.  If true then a CAS is processes only when one of the typesFilter named types
+     * are found, false otherwise.
+     *
+     * @param includeFilter filter value to set
+     * @return reference to this annotation instance
+     */
+    public <T extends LeoBaseAnnotator> T setIncludeFilter(boolean includeFilter) {
+        this.includeFilter = includeFilter;
         return (T) this;
     }
 
@@ -394,6 +432,30 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     @Override
     public void process(JCas aJCas) throws AnalysisEngineProcessException {
         numberOfCASesProcessed++;
+    }
+
+    //TODO Add abstract processing method for filtering.  Discuss this in the architecture meeting.
+
+    /**
+     * If typesFilter is not set then return true.  If there is a typesFilter and includeFilter is true then return true
+     * only if one of the typesFilter types have been found and false if not.  If includeFilter is false then return true
+     * when all of the types in the filter list have not been found or true otherwise.
+     *
+     * @param jCas CAS to check for filtered types
+     * @return true if the filter is met, false otherwise
+     * @throws AnalysisEngineProcessException if one of the type names in the tyepsFilter is not found in the type system
+     */
+    protected boolean hasFilteredAnnotation(JCas jCas) throws AnalysisEngineProcessException {
+        if(typesFilter == null)
+            return true;
+        for(String typeName : typesFilter) {
+            Type type = jCas.getTypeSystem().getType(typeName);
+            if(type == null)
+                throw new AnalysisEngineProcessException("Type " + typeName + " was not found in the CAS type system.", null);
+            if(jCas.getAnnotationIndex(type).size() > 0)
+                return includeFilter;
+        }
+        return !includeFilter;
     }
 
     /**
