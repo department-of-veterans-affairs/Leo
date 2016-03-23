@@ -179,7 +179,27 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
 
     }
 
+    /**
+     * Generate a new CollectionReaderDescription from the current reader and reader parameters.  Uses the UIMAFramework
+     * to create a new CollectionReader from the description and return it.
+     *
+     * @return CollectionReader instance
+     * @throws ResourceInitializationException if there is an error creating the descriptor
+     */
     public CollectionReader produceCollectionReader() throws ResourceInitializationException {
+        CollectionReaderDescription crDesc = generateCollectionReaderDescription();
+
+        //Return the generated CollectionReader
+        return UIMAFramework.produceCollectionReader(crDesc);
+    }
+
+    /**
+     * Generate a new CollectionReaderDescription from the CollectionReader parameters and values.
+     *
+     * @return CollectionReaderDescription instance
+     * @throws ResourceInitializationException if there is an error creating the descriptor
+     */
+    public CollectionReaderDescription generateCollectionReaderDescription() throws ResourceInitializationException {
         CollectionReaderDescription crDesc = new CollectionReaderDescription_impl();
 
         //Set the initial metadata for the descriptor
@@ -212,8 +232,7 @@ public abstract class BaseLeoCollectionReader extends CollectionReader_ImplBase 
         }
         crDesc.getMetaData().getConfigurationParameterSettings().setParameterSettings(confSettings.getParameterSettings());
 
-        //Return the generated CollectionReader
-        return UIMAFramework.produceCollectionReader(crDesc);
+        return crDesc;
     }
 
 }//SuperReader class

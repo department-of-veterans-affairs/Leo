@@ -23,9 +23,8 @@ package gov.va.vinci.leo.ae;
 import gov.va.vinci.leo.descriptors.*;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.reflect.FieldUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.GenericValidator;
 import org.apache.log4j.Logger;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
@@ -37,12 +36,9 @@ import org.apache.uima.cas.Type;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 /**
@@ -61,7 +57,7 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     private static Logger  logger = Logger.getLogger(LeoBaseAnnotator.class.getCanonicalName());
 
     /**
-     * The types of annotations to use as "anchors".
+     * The types of annotations to use as "anchors" or to be processed.
      */
     @LeoConfigurationParameter
     protected String[] inputTypes = null;
@@ -76,6 +72,11 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      * Counter for the number of CASes this annotator has processed.
      */
     protected long numberOfCASesProcessed = 0;
+
+    /**
+     * Counter for the number of CASes that made it past the filter for processing.
+     */
+    protected long numberOfFilteredCASesProcessed = 0;
 
     /**
      * Number of replication instances for this annotator.
@@ -93,15 +94,14 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     protected LeoTypeSystemDescription typeSystemDescription = new LeoTypeSystemDescription();
 
     /**
-     * Use this setting to filter a CAS for processing.
+     * Optional, only process CAS if it includes instances of one of the types in the list.
      */
-    protected String[] typesFilter = null;
+    protected String[] includeTypesFilter = null;
 
     /**
-     * If true then only a CAS with one of the types filter annotations will be processed otherwise only a CAS
-     * without one of the types will be passed on for processing. Defaults to true.
+     * Optional, only process a CAS if it does not include instances of one of the types in this list.
      */
-    protected boolean includeFilter = true;
+    protected String[] excludeTypesFilter = null;
 
     /**
      * Default constructor for initialization by the UIMA Framework.
@@ -184,39 +184,38 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      *
      * @return list of type names to filter on
      */
-    public String[] getTypesFilter() {
-        return typesFilter;
+    public String[] getIncludeTypesFilter() {
+        return includeTypesFilter;
     }
 
     /**
      * Set one or more types to filter on.
      *
-     * @param typesFilterNames One or more type names to filter on
+     * @param includeTypesFilterNames One or more type names to filter on
      * @return reference to this annotation instance
      */
-    public <T extends LeoBaseAnnotator> T setTypesFilter(String...typesFilterNames) {
-        this.typesFilter = typesFilterNames;
+    public <T extends LeoBaseAnnotator> T setIncludeTypesFilter(String...includeTypesFilterNames) {
+        this.includeTypesFilter = includeTypesFilterNames;
         return (T) this;
     }
 
     /**
-     * Return the value of the include filter flag.
+     * Get the exclude types list.
      *
-     * @return true if includeFilter is true, false otherwise
+     * @return exclude types list
      */
-    public boolean isIncludeFilter() {
-        return includeFilter;
+    public String[] getExcludeTypesFilter() {
+        return excludeTypesFilter;
     }
 
     /**
-     * Set the includeFilter flag value.  If true then a CAS is processes only when one of the typesFilter named types
-     * are found, false otherwise.
+     * Set the list of exclude types.
      *
-     * @param includeFilter filter value to set
+     * @param excludeTypesFilterNames one or more type names to exclude
      * @return reference to this annotation instance
      */
-    public <T extends LeoBaseAnnotator> T setIncludeFilter(boolean includeFilter) {
-        this.includeFilter = includeFilter;
+    public <T extends LeoBaseAnnotator> T setExcludeTypesFilter(String...excludeTypesFilterNames) {
+        this.excludeTypesFilter = excludeTypesFilterNames;
         return (T) this;
     }
 
@@ -409,11 +408,28 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
 
     /**
      * Set the number of CASes this annotator has processed.
-     *
-     * @param numberOfCASesProcessed  the number of documents this annotator has processed.
      */
-    public <T extends LeoBaseAnnotator> T setNumberOfCASesProcessed(long numberOfCASesProcessed) {
-        this.numberOfCASesProcessed = numberOfCASesProcessed;
+    public <T extends LeoBaseAnnotator> T resetNumberOfCASesProcessed() {
+        this.numberOfCASesProcessed = 0;
+        return (T) this;
+    }
+
+    /**
+     * Get the number of CASes that were processed once getting through the filter.
+     *
+     * @return number of filtered CASes processed
+     */
+    public long getNumberOfFilteredCASesProcessed() {
+        return numberOfFilteredCASesProcessed;
+    }
+
+    /**
+     * Reset the number of filtered CASes processed.
+     *
+     * @return reference to this
+     */
+    public <T extends LeoBaseAnnotator> T setNumberOfFilteredCASesProcessed() {
+        this.numberOfFilteredCASesProcessed = 0;
         return (T) this;
     }
 
@@ -430,15 +446,27 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      *
      */
     @Override
-    public void process(JCas aJCas) throws AnalysisEngineProcessException {
+    public final void process(JCas aJCas) throws AnalysisEngineProcessException {
         numberOfCASesProcessed++;
+        if(hasFilteredAnnotation(aJCas) && hasInputTypesAnnotation(aJCas)) {
+            numberOfFilteredCASesProcessed++;
+            annotate(aJCas);
+        }
     }
 
-    //TODO Add abstract processing method for filtering.  Discuss this in the architecture meeting.
+    /**
+     * This method is called by the LeoBaseAnnotator process method if the CAS meets the filter requirements and either
+     * has not input types defined or else contains one or more instances of the input types.
+     *
+     * @param aJCas CAS for processing
+     * @throws AnalysisEngineProcessException if there is an error processing the CAS
+     */
+    public abstract void annotate(JCas aJCas) throws AnalysisEngineProcessException;
+
 
     /**
-     * If typesFilter is not set then return true.  If there is a typesFilter and includeFilter is true then return true
-     * only if one of the typesFilter types have been found and false if not.  If includeFilter is false then return true
+     * If includeTypesFilter is not set then return true.  If there is a includeTypesFilter and includeFilter is true then return true
+     * only if one of the includeTypesFilter types have been found and false if not.  If includeFilter is false then return true
      * when all of the types in the filter list have not been found or true otherwise.
      *
      * @param jCas CAS to check for filtered types
@@ -446,16 +474,49 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      * @throws AnalysisEngineProcessException if one of the type names in the tyepsFilter is not found in the type system
      */
     protected boolean hasFilteredAnnotation(JCas jCas) throws AnalysisEngineProcessException {
-        if(typesFilter == null)
+        if(containsAnnotationInList(jCas, includeTypesFilter, true) ||
+            !containsAnnotationInList(jCas, excludeTypesFilter, false)) {
             return true;
-        for(String typeName : typesFilter) {
-            Type type = jCas.getTypeSystem().getType(typeName);
-            if(type == null)
-                throw new AnalysisEngineProcessException("Type " + typeName + " was not found in the CAS type system.", null);
-            if(jCas.getAnnotationIndex(type).size() > 0)
-                return includeFilter;
         }
-        return !includeFilter;
+        return false;
+    }
+
+    /**
+     * If the input types list is empty or one or more of the types are found in the CAS then return true, return false
+     * otherwise.
+     *
+     * @param jCas CAS to check
+     * @return true if types are found, false otherwise
+     * @throws AnalysisEngineProcessException If one of the type names in the inputTypes list is not found in the type system
+     */
+    protected boolean hasInputTypesAnnotation(JCas jCas) throws AnalysisEngineProcessException {
+        if(containsAnnotationInList(jCas, inputTypes, true))
+            return true;
+        return false;
+    }
+
+    /**
+     * Checks the CAS for instances of the annotation types in the list. If the list is empty return the value of the
+     * isEmpty flag.
+     *
+     * @param jCas CAS to check
+     * @param typeList list of types to check for
+ *     @param isEmpty if this list is empty then return the value of this boolean flag
+     * @return true if a type instance if found, false if not found, isEmpty if the list is empty
+     * @throws AnalysisEngineProcessException If one of the types is not in the type system of the CAS
+     */
+    protected boolean containsAnnotationInList(JCas jCas, String[] typeList, boolean isEmpty) throws AnalysisEngineProcessException {
+        if(ArrayUtils.isNotEmpty(typeList)) {
+            for(String typeName : typeList) {
+                Type type = jCas.getTypeSystem().getType(typeName);
+                if (type == null)
+                    throw new AnalysisEngineProcessException("Type " + typeName + " was not found in the CAS type system.", null);
+                if (jCas.getAnnotationIndex(type).size() > 0)
+                    return true;
+            }
+            return false;
+        }
+        return isEmpty;
     }
 
     /**

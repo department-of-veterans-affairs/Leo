@@ -162,4 +162,3 @@ The reader consists of two parts. The first is **gov.va.vinci.leo.tools.SimpeAnn
 database selects and returns POJO objects. It can be used outside of the UIMA environment.
 
 The second part is the actual UIMA Reader **gov.va.vinci.leo.cr.OldManSimanDatabaseReader**.
-

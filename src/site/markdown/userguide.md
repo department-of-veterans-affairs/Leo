@@ -1,7 +1,6 @@
 
 ## 1. Leo Overview 
 
-
 The [VINCI](http://www.hsrd.research.va.gov/for_researchers/vinci/)-developed Natural Language Processing(NLP) infrastructure, is a set of services and libraries that facilitate the rapid creation and deployment of Apache UIMA-AS annotators focused on NLP.  Leo is separated into three main components; Leo-client, Leo-core, and Leo-service.  
 
 **Leo-Client** contains the components that send requests to the services. Setting up a client is as simple as picking the collection reader and listener required; plugging in the input directory you're using, and specifying the output that you'd like to use.  
@@ -13,17 +12,13 @@ The [VINCI](http://www.hsrd.research.va.gov/for_researchers/vinci/)-developed Na
 
 Leo also contains a collection of packages that provide different functionalities for creating custom pipelines for distributed NLP systems.  The Basic architecture of Leo is shown in the following image with the flow beginning at the reader.
 
-
-
 <img src="images/IntroFigure1.png" alt="" style="width: 750px;"/>
 
 ###Documentation Overview
 The documentation is separated into two main sections; in the first sections of this guide you'll find a description of Leo as well as associated terminology and concepts.  The next section goes into detail about setting up your computer, installing and configuring everything needed in order to run a sample Leo Project.  Once the Leo project is up and running, you will find a description of the steps needed in order to adapt Leo to your specific project needs.  For specific questions about the use of various classes and methods within Leo see the Javadoc page.
 
-
 If you're already familiar with UIMA and Maven, you can go to the Download page [here](download.html) for the POM dependencies required.
 A list of relevant tools and packages used by Leo can be found in the [Components and Tools](components.html) page. 
-    
 
 ###1.1 Leo-Client
 The client is used to define the readers and listeners needed to execute a pipeline via the client API for UIMA_AS.  In Leo-client will initialize and execute a pipeline via the client API for UIMA AS which has been created via the Service object.  Setting up a client is as simple as picking the collection reader and listener required; plugging in the input directory you're using, and specifying the output that you'd like to use.  An example of the code requiring your input can be found in the "Understanding and Adapting the Leo-Example Project" section of the User-guide.  
@@ -40,10 +35,11 @@ files and relational database tables.
 
 #####  Leo Readers 
 
-Leo provides complete CollectionReaders for the some of the most common data sources.  The readers that are included the the core leo
-packages are the `BatchDatabaseCollectionReader`, `DatabaseCollectionReader`, `FileCollectionReader`, and
-`XmiFileCollectionReader`.  There are also other readers not included in the core leo packages for some common specific
-formats such as Knowtator or Siman pre-annotated document information.
+Leo provides complete CollectionReaders for the some of the most common data sources.  The readers that are included in 
+the core leo packages are the `BatchDatabaseCollectionReader`, `DatabaseCollectionReader`, 
+`SQLServerPagedDatabaseCollectionReader`, `FileCollectionReader`, and `XmiFileCollectionReader`.  There are also other 
+readers not included in the core leo packages for some common specific formats such as Knowtator or Siman pre-annotated 
+document information.
 
 ##### Complete Leo Readers
 
@@ -55,9 +51,10 @@ document text.  See the javadocs for more information on expected parameters.
 ```java
 DatabaseCollectionReader reader = new DatabaseCollectionReader("com.mysql.jdbc.Driver", "jdbc:mysql://localhost/test",
                                  "testuser", "password", "select id, document from example_document", "id", "document");
+                                 
 ```
 
-The `BatchDatabaseCollectionReader` extends the `DatabaseCollectionReader` by allowing the user to pull the data in batches
+The `BatchDatabaseCollectionReader` extends the `DatabaseCollectionReader`. It allows the user to pull the data in batches
 based on some sequential identifier, such as a row number field in the table.  This is handy for large tables as well as
 environments with less reliable database connections.  The information required to initialize the `BatchDatabaseCollectionReader`
 is the same as for the `DatabaseCollectionReader` with the addition of the minimum and maximum identifier fields and a
@@ -69,6 +66,19 @@ BatchDatabaseCollectionReader reader = new BatchDatabaseCollectionReader("com.my
                                       "testuser", "password",
                                       "select id, document from example_document where rowno >= {min} and rowno < {max}",
                                       "id", "document", 0, 100, 10);
+                                      
+```
+
+The `SQLServerPagedDatabaseCollectionReader` extends the `DatabaseCollectionReader`.  It allows the user to pull table 
+data in batches from a MS SQL Server table.  Parameters include a first row offset for processing and the number of records
+to pull in each batch or page size as in the following code:
+
+```java
+SQLServerPagedDatabaseCollectionReader reader = new SQLServerPagedDatabaseCollectionReader("com.microsoft.sqlserver.jdbc.SQLServerDriver",
+                                                "testuser", "password",
+                                                "select id, document from example_document order by id",
+                                                50000, 0);
+                                                
 ```
 
 The `FileCollectionReader` reads a collection of files from an input directory.  The reader can be flagged to recurse into
@@ -76,7 +86,7 @@ sub-directories.  By default the reader will only process files with a .txt exte
 can also be specified.  See the javadocs for more information.
 
 ```java
-FileCollectionReader reader = new FileCollectionReader(new File("data/input"), new SuffixFileFilter(new String[]{".txt",".doc"}), false);
+FileCollectionReader reader = new FileCollectionReader(new File("data/input"), false);
 
 ```
 
@@ -139,35 +149,9 @@ public Progress[] getProgress() {
 
 ```
      
-`CollectionReader produceCollectionReader()` initializes a map of parameter names to values based on a static inner class called Param which defines the ConfigurationParameters of the reader.  Typically the map is then passed to the `BaseLeoCollectionReader.produceCollectionReader( Set<ConfigurationParameter> configurationParameters, Map<String, ? extends Object> parameterValues)` method as in the following code example:
-     
-```java
- /**
- * Generate the UIMA Collection reader with resources.
- *
- * @return a uima collection reader.
- * @throws org.apache.uima.resource.ResourceInitializationException
- */
-@Override
-public CollectionReader produceCollectionReader() throws ResourceInitializationException {
-    Map<String, Object> parameterValues = new HashMap<String, Object>();
-    parameterValues.put(Param.NUMBER_OF_STRINGS.getName(), numberOfStrings);
-    return produceCollectionReader(LeoUtils.getStaticConfigurationParameters(Param.class), parameterValues);
-}
-
-/**
- * Static inner class for holding parameter information.
- */
-public static class Param extends BaseLeoCollectionReader.Param {
-    /**
-     * Input directory to read from.
-     */
-    public static ConfigurationParameter NUMBER_OF_STRINGS =
-            new ConfigurationParameterImpl("numberOfStrings", "The number of random strings to generate",
-                    ConfigurationParameter.TYPE_INTEGER, true, false, new String[]{});
-}
-
-```
+`CollectionReader produceCollectionReader()` creates a new CollectionReaderDescription by creating parameters from class
+variables marked with the @LeoConfigurationParameter annotation.  Values from those variables are propagated into the 
+descriptor and then a new CollectionReader instance is produced from the descriptor that is created.
 
 Here is the code for a complete CollectionReader implementation.  This code is also 
 included in the leo-examples public project:
@@ -190,6 +174,7 @@ public class RandomStringCollectionReader extends BaseLeoCollectionReader {
     /**
      * Number of strings that the reader will create.
      */
+    @LeoConfigurationParameter(mandatory = true)
     protected int numberOfStrings = 0;
     /**
      * Generates a random length for each string.
