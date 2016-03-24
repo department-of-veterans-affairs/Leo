@@ -196,7 +196,8 @@ public class LeoRemoteAEDescriptor implements LeoDelegate {
         if(this.name == null) {
             this.addParameterSetting("componentName", name);
         } else {
-            this.name.setName(name);
+            this.name.setValue(name);
+            this.setParameterSetting(this.name);
         }
         return this;
     }

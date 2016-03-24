@@ -31,18 +31,6 @@ public class LeoRemoteAnnotator implements LeoAnnotator {
     }
 
     /**
-     * Create a new LeoRemoteAnnotator with the brokerURL, endPoint, and annotator name specified.
-     *
-     * @param brokerURL ActiveMQ broker URL for remote UIMA-AS service
-     * @param endPoint Input queue name to which the remote service responds
-     * @param name Name of the annotator in the pipeline
-     */
-    public LeoRemoteAnnotator(String brokerURL, String endPoint, String name) {
-        this.descriptor = new LeoRemoteAEDescriptor(brokerURL, endPoint);
-        this.descriptor.setName(name);
-    }
-
-    /**
      * Get the name of this annotator.
      *
      * @return String representation of the annotator name
@@ -55,9 +43,12 @@ public class LeoRemoteAnnotator implements LeoAnnotator {
      * Set the name of this annotator.
      *
      * @param name String representation of the annotator name to set
+     * @return reference to this LeoRemoteAnnotator object
      */
-    public void setName(String name) {
+    public <T extends LeoRemoteAnnotator> T setName(String name) {
+
         descriptor.setName(name);
+        return (T) this;
     }
 
     /**
