@@ -99,9 +99,9 @@ public class ExampleWhitespaceTokenizer extends LeoBaseAnnotator {
     /**
      * Type system constants
      */
-    public static final String TOKEN_OUTPUT_TYPE_NAME         = "gov.va.vinci.leo.types.Token";
+    public static final String TOKEN_OUTPUT_TYPE_NAME         = "gov.va.vinci.leo.whitespace.types.Token";
     public static final String TOKEN_OUTPUT_TYPE_FEATURE_NAME = "TokenType";
-    public static final String WORD_OUTPUT_TYPE_NAME          = "gov.va.vinci.leo.types.WordToken";
+    public static final String WORD_OUTPUT_TYPE_NAME          = "gov.va.vinci.leo.whitespace.types.WordToken";
 
     public ExampleWhitespaceTokenizer() {
         /** Default for UIMA Init **/
@@ -152,8 +152,7 @@ public class ExampleWhitespaceTokenizer extends LeoBaseAnnotator {
      * @see org.apache.uima.analysis_component.JCasAnnotator_ImplBase#process(org.apache.uima.jcas.JCas)
      */
     @Override
-    public void process(JCas aJCas) throws AnalysisEngineProcessException {
-        super.process(aJCas);
+    public void annotate(JCas aJCas) throws AnalysisEngineProcessException {
 
         Feature tokenTypeFeature = aJCas.getTypeSystem().getType(tokenOutputType).getFeatureByBaseName(tokenOutputTypeFeature);
 

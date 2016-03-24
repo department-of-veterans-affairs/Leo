@@ -33,6 +33,7 @@ import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
+import org.apache.uima.cas.text.AnnotationIndex;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -96,11 +97,13 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     /**
      * Optional, only process CAS if it includes instances of one of the types in the list.
      */
+    @LeoConfigurationParameter
     protected String[] includeTypesFilter = null;
 
     /**
      * Optional, only process a CAS if it does not include instances of one of the types in this list.
      */
+    @LeoConfigurationParameter
     protected String[] excludeTypesFilter = null;
 
     /**
@@ -119,19 +122,41 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
         this.inputTypes = inputTypes;
     }
 
+    /**
+     * Get the input types list this annotator will use.
+     *
+     * @return list of input types
+     */
     public String[] getInputTypes() {
         return inputTypes;
     }
 
-    public <T extends LeoBaseAnnotator> T setInputTypes(String[] inputTypes) {
+    /**
+     * Set the input types list.
+     *
+     * @param inputTypes input types list
+     * @return reference to this annotator instance
+     */
+    public <T extends LeoBaseAnnotator> T setInputTypes(String...inputTypes) {
         this.inputTypes = inputTypes;
         return (T) this;
     }
 
+    /**
+     * Get the output type name this annotator will use.
+     *
+     * @return output type name
+     */
     public String getOutputType() {
         return outputType;
     }
 
+    /**
+     * Set the output type name.
+     *
+     * @param outputType output type name
+     * @return reference to this annotator instance
+     */
     public <T extends LeoBaseAnnotator> T setOutputType(String outputType) {
         this.outputType = outputType;
         return (T) this;
@@ -463,6 +488,11 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      */
     public abstract void annotate(JCas aJCas) throws AnalysisEngineProcessException;
 
+    @Override
+    public void collectionProcessComplete() throws AnalysisEngineProcessException {
+        super.collectionProcessComplete();
+
+    }
 
     /**
      * If includeTypesFilter is not set then return true.  If there is a includeTypesFilter and includeFilter is true then return true
@@ -474,7 +504,7 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      * @throws AnalysisEngineProcessException if one of the type names in the tyepsFilter is not found in the type system
      */
     protected boolean hasFilteredAnnotation(JCas jCas) throws AnalysisEngineProcessException {
-        if(containsAnnotationInList(jCas, includeTypesFilter, true) ||
+        if(containsAnnotationInList(jCas, includeTypesFilter, true) &&
             !containsAnnotationInList(jCas, excludeTypesFilter, false)) {
             return true;
         }

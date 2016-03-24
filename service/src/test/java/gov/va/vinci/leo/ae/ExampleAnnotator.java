@@ -22,6 +22,8 @@ package gov.va.vinci.leo.ae;
 
 import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
+import gov.va.vinci.leo.descriptors.TypeDescriptionBuilder;
+import gov.va.vinci.leo.types.ExampleType;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 
@@ -41,13 +43,22 @@ public class ExampleAnnotator extends LeoBaseAnnotator {
     }
 
     @Override
-    public void process(JCas arg0) throws AnalysisEngineProcessException {
-        // TODO Auto-generated method stub
+    public void annotate(JCas arg0) throws AnalysisEngineProcessException {
+        String docText = arg0.getDocumentText();
+        ExampleType example = new ExampleType(arg0, 0, docText.length());
+        example.setNumberOfCASesProcessed((int) this.numberOfCASesProcessed);
+        example.setNumberOfFilteredCASesProcessed((int) this.numberOfFilteredCASesProcessed);
+        example.addToIndexes();
     }
 
     @Override
     public LeoTypeSystemDescription getLeoTypeSystemDescription() {
-        return new LeoTypeSystemDescription();
+        return new LeoTypeSystemDescription().addType(
+                TypeDescriptionBuilder.create("gov.va.vinci.leo.types.ExampleType", "", "uima.tcas.Annotation")
+                        .addFeature("numberOfCASesProcessed", "", "uima.cas.Integer")
+                        .addFeature("numberOfFilteredCASesProcessed", "", "uima.cas.Integer")
+                        .getTypeDescription()
+        );
     }
 
 }
