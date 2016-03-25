@@ -35,6 +35,7 @@ import org.apache.uima.cas.FSIterator;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.resource.metadata.TypeDescription;
 import org.apache.uima.util.CasCreationUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,9 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class LeoBaseAnnotatorTest {
     String rootDirectory = "";
@@ -81,18 +80,21 @@ public class LeoBaseAnnotatorTest {
                 .addTypeSystemDescription(new ExampleAnnotator().getLeoTypeSystemDescription());
         //Setup the aggregate pipeline
         LeoAEDescriptor aggregate = new LeoAEDescriptor();
+        ExampleAnnotator exampleAnnotator = new ExampleAnnotator("pvalue", "preqvalue")
+                .setIncludeTypesFilter(WordToken.class.getCanonicalName());
         aggregate.addDelegate(
             new ExampleWhitespaceTokenizer(Token.class.getCanonicalName(), "TokenType",
                     WordToken.class.getCanonicalName(), null)
                 .getLeoAEDescriptor()
                 .setTypeSystemDescription(typeSystemDescription)
         ).addDelegate(
-            new ExampleAnnotator("pvalue", "preqvalue")
-                .setIncludeTypesFilter(WordToken.class.getCanonicalName())
-                .getLeoAEDescriptor()
-                .setTypeSystemDescription(typeSystemDescription)
+            exampleAnnotator.getLeoAEDescriptor().setTypeSystemDescription(typeSystemDescription)
         );
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(aggregate.getAnalysisEngineDescription());
+        //Check includeTypes filter in the annotator
+        String[] includeTypes = exampleAnnotator.getIncludeTypesFilter();
+        assertNotNull(includeTypes);
+        assertEquals(WordToken.class.getCanonicalName(), includeTypes[0]);
 
         //Process the first cas with word tokens
         JCas jCas = ae.newJCas();
@@ -100,7 +102,7 @@ public class LeoBaseAnnotatorTest {
         ae.process(jCas);
 
         //Make sure that the number of CASes processed and filtered CASes processed are the same.
-        ExampleType exampleType = getExampleType(jCas);
+        ExampleType exampleType = getExampleType(exampleAnnotator, jCas);
         assertNotNull(exampleType);
         assertEquals(exampleType.getNumberOfCASesProcessed(), exampleType.getNumberOfFilteredCASesProcessed());
 //        System.out.println("Number of CASes: " + exampleType.getNumberOfCASesProcessed()
@@ -112,7 +114,7 @@ public class LeoBaseAnnotatorTest {
         ae.process(jCas);
 
         //Check the results of processing
-        exampleType = getExampleType(jCas);
+        exampleType = getExampleType(exampleAnnotator, jCas);
         assertNull(exampleType);
 //        if(exampleType == null)
 //            System.out.println("CAS2 example type is null.");
@@ -127,18 +129,21 @@ public class LeoBaseAnnotatorTest {
                 .addTypeSystemDescription(new ExampleAnnotator().getLeoTypeSystemDescription());
         //Setup the aggregate pipeline
         LeoAEDescriptor aggregate = new LeoAEDescriptor();
+        ExampleAnnotator exampleAnnotator = new ExampleAnnotator("pvalue", "preqvalue")
+                .setExcludeTypesFilter(WordToken.class.getCanonicalName());
         aggregate.addDelegate(
                 new ExampleWhitespaceTokenizer(Token.class.getCanonicalName(), "TokenType",
                         WordToken.class.getCanonicalName(), null)
                         .getLeoAEDescriptor()
                         .setTypeSystemDescription(typeSystemDescription)
         ).addDelegate(
-                new ExampleAnnotator("pvalue", "preqvalue")
-                        .setExcludeTypesFilter(WordToken.class.getCanonicalName())
-                        .getLeoAEDescriptor()
-                        .setTypeSystemDescription(typeSystemDescription)
+                exampleAnnotator.getLeoAEDescriptor().setTypeSystemDescription(typeSystemDescription)
         );
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(aggregate.getAnalysisEngineDescription());
+        //Check exclude types set in the annotator
+        String[] exludeTypes = exampleAnnotator.getExcludeTypesFilter();
+        assertNotNull(exludeTypes);
+        assertEquals(WordToken.class.getCanonicalName(), exludeTypes[0]);
 
         //Process the first cas with word tokens
         JCas jCas = ae.newJCas();
@@ -146,7 +151,7 @@ public class LeoBaseAnnotatorTest {
         ae.process(jCas);
 
         //Make sure that there is no example type.
-        ExampleType exampleType = getExampleType(jCas);
+        ExampleType exampleType = getExampleType(exampleAnnotator, jCas);
         assertNull(exampleType);
 //        if(exampleType == null)
 //            System.out.println("CAS2 example type is null.");
@@ -160,7 +165,7 @@ public class LeoBaseAnnotatorTest {
         ae.process(jCas);
 
         //Check the results of processing
-        exampleType = getExampleType(jCas);
+        exampleType = getExampleType(exampleAnnotator, jCas);
         assertNotNull(exampleType);
         assertEquals(2, exampleType.getNumberOfCASesProcessed());
         assertEquals(1, exampleType.getNumberOfFilteredCASesProcessed());
@@ -177,53 +182,106 @@ public class LeoBaseAnnotatorTest {
                 .addTypeSystemDescription(new ExampleAnnotator().getLeoTypeSystemDescription());
         //Setup the aggregate pipeline
         LeoAEDescriptor aggregate = new LeoAEDescriptor();
+        ExampleAnnotator exampleAnnotator = new ExampleAnnotator("pvalue", "preqvalue")
+                .setInputTypes(WordToken.class.getCanonicalName());
         aggregate.addDelegate(
                 new ExampleWhitespaceTokenizer(Token.class.getCanonicalName(), "TokenType",
                         WordToken.class.getCanonicalName(), null)
                         .getLeoAEDescriptor()
                         .setTypeSystemDescription(typeSystemDescription)
         ).addDelegate(
-                new ExampleAnnotator("pvalue", "preqvalue")
-                        .setInputTypes(WordToken.class.getCanonicalName())
-                        .getLeoAEDescriptor()
-                        .setTypeSystemDescription(typeSystemDescription)
+                exampleAnnotator.getLeoAEDescriptor().setTypeSystemDescription(typeSystemDescription)
         );
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(aggregate.getAnalysisEngineDescription());
+
+        //Check for input types setting
+        String[] inputTypes = exampleAnnotator.getInputTypes();
+        assertNotNull(inputTypes);
+        assertEquals(WordToken.class.getCanonicalName(), inputTypes[0]);
 
         //Process the first cas with word tokens
         JCas jCas = ae.newJCas();
         jCas.setDocumentText("aa bb cc");
         ae.process(jCas);
 
-        ExampleType exampleType = getExampleType(jCas);
+        ExampleType exampleType = getExampleType(exampleAnnotator, jCas);
         assertNotNull(exampleType);
         assertEquals(1, exampleType.getNumberOfCASesProcessed());
         assertEquals(1, exampleType.getNumberOfFilteredCASesProcessed());
-//        if(exampleType == null)
-//            System.out.println("CAS2 example type is null.");
-//        else
-//            System.out.println("Number of CASes: " + exampleType.getNumberOfCASesProcessed()
-//                    + ", Number of Filtered CASes: " + exampleType.getNumberOfFilteredCASesProcessed());
 
         jCas = ae.newJCas();
         jCas.setDocumentText("1 2 3");
         ae.process(jCas);
 
-        exampleType = getExampleType(jCas);
+        exampleType = getExampleType(exampleAnnotator, jCas);
         assertNull(exampleType);
-//        if(exampleType == null)
-//            System.out.println("CAS2 example type is null.");
-//        else
-//            System.out.println("Number of CASes: " + exampleType.getNumberOfCASesProcessed()
-//                    + ", Number of Filtered CASes: " + exampleType.getNumberOfFilteredCASesProcessed());
     }
 
-    protected ExampleType getExampleType(JCas jCas) {
-        FSIterator iterator = jCas.getAnnotationIndex(ExampleType.type).iterator();
+    protected ExampleType getExampleType(ExampleAnnotator exampleAnnotator, JCas jCas) {
+        FSIterator iterator = exampleAnnotator.getAnnotationListForType(jCas, ExampleType.class.getCanonicalName());
         if(iterator.hasNext()) {
             return (ExampleType) iterator.next();
         }
         return null;
+    }
+
+    @Test
+    public void testCountersReset() throws Exception {
+        LeoTypeSystemDescription typeSystemDescription = new ExampleWhitespaceTokenizer().getLeoTypeSystemDescription()
+                .addTypeSystemDescription(new ExampleAnnotator().getLeoTypeSystemDescription());
+        //Setup the aggregate pipeline
+        LeoAEDescriptor aggregate = new LeoAEDescriptor();
+        ExampleAnnotator exampleAnnotator = new ExampleAnnotator("pvalue", "preqvalue");
+        aggregate.addDelegate(
+                new ExampleWhitespaceTokenizer(Token.class.getCanonicalName(), "TokenType",
+                        WordToken.class.getCanonicalName(), null)
+                        .getLeoAEDescriptor()
+                        .setTypeSystemDescription(typeSystemDescription)
+        ).addDelegate(
+                exampleAnnotator.getLeoAEDescriptor().setTypeSystemDescription(typeSystemDescription)
+        );
+        exampleAnnotator.setLeoTypeSystemDescription(typeSystemDescription);
+        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(aggregate.getAnalysisEngineDescription());
+
+        //Process the first cas with word tokens
+        JCas jCas = ae.newJCas();
+        jCas.setDocumentText("aa bb cc");
+
+        exampleAnnotator.process(jCas);
+        assertEquals(1, exampleAnnotator.getNumberOfCASesProcessed());
+        assertEquals(1, exampleAnnotator.getNumberOfFilteredCASesProcessed());
+
+        exampleAnnotator.resetNumberOfCASesProcessed();
+        exampleAnnotator.resetNumberOfFilteredCASesProcessed();
+        assertEquals(0, exampleAnnotator.getNumberOfCASesProcessed());
+        assertEquals(0, exampleAnnotator.getNumberOfFilteredCASesProcessed());
+    }
+
+    @Test
+    public void testGettersSetters() throws Exception {
+        Example2Annotator example2Annotator
+                = new Example2Annotator(ExampleType.class.getCanonicalName(), WordToken.class.getCanonicalName());
+        assertNotNull(example2Annotator);
+        assertEquals(ExampleType.class.getCanonicalName(), example2Annotator.getOutputType());
+        assertEquals(WordToken.class.getCanonicalName(), example2Annotator.getInputTypes()[0]);
+
+        ExampleAnnotator exampleAnnotator = new ExampleAnnotator("pvalue", "preqvalue",
+                ExampleType.class.getCanonicalName(), WordToken.class.getCanonicalName());
+        assertNotNull(exampleAnnotator);
+        assertEquals(ExampleType.class.getCanonicalName(), exampleAnnotator.getOutputType());
+        assertEquals(WordToken.class.getCanonicalName(), exampleAnnotator.getInputTypes()[0]);
+
+        exampleAnnotator.setNumInstances(2112);
+        assertEquals(2112, exampleAnnotator.getNumInstances());
+
+        exampleAnnotator.setName("MyExampleBrah");
+        assertTrue(exampleAnnotator.getName().startsWith("MyExampleBrah"));
+
+        exampleAnnotator.setLeoTypeSystemDescription(new ExampleWhitespaceTokenizer().getLeoTypeSystemDescription());
+        exampleAnnotator.addLeoTypeSystemDescription(new ExampleAnnotator().getLeoTypeSystemDescription());
+        LeoTypeSystemDescription typeSystemDescription = exampleAnnotator.getTypeSystemDescription();
+        assertNotNull(typeSystemDescription.getType(WordToken.class.getCanonicalName()));
+        assertNotNull(typeSystemDescription.getType(ExampleType.class.getCanonicalName()));
     }
 
     @Test

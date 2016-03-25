@@ -48,22 +48,6 @@ public class ExternalAnnotator implements LeoAnnotator {
     }
 
     /**
-     * Create this annotator by importing an external descriptor.
-     *
-     * @param descriptor  path or name of a descriptor file used to generate the AED
-     * @param byName      if true then try to import by name otherwise import by location
-     * @param numInstances Number of replication instances for this annotator in the pipeline
-     * @param paramValues Optional, list of parameters names and values to set.  Creates the
-     *                    parameter if it does not already exist.
-     * @throws java.io.IOException if the descriptor cannot created.
-     * @throws org.apache.uima.util.InvalidXMLException if there is a problem creating the xml.
-     */
-    public ExternalAnnotator(String descriptor, boolean byName, int numInstances, NameValue... paramValues) throws IOException, InvalidXMLException {
-        this(descriptor, byName, paramValues);
-        this.setNumInstances(numInstances);
-    }
-
-    /**
      * Number of instances of this annotator in the pipeline.  Used during asynchronous processing only.
      *
      * @return Number of instances

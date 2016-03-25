@@ -27,6 +27,8 @@ import gov.va.vinci.leo.types.ExampleType;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 
+import java.util.HashMap;
+
 public class ExampleAnnotator extends LeoBaseAnnotator {
     @LeoConfigurationParameter(description="My Param")
     protected String myParam = null;
@@ -42,13 +44,24 @@ public class ExampleAnnotator extends LeoBaseAnnotator {
         this.myParamRequired = myParamRequired;
     }
 
+    public ExampleAnnotator(String myParam, String myParamRequired, String outputType, String inputType) {
+        this.myParam = myParam;
+        this.myParamRequired = myParamRequired;
+        this.setOutputType(outputType);
+        this.setInputTypes(inputType);
+    }
+
     @Override
     public void annotate(JCas arg0) throws AnalysisEngineProcessException {
         String docText = arg0.getDocumentText();
-        ExampleType example = new ExampleType(arg0, 0, docText.length());
-        example.setNumberOfCASesProcessed((int) this.numberOfCASesProcessed);
-        example.setNumberOfFilteredCASesProcessed((int) this.numberOfFilteredCASesProcessed);
-        example.addToIndexes();
+        HashMap<String, Object> featureMap = new HashMap<>(2);
+        featureMap.put("numberOfCASesProcessed", new Integer((int) this.getNumberOfCASesProcessed()));
+        featureMap.put("numberOfFilteredCASesProcessed", new Integer((int) this.getNumberOfFilteredCASesProcessed()));
+        this.addOutputAnnotation(ExampleType.class.getCanonicalName(), arg0, 0, docText.length(), featureMap);
+//        ExampleType example = new ExampleType(arg0, 0, docText.length());
+//        example.setNumberOfCASesProcessed((int) this.numberOfCASesProcessed);
+//        example.setNumberOfFilteredCASesProcessed((int) this.numberOfFilteredCASesProcessed);
+//        example.addToIndexes();
     }
 
     @Override
@@ -59,6 +72,10 @@ public class ExampleAnnotator extends LeoBaseAnnotator {
                         .addFeature("numberOfFilteredCASesProcessed", "", "uima.cas.Integer")
                         .getTypeDescription()
         );
+    }
+
+    public LeoTypeSystemDescription getTypeSystemDescription() {
+        return super.getLeoTypeSystemDescription();
     }
 
 }

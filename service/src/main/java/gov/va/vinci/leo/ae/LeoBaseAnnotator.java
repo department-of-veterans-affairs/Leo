@@ -453,7 +453,7 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      *
      * @return reference to this
      */
-    public <T extends LeoBaseAnnotator> T setNumberOfFilteredCASesProcessed() {
+    public <T extends LeoBaseAnnotator> T resetNumberOfFilteredCASesProcessed() {
         this.numberOfFilteredCASesProcessed = 0;
         return (T) this;
     }
@@ -618,21 +618,6 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     public <T extends LeoBaseAnnotator> T setLeoTypeSystemDescription(LeoTypeSystemDescription typeSystemDescription) {
         this.typeSystemDescription = typeSystemDescription;
         return (T) this;
-    }
-
-    /**
-     * A set of default parameters for the base annotation.
-     *
-     * Extending annotators may use persist parameters from a parent class by extending the inner Param from the parent as in:
-     * <code>public static class Param extends LeoBaseAnnotator.param {}</code>
-     *
-     * Each field represents an annotation parameter and utilizes the UIMA ConfigurationParameter as in the declaration:
-     * <p>
-     * <code>public static ConfigurationParameter PARAMETER_NAME = new ConfigurationParameterImpl("name", "description", "type", isMandatory, isMultivalued, new String[]{});</code>
-     */
-    @Deprecated
-    public static class Param {
-        /** Parameters for this class are now defined using annotations **/
     }
 
 }
