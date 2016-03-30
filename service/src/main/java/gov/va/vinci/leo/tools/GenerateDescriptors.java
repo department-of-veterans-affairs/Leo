@@ -85,8 +85,9 @@ public class GenerateDescriptors {
         FileUtils.forceMkdir(new File(newOutputPath));
         annotator.getLeoTypeSystemDescription().toXML(newOutputPath + shortName + "Type.xml");
 
-        LeoAEDescriptor desc = (LeoAEDescriptor) annotator.getDescriptor();
-        desc.toXML(shortName);
+        LeoAEDescriptor desc = (LeoAEDescriptor) annotator.getDescriptor()
+                .setDescriptorLocator(new File(newOutputPath + shortName).toURI());
+        desc.toXML();
         String descriptorPath = desc.getDescriptorLocator();
         if (descriptorPath.startsWith("file:")) {
             descriptorPath = descriptorPath.substring(5);

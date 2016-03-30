@@ -20,6 +20,8 @@ package gov.va.vinci.leo.listener;
  * #L%
  */
 
+import gov.va.vinci.leo.model.NameValue;
+import gov.va.vinci.leo.tools.CasTools;
 import gov.va.vinci.leo.types.CSI;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -298,28 +300,14 @@ public abstract class BaseListener extends UimaAsBaseCallbackListener {
      * found
      */
     protected String getReferenceLocation(JCas jcas) {
-        Iterator<Annotation> it = null;
-        try {
-            if (jcas.getAnnotationIndex(CSI.type).iterator().hasNext()) {
-                it = jcas.getAnnotationIndex(CSI.type).iterator();
-                CSI srcDocInfo = (CSI) it.next();
-                if (srcDocInfo != null)
-                    this.docInfo = srcDocInfo;
-                return srcDocInfo.getID();
-            } else if (jcas.getAnnotationIndex(SourceDocumentInformation.type)
-                    .iterator().hasNext()) {
-                it = jcas.getAnnotationIndex(SourceDocumentInformation.type)
-                        .iterator();
-                SourceDocumentInformation srcDocInfo = (SourceDocumentInformation) it
-                        .next();
-                return srcDocInfo.getUri();
-            } else {
-                return null;
-            }// else
-        } catch (Exception e) {
-            // Happens when CSI is not in the descriptor.
+        NameValue nv = CasTools.getReferenceID(jcas);
+        if(nv == null)
             return null;
-        }
+
+        if(nv.getValue() != null)
+            this.docInfo = (CSI) nv.getValue();
+        return nv.getName();
+
     }// getReferenceLocation method
 
     /**

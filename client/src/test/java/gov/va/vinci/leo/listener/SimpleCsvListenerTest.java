@@ -69,11 +69,12 @@ public class SimpleCsvListenerTest {
     }
 
     @Test
-    public void testSimple() throws IOException {
+    public void testSimple() throws Exception {
         File f = File.createTempFile("testSimple", "txt");
         SimpleCsvListener listener = new SimpleCsvListener(f).setIncludeHeader(true);
         listener.initializationComplete(null);
         listener.entityProcessComplete(cas, null);
+        assertEquals("1", listener.getReferenceLocation(cas.getJCas()));
         String b = FileUtils.readFileToString(f).trim();
         assertEquals("\"DocumentId\",\"Start\",\"End\",\"Type\",\"CoveredText\"\n" +
                 "\"1\",\"0\",\"29\",\"gov.va.vinci.leo.types.CSI\",\"01234567890123456789012345678\"\n" +

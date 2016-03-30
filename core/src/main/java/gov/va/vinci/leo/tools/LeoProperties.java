@@ -329,9 +329,11 @@ public abstract class LeoProperties {
      * Set the existing Deployment Descriptor file to use.
      *
      * @param mDeploymentDescriptorFile the DeploymentDescriptorFile to set
+     * @return reference to this instance
      */
-    public void setDeploymentDescriptorFile(String mDeploymentDescriptorFile) {
+    public <T extends LeoProperties> T setDeploymentDescriptorFile(String mDeploymentDescriptorFile) {
         this.mDeploymentDescriptorFile = mDeploymentDescriptorFile;
+        return (T) this;
     }
 
     /**
@@ -347,9 +349,11 @@ public abstract class LeoProperties {
      * Optional, name of the service to deploy.
      *
      * @param mServiceName the ServiceName to set
+     * @return reference to this instance
      */
-    public void setServiceName(String mServiceName) {
+    public <T extends LeoProperties> T setServiceName(String mServiceName) {
         this.mServiceName = mServiceName;
+        return (T) this;
     }
 
     /**
@@ -365,9 +369,11 @@ public abstract class LeoProperties {
      * set the broker url.
      *
      * @param mBrokerURL the BrokerURL to set
+     * @return reference to this instance
      */
-    public void setBrokerURL(String mBrokerURL) {
+    public <T extends LeoProperties> T setBrokerURL(String mBrokerURL) {
         this.mBrokerURL = mBrokerURL;
+        return (T) this;
     }
 
     /**
@@ -383,9 +389,11 @@ public abstract class LeoProperties {
      * Set the "InputQueueName" for this service.
      *
      * @param mEndpoint the Endpoint to set
+     * @return reference to this instance
      */
-    public void setEndpoint(String mEndpoint) {
+    public <T extends LeoProperties> T setEndpoint(String mEndpoint) {
         this.mEndpoint = mEndpoint;
+        return (T) this;
     }
 
     /**
@@ -401,9 +409,11 @@ public abstract class LeoProperties {
      * Set the "InputQueueName" for this service.
      *
      * @param mInputQueueName  the input queue name for this service.
+     * @return reference to this instance
      */
-    public void setInputQueueName(String mInputQueueName) {
+    public <T extends LeoProperties> T setInputQueueName(String mInputQueueName) {
         this.setEndpoint(mInputQueueName);
+        return (T) this;
     }
 
     /**
@@ -420,9 +430,11 @@ public abstract class LeoProperties {
      * the largest number of replicated objects in the service definition.
      *
      * @param mCasPoolSize the CasPoolSize to set
+     * @return reference to this instance
      */
-    public void setCasPoolSize(int mCasPoolSize) {
+    public <T extends LeoProperties> T setCasPoolSize(int mCasPoolSize) {
         this.mCasPoolSize = mCasPoolSize;
+        return (T) this;
     }
 
     /**
@@ -438,9 +450,11 @@ public abstract class LeoProperties {
      * Size of the FS heap in bytes of each CAS in the pool.
      *
      * @param mFSHeapSize the FSHeapSize to set
+     * @return reference to this instance
      */
-    public void setFSHeapSize(int mFSHeapSize) {
+    public <T extends LeoProperties> T setFSHeapSize(int mFSHeapSize) {
         this.mFSHeapSize = mFSHeapSize;
+        return (T) this;
     }
 
     /**
@@ -457,9 +471,11 @@ public abstract class LeoProperties {
      * an error.  Default is wait forever.
      *
      * @param mTimeout the Timeout to set
+     * @return reference to this instance
      */
-    public void setTimeout(int mTimeout) {
+    public <T extends LeoProperties> T setTimeout(int mTimeout) {
         this.mTimeout = mTimeout;
+        return (T) this;
     }
 
     /**
@@ -476,9 +492,11 @@ public abstract class LeoProperties {
      * time it is considered an error. Default is 60 seconds.
      *
      * @param mInitTimeout the InitTimeout to set
+     * @return reference to this instance
      */
-    public void setInitTimeout(int mInitTimeout) {
+    public <T extends LeoProperties> T setInitTimeout(int mInitTimeout) {
         this.mInitTimeout = mInitTimeout;
+        return (T) this;
     }
 
     /**
@@ -495,9 +513,11 @@ public abstract class LeoProperties {
      * event is thrown.  Default is wait forever.
      *
      * @param mCCTimeout the CCTimeout to set
+     * @return reference to this instance
      */
-    public void setCCTimeout(int mCCTimeout) {
+    public <T extends LeoProperties> T setCCTimeout(int mCCTimeout) {
         this.mCCTimeout = mCCTimeout;
+        return (T) this;
     }
 
     /**
@@ -513,9 +533,11 @@ public abstract class LeoProperties {
      * The base URL for the JAM (JMX Analytics Monitoring) server if available.
      *
      * @param mJamServerBaseUrl the JamServerBaseUrl to set
+     * @return reference to this instance
      */
-    public void setJamServerBaseUrl(String mJamServerBaseUrl) {
+    public <T extends LeoProperties> T setJamServerBaseUrl(String mJamServerBaseUrl) {
         this.mJamServerBaseUrl = mJamServerBaseUrl;
+        return (T) this;
     }
 
     /**
@@ -531,9 +553,11 @@ public abstract class LeoProperties {
      * If registering with JAM, the monitor query interval in seconds.  Default is 60*60 (1 hour)
      *
      * @param mJamQueryIntervalInSeconds the JamQueryIntervalInSeconds to set
+     * @return reference to this instance
      */
-    public void setJamQueryIntervalInSeconds(int mJamQueryIntervalInSeconds) {
+    public <T extends LeoProperties> T setJamQueryIntervalInSeconds(int mJamQueryIntervalInSeconds) {
         this.mJamQueryIntervalInSeconds = mJamQueryIntervalInSeconds;
+        return (T) this;
     }
 
     /**
@@ -550,8 +574,9 @@ public abstract class LeoProperties {
      *
      * @param mJamResetStatisticsAfterQuery the JamResetStatisticsAfterQuery flag to set
      */
-    public void setJamResetStatisticsAfterQuery(boolean mJamResetStatisticsAfterQuery) {
+    public <T extends LeoProperties> T setJamResetStatisticsAfterQuery(boolean mJamResetStatisticsAfterQuery) {
         this.mJamResetStatisticsAfterQuery = mJamResetStatisticsAfterQuery;
+        return (T) this;
     }
 
     /**
@@ -568,8 +593,9 @@ public abstract class LeoProperties {
      *
      * @param mDeleteOnExit true if the descriptors should auto delete.
      */
-    public void setDeleteOnExit(boolean mDeleteOnExit) {
+    public <T extends LeoProperties> T setDeleteOnExit(boolean mDeleteOnExit) {
         this.mDeleteOnExit = mDeleteOnExit;
+        return (T) this;
     }
 
     /**
@@ -586,7 +612,8 @@ public abstract class LeoProperties {
      *
      * @param mDescriptorDirectory String representation of the descriptor directory.
      */
-    public void setDescriptorDirectory(String mDescriptorDirectory) {
+    public <T extends LeoProperties> T setDescriptorDirectory(String mDescriptorDirectory) {
         this.mDescriptorDirectory = mDescriptorDirectory;
+        return (T) this;
     }
 }//LeoProps Class
