@@ -36,6 +36,7 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.util.Progress;
+import org.apache.uima.util.ProgressImpl;
 
 import java.io.IOException;
 import java.util.Map;
@@ -305,7 +306,9 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
      */
     @Override
     public Progress[] getProgress() {
-        return new Progress[0];
+        int current = (mRowIndex > 0)? mRowIndex : 0;
+        int total = (mRecordList == null)? 0 : mRecordList.size();
+        return new Progress[]{ new ProgressImpl(current, total, "row(s)")};
     }
 
 }

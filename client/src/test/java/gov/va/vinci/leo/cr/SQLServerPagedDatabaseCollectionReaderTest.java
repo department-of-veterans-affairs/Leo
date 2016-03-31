@@ -22,7 +22,7 @@ public class SQLServerPagedDatabaseCollectionReaderTest {
 
     @Test
     public void testHasNext() throws Exception {
-        MockSQLServerPagedDatabaseCollectionReader cr = (MockSQLServerPagedDatabaseCollectionReader) new MockSQLServerPagedDatabaseCollectionReader("com.mock", "url", "user", "password", "select id, note from doc order by id",
+        MockSQLServerPagedDatabaseCollectionReader cr = (MockSQLServerPagedDatabaseCollectionReader) new MockSQLServerPagedDatabaseCollectionReader("com.mock", "url", "username", "password", "select id, note from doc order by id",
                 "id", "note", 3).produceCollectionReader();
 
 
@@ -99,7 +99,7 @@ public class SQLServerPagedDatabaseCollectionReaderTest {
 
     @Test
     public void testHasNextWithStartOffset() throws Exception {
-        MockSQLServerPagedDatabaseCollectionReader cr = (MockSQLServerPagedDatabaseCollectionReader) new MockSQLServerPagedDatabaseCollectionReader("com.mock", "url", "user", "password", "select id, note from doc order by id",
+        MockSQLServerPagedDatabaseCollectionReader cr = (MockSQLServerPagedDatabaseCollectionReader) new MockSQLServerPagedDatabaseCollectionReader("com.mock", "url", "username", "password", "select id, note from doc order by id",
                 "id", "note", 3, 2).produceCollectionReader();
 
 
@@ -176,7 +176,7 @@ public class SQLServerPagedDatabaseCollectionReaderTest {
 
     @Test
     public void testHasNextWithStartOffsetMaxOffset() throws Exception {
-        MockSQLServerPagedDatabaseCollectionReader cr = (MockSQLServerPagedDatabaseCollectionReader) new MockSQLServerPagedDatabaseCollectionReader("com.mock", "url", "user", "password", "select id, note from doc order by id",
+        MockSQLServerPagedDatabaseCollectionReader cr = (MockSQLServerPagedDatabaseCollectionReader) new MockSQLServerPagedDatabaseCollectionReader("com.mock", "url", "username", "password", "select id, note from doc order by id",
                 "id", "note", 3, 2, 7).produceCollectionReader();
 
 
