@@ -1,6 +1,8 @@
 package gov.va.vinci.leo.cr;
 
 import gov.va.vinci.leo.SampleService;
+import gov.va.vinci.leo.model.DataQueryInformation;
+import gov.va.vinci.leo.model.DatabaseConnectionInformation;
 import gov.va.vinci.leo.tools.db.DataManager;
 import gov.va.vinci.leo.tools.db.LeoArrayListHandler;
 import org.apache.uima.UIMAFramework;
@@ -11,6 +13,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,6 +23,53 @@ import static org.mockito.Mockito.when;
  */
 public class SQLServerPagedDatabaseCollectionReaderTest {
 
+    @Test
+    public void testInitializeDciDqi() throws Exception {
+        String driver = "com.mock", url = "url", username = "username", password = "password",
+               query = "select * from notes order by id", idColumn = "id", noteColumn = "note";
+        int pageSize = 10, firstOffset = 0;
+        //Create reader using first constructor
+        SQLServerPagedDatabaseCollectionReader reader = new SQLServerPagedDatabaseCollectionReader(
+            new DatabaseConnectionInformation(driver, url, username, password),
+            new DataQueryInformation(query, noteColumn, idColumn),
+            pageSize
+        );
+        assertNotNull(reader);
+        assertEquals(driver, reader.getDriver());
+        assertEquals(url, reader.getURL());
+        assertEquals(username, reader.getUsername());
+        assertEquals(password, reader.getPassword());
+        assertEquals(query, reader.getQuery());
+        assertEquals(idColumn, reader.getIdColumn());
+        assertEquals(noteColumn, reader.getNoteColumn());
+        assertEquals(pageSize, reader.getPageSize());
+        assertEquals(0, reader.getFirstOffset());
+
+        //Create reader using second constructor
+        reader = new SQLServerPagedDatabaseCollectionReader(
+                new DatabaseConnectionInformation(driver, url, username, password),
+                new DataQueryInformation(query, noteColumn, idColumn),
+                pageSize, firstOffset
+        );
+        assertNotNull(reader);
+        assertEquals(driver, reader.getDriver());
+        assertEquals(url, reader.getURL());
+        assertEquals(username, reader.getUsername());
+        assertEquals(password, reader.getPassword());
+        assertEquals(query, reader.getQuery());
+        assertEquals(idColumn, reader.getIdColumn());
+        assertEquals(noteColumn, reader.getNoteColumn());
+        assertEquals(pageSize, reader.getPageSize());
+        assertEquals(firstOffset, reader.getFirstOffset());
+
+        //Check getters and setters
+        reader.setFirstOffset(100);
+        reader.setMaxOffset(1000);
+        reader.setPageSize(200);
+        assertEquals(100, reader.getFirstOffset());
+        assertEquals(1000, reader.getMaxOffset());
+        assertEquals(200, reader.getPageSize());
+    }
 
     @Test
     public void testHasNext() throws Exception {
