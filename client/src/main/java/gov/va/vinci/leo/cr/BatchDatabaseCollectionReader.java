@@ -82,7 +82,7 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
     /**
      * Store the batch numbers already visited when executing random batches.
      */
-    protected HashSet<Integer> usedBatches = null;
+    protected HashSet<Integer> usedBatches = new HashSet<>();
     /**
      * Generates the random batch number if random batches are indicated.
      */
