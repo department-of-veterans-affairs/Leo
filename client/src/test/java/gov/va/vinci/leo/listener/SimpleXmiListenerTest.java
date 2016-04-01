@@ -16,6 +16,7 @@ import org.junit.Test;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -24,9 +25,10 @@ import static org.junit.Assert.assertTrue;
 public class SimpleXmiListenerTest {
     protected static AnalysisEngine ae = null;
     protected static File aggregateDescriptor = new File("src/test/resources/aggSimpleXmiListenerTest.xml");
-    protected static File outDir = new File("src/test/resources/xmi-listener-test-out");
+    protected static File outDir = new File("src/test/resources/xmi-listener-test");
     protected static File inDir = new File("src/test/resources/inputDirectory");
     protected static String rootDirectory = "";
+    protected static LeoAEDescriptor aggDesc = null;
 
     @Before
     public void setup() throws Exception {
@@ -35,18 +37,17 @@ public class SimpleXmiListenerTest {
         if (!path.endsWith("client")) {
             rootDirectory = "client/";
             aggregateDescriptor = new File(rootDirectory + "src/test/resources/aggSimpleXmiListenerTest.xml");
-            outDir = new File(rootDirectory + "src/test/resources/xmi-listener-test-out");
+            outDir = new File(rootDirectory + "src/test/resources/xmi-listener-test");
             inDir = new File(rootDirectory + "src/test/resources/inputDirectory");
         }
 
         if (ae != null)
             return;
-        LeoAEDescriptor aggDesc = SampleService.simpleServiceDefinition();
+        aggDesc = SampleService.simpleServiceDefinition();
         ae = UIMAFramework.produceAnalysisEngine(
                 aggDesc.getAnalysisEngineDescription()
         );
         aggDesc.setDescriptorLocator(aggregateDescriptor.toURI()).toXML();
-        //aggDesc.getAnalysisEngineDescription().toXML(FileUtils.openOutputStream(aggregateDescriptor));
         if (!outDir.exists())
             outDir.mkdir();
         /**
@@ -64,9 +65,10 @@ public class SimpleXmiListenerTest {
     @Test
     public void testSimpleXmiListener() throws Exception {
         SimpleXmiListener listener = new SimpleXmiListener(outDir)
-                .setLaunchAnnotationViewer(false)
-                .setTypeSystemDescriptor(aggregateDescriptor);
-        FileCollectionReader reader = (FileCollectionReader) new FileCollectionReader(inDir, false).produceCollectionReader();
+                .setTypeSystemDescriptor(aggDesc.getTypeSystemDescription())
+                .setLaunchAnnotationViewer(false);
+        assertNotNull(listener);
+        FileCollectionReader reader = (FileCollectionReader) new FileCollectionReader(inDir, true).produceCollectionReader();
         int counter = 0;
         while(reader.hasNext()) {
             CAS cas = ae.newCAS();
@@ -77,7 +79,7 @@ public class SimpleXmiListenerTest {
         }
         listener.collectionProcessComplete(null);
         File[] files = outDir.listFiles();
-        assertEquals(counter, files.length);
+        assertEquals(counter+1, files.length);
         if(files.length > 0) {
             String xmiText = FileUtils.readFileToString(files[0]);
             assertTrue(xmiText.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?><xmi:XMI xmlns:tcas=\"http:///uima/tcas.ecore\""));

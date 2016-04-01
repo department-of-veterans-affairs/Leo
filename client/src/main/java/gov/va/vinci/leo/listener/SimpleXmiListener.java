@@ -24,10 +24,13 @@ package gov.va.vinci.leo.listener;
  */
 
 
+import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import org.apache.log4j.Logger;
 import org.apache.uima.aae.client.UimaASProcessStatus;
+import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
+import org.apache.uima.cas.TypeSystem;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.collection.EntityProcessStatus;
 import org.apache.uima.jcas.JCas;
@@ -54,7 +57,18 @@ public class SimpleXmiListener extends BaseListener {
     /**
      * Path to the type system descriptor or aggregate descriptor file for the service.
      */
-    protected File typeSystemDescriptor = null;
+    protected LeoTypeSystemDescription typeSystemDescriptor = null;
+
+    /**
+     * File pointer to the serialized type description.
+     */
+    protected File typeDescriptionFile = null;
+
+    /**
+     * Name of the type system description which this listener will serialize if the typeSystemDescriptor is set.
+     */
+    public static final String TYPE_DESCRIPTION_NAME = "type_system_desc.xml";
+
     /**
      * Logging object of output.
      */
@@ -72,19 +86,30 @@ public class SimpleXmiListener extends BaseListener {
     /**
      * Get the type system or aggregate descriptor File reference that this listener will set in the viewer if launched.
      *
-     * @return type system descriptor file reference
+     * @return leo type system description
      */
-    public File getTypeSystemDescriptor() {
+    public LeoTypeSystemDescription getTypeSystemDescriptor() {
         return typeSystemDescriptor;
     }
 
     /**
-     * Set the type system or aggregate descriptor File reference that this listener will set in the viewer if launched.
+     * Set the type system descriptor File reference that this listener will set in the viewer if launched.
      *
      * @param typeSystemDescriptor type system descriptor file reference
      * @return reference to this listener instance
      */
-    public SimpleXmiListener setTypeSystemDescriptor(File typeSystemDescriptor) {
+    public SimpleXmiListener setTypeSystemDescriptor(File typeSystemDescriptor) throws Exception {
+        this.typeSystemDescriptor = new LeoTypeSystemDescription(typeSystemDescriptor.getAbsolutePath(), false);
+        return this;
+    }
+
+    /**
+     * Set the type system description this listener will serialize into the output directory.
+     *
+     * @param typeSystemDescriptor type system descriptor to set
+     * @return reference to this listener instance
+     */
+    public SimpleXmiListener setTypeSystemDescriptor(LeoTypeSystemDescription typeSystemDescriptor) {
         this.typeSystemDescriptor = typeSystemDescriptor;
         return this;
     }
@@ -165,10 +190,18 @@ public class SimpleXmiListener extends BaseListener {
                     log.warn("Could not close stream: " + e);
                 }
             }
-
             return;
         }//if aStatus != null && isException
 
+        //Serialize the file if not done already
+        if(typeSystemDescriptor != null && typeDescriptionFile == null) {
+            typeDescriptionFile = new File(mOutputDir, TYPE_DESCRIPTION_NAME);
+            try {
+                typeSystemDescriptor.toXML(typeDescriptionFile.getAbsolutePath());
+            } catch (Exception e) {
+                log.error("Error writing out the Type system XML", e);
+            }
+        }
 
         if (doc == null || doc.equals("")) {
             String casID = ((UimaASProcessStatus) aStatus).getCasReferenceId();
@@ -212,8 +245,8 @@ public class SimpleXmiListener extends BaseListener {
      */
     protected void launchAnnotationViewer() {
         Preferences prefs = Preferences.userRoot().node("org/apache/uima/tools/AnnotationViewer");
-        if (typeSystemDescriptor != null) {
-            prefs.put("taeDescriptorFile", typeSystemDescriptor.getAbsolutePath());
+        if (typeDescriptionFile != null) {
+            prefs.put("taeDescriptorFile", typeDescriptionFile.getAbsolutePath());
         }//if typeSystemDescriptor != null
         if (mOutputDir != null) {
             try {

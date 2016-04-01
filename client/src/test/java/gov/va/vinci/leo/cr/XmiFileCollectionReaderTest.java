@@ -20,20 +20,25 @@ package gov.va.vinci.leo.cr;
  * #L%
  */
 
-import gov.va.vinci.leo.SampleService;
+import gov.va.vinci.leo.MockClient;
+import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
+import gov.va.vinci.leo.listener.DoNothingListener;
+import gov.va.vinci.leo.listener.SimpleXmiListener;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
+import org.apache.uima.resource.ResourceProcessException;
 import org.apache.uima.resource.metadata.TypeDescription;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static gov.va.vinci.leo.SampleService.simpleServiceDefinition;
+import static org.junit.Assert.*;
 
 
 /**
@@ -45,7 +50,21 @@ import static org.junit.Assert.assertTrue;
  */
 public class XmiFileCollectionReaderTest {
 
-    public static final File xmiTestCorpus = new File("client/src/test/resources/xmi-corpus");
+    public static File xmiTestCorpus = null;
+    public static File xmiTestBadCorpus = null;
+    String rootDirectory = "";
+
+
+    @Before
+    public void setTestString() throws IOException {
+        String path = new File(".").getCanonicalPath();
+        if (!path.endsWith("client")) {
+            rootDirectory = "client/";
+        }
+        xmiTestBadCorpus = new File(rootDirectory + "src/test/resources/xmi-corpus-bad");
+        xmiTestCorpus = new File(rootDirectory + "src/test/resources/xmi-corpus-good");
+    }
+
 
     @Test
     public void testEmptyConstructor() throws Exception {
@@ -78,6 +97,49 @@ public class XmiFileCollectionReaderTest {
         xmiFileSubReader.initialize();
     }
 
+    @Test(expected = ResourceProcessException.class)
+    public void testRunReaderBadTypeSystem() throws Exception {
+        XmiFileCollectionReader reader = new XmiFileCollectionReader(xmiTestBadCorpus, false);
+        assertNotNull(reader);
+        DoNothingListener listener = new DoNothingListener();
+        MockClient client = new MockClient();
+        assertNotNull(client);
+        assertNotNull(listener);
+
+        //Add the type system
+        client.getEngine().setAnalysisEngineFromDescription(
+                simpleServiceDefinition(
+                        new LeoTypeSystemDescription(new File(xmiTestBadCorpus, "type-system.xml").getAbsolutePath(), false)
+                )
+        );
+
+        //Run the client
+        client.run(reader, listener);
+    }
+
+    @Test
+    public void testRunReader() throws Exception {
+        XmiFileCollectionReader reader = new XmiFileCollectionReader(xmiTestCorpus, false);
+        assertNotNull(reader);
+        DoNothingListener listener = new DoNothingListener();
+        MockClient client = new MockClient();
+        assertNotNull(client);
+        assertNotNull(listener);
+
+        //Add the type system
+        client.getEngine().setAnalysisEngineFromDescription(
+                simpleServiceDefinition(
+                        new LeoTypeSystemDescription(new File(xmiTestCorpus, SimpleXmiListener.TYPE_DESCRIPTION_NAME).getAbsolutePath(), false)
+                )
+        );
+
+        //Run the client
+        client.run(reader, listener);
+        //System.out.println("xmiTestCorpus files: " + xmiTestCorpus.listFiles().length + ", listener.processed: " + listener.getNumReceived());
+        assertEquals(xmiTestCorpus.listFiles().length - 1, listener.getNumReceived());
+    }
+
+    @Test
     public void testInitialize() throws Exception {
         XmiFileCollectionReader xmiFileCollectionReader =
                 (XmiFileCollectionReader) new XmiFileCollectionReader(xmiTestCorpus, true).produceCollectionReader();
@@ -88,11 +150,12 @@ public class XmiFileCollectionReaderTest {
     public void checkCollection(XmiFileCollectionReader xfsr) throws Exception {
         assertNotNull(xfsr);
         assertTrue(xfsr.hasNext());
-        assertEquals(xfsr.getCollectionSize(), 12);
-        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(SampleService.simpleServiceDefinition().getAnalysisEngineDescription());
+        assertEquals(2, xfsr.getCollectionSize());
+        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(simpleServiceDefinition().getAnalysisEngineDescription());
         TypeDescription[] ar = ae.getAnalysisEngineMetaData().getTypeSystem().getTypes();
         JCas mockCas = ae.newJCas();
         xfsr.getNext(mockCas.getCas());
-        assertTrue(mockCas.getDocumentText().startsWith("ReportText"));
+        //System.out.println(mockCas.getDocumentText());
+        assertTrue(mockCas.getDocumentText().startsWith("this"));
     }
 }

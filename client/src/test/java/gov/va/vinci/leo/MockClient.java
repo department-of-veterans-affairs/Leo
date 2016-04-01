@@ -1,6 +1,8 @@
 package gov.va.vinci.leo;
 
 import gov.va.vinci.leo.cr.LeoCollectionReaderInterface;
+import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
+import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.listener.MockUimaASProcessStatus;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.AsynchAECasManager_impl;
@@ -141,6 +143,21 @@ public class MockClient extends Client {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        public void setAnalysisEngineFromDescription(LeoAEDescriptor descriptor) {
+            if(descriptor == null) {
+                throw new RuntimeException("Cannot create AnalysisEngine from null descriptor!");
+            }
+            try {
+                ae = UIMAFramework.produceAnalysisEngine(descriptor.getAnalysisEngineDescription());
+            } catch (ResourceInitializationException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public AnalysisEngine getAnalysisEngine() {
+            return ae;
         }
 
         public synchronized void initialize(Map anApplicationContext) throws ResourceInitializationException {

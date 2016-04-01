@@ -103,6 +103,8 @@ public class XmiFileCollectionReader extends BaseFileCollectionReader {
             file = new FileInputStream(next);
             XmiCasDeserializer.deserialize(file, aCAS);
         } catch (SAXException e) {
+            if(next != null)
+                LOG.error("Error reading file: " + next.getAbsolutePath());
             throw new CollectionException(e);
         } finally {
             try {

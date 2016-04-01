@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<typeSystemDescription xmlns="http://uima.apache.org/resourceSpecifier">
+    <name>leoTypeDescription_a896563a-c4a4-4db8-ae97-515aa6714225</name>
+    <types>
+        <typeDescription>
+            <name>gov.va.vinci.leo.whitespace.types.Token</name>
+            <description/>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>TokenType</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.Integer</rangeTypeName>
+                </featureDescription>
+            </features>
+        </typeDescription>
+        <typeDescription>
+            <name>gov.va.vinci.leo.whitespace.types.WordToken</name>
+            <description>Annotates collections of letters</description>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+        </typeDescription>
+        <typeDescription>
+            <name>gov.va.vinci.leo.types.CSI</name>
+            <description>CSI Annotation</description>
+            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>ID</name>
+                    <description>ID</description>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
+                <featureDescription>
+                    <name>Locator</name>
+                    <description>Locator for document.</description>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
+                <featureDescription>
+                    <name>RowData</name>
+                    <description>Row data for document (if any)</description>
+                    <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+                </featureDescription>
+                <featureDescription>
+                    <name>PropertiesKeys</name>
+                    <description>Property keys</description>
+                    <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+                </featureDescription>
+                <featureDescription>
+                    <name>PropertiesValues</name>
+                    <description>Property Values</description>
+                    <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+                </featureDescription>
+            </features>
+        </typeDescription>
+    </types>
+</typeSystemDescription>

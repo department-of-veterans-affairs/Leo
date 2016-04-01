@@ -26,6 +26,7 @@ package gov.va.vinci.leo;
  */
 
 import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
+import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.types.TypeLibrarian;
 import gov.va.vinci.leo.whitespace.ae.WhitespaceTokenizer;
 import gov.va.vinci.leo.whitespace.types.Token;
@@ -34,39 +35,53 @@ import gov.va.vinci.leo.whitespace.types.WordToken;
 /**
  * Test code that creates services that can be used for SystemIntegration Testing.
  * Not to be used as jUnit tests.
- * 
+ *
  * @author thomasginter
  */
 public class SampleService {
-	
-	/**
-	 * Provide a simple service definition for testing.
-	 * 
-	 * @return
-	 * 		Aggregate LeoAEDescriptor object
-	 * @throws Exception
-	 */
-	public static LeoAEDescriptor simpleServiceDefinition () throws Exception {
-		LeoAEDescriptor ae = new WhitespaceTokenizer().getLeoAEDescriptor()
+
+    /**
+     * Provide a simple service definition for testing.
+     *
+     * @return Aggregate LeoAEDescriptor object
+     * @throws Exception
+     */
+    public static LeoAEDescriptor simpleServiceDefinition() throws Exception {
+        return simpleServiceDefinition(null);
+    }
+
+    public static LeoAEDescriptor simpleServiceDefinition(LeoTypeSystemDescription typeSystemDescriptionToAdd) throws Exception {
+        LeoTypeSystemDescription typeSystem = getTypeSystemDescription(typeSystemDescriptionToAdd);
+        LeoAEDescriptor ae = new WhitespaceTokenizer().getLeoAEDescriptor()
                 .setParameterSetting(WhitespaceTokenizer.Param.TOKEN_OUTPUT_TYPE.getName(), Token.class.getCanonicalName())
                 .setParameterSetting(WhitespaceTokenizer.Param.WORD_OUTPUT_TYPE.getName(), WordToken.class.getCanonicalName())
                 .setParameterSetting(WhitespaceTokenizer.Param.TOKEN_OUTPUT_TYPE_FEATURE.getName(), "TokenType")
-                .setTypeSystemDescription(new WhitespaceTokenizer().getLeoTypeSystemDescription());
+                .setTypeSystemDescription(typeSystem);
         ae.addType(TypeLibrarian.getCSITypeSystemDescription());
-		ae.setIsAsync(true);
+        ae.setIsAsync(true);
         return ae;
     }
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			Service s = new Service();
-			s.deploy(SampleService.simpleServiceDefinition());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}//main method
+    public static LeoTypeSystemDescription getTypeSystemDescription(LeoTypeSystemDescription typeSystemDescriptionToAdd) {
+        if(typeSystemDescriptionToAdd == null)
+            return getTypeSystemDescription();
+        return getTypeSystemDescription().addTypeSystemDescription(typeSystemDescriptionToAdd);
+    }
+
+    public static LeoTypeSystemDescription getTypeSystemDescription() {
+        return new WhitespaceTokenizer().getLeoTypeSystemDescription().addType(TypeLibrarian.getCSITypeSystemDescription());
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        try {
+            Service s = new Service();
+            s.deploy(SampleService.simpleServiceDefinition());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//main method
 
 }//SampleService class
