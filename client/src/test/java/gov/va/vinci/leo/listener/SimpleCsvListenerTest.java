@@ -21,40 +21,45 @@ package gov.va.vinci.leo.listener;
  */
 
 
+import au.com.bytecode.opencsv.CSVWriter;
+import clover.org.apache.commons.lang3.StringUtils;
 import gov.va.vinci.leo.SampleService;
+import gov.va.vinci.leo.cr.RandomStringCollectionReader;
 import gov.va.vinci.leo.types.CSI;
-import gov.va.vinci.leo.whitespace.ae.WhitespaceTokenizer;
 import gov.va.vinci.leo.whitespace.types.Token;
 import gov.va.vinci.leo.whitespace.types.WordToken;
 import org.apache.commons.io.FileUtils;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.analysis_engine.AnalysisEngine;
-import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
-import org.apache.uima.cas.Feature;
-import org.apache.uima.cas.FeatureStructure;
-import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.tcas.Annotation;
-import org.apache.uima.util.CasCreationUtils;
+import org.apache.uima.collection.impl.EntityProcessStatusImpl;
+import org.apache.uima.util.ProcessTrace;
+import org.apache.uima.util.impl.ProcessTrace_impl;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.OutputStream;
+import java.io.StringWriter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class SimpleCsvListenerTest {
     protected static CAS cas = null;
-
+    protected static File inDir = new File("src/test/resources/inputDirectory");
+    protected static String rootDirectory = "";
 
     @Before
     public void setup() throws Exception {
-        if(cas != null)
+        if (cas != null)
             return;
+        String path = new File(".").getCanonicalPath();
+        if(!path.endsWith("client")) {
+            rootDirectory = "client/";
+            inDir = new File(rootDirectory + "src/test/resources/inputDirectory");
+        }
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(
                 SampleService.simpleServiceDefinition().getAnalysisEngineDescription()
         );
@@ -66,6 +71,27 @@ public class SimpleCsvListenerTest {
         csi.setEnd(29);
         csi.addToIndexes();
         ae.process(cas);
+    }
+
+    @Test
+    public void testOutputStreamConstructor() throws Exception {
+        OutputStream out = FileUtils.openOutputStream(File.createTempFile("testOutput", "csv"));
+        assertNotNull(out);
+        SimpleCsvListener listener = new SimpleCsvListener(out);
+        assertNotNull(listener);
+        listener.setIncludeFeatures(true);
+        assertTrue(listener.isIncludeFeatures());
+    }
+
+    @Test
+    public void testWriterConstructor() throws Exception {
+        StringWriter writer = new StringWriter();
+        SimpleCsvListener listener = new SimpleCsvListener(writer);
+        assertNotNull(listener);
+        assertEquals(CSVWriter.DEFAULT_ESCAPE_CHARACTER, listener.getEscapechar());
+        assertEquals(CSVWriter.DEFAULT_SEPARATOR, listener.getSeparator());
+        assertEquals(CSVWriter.DEFAULT_QUOTE_CHARACTER, listener.getQuotechar());
+        assertEquals(CSVWriter.DEFAULT_LINE_END, listener.getLineEnd());
     }
 
     @Test
@@ -93,6 +119,29 @@ public class SimpleCsvListenerTest {
         String b = FileUtils.readFileToString(f).trim();
         assertEquals("\"1\"|\"0\"|\"29\"|\"gov.va.vinci.leo.types.CSI\"|\"01234567890123456789012345678\"|\"[ID = 1]\"|\"[Locator = null]\"|\"[RowData = null]\"|\"[PropertiesKeys = null]\"|\"[PropertiesValues = null]\"\n" +
                 "\"1\"|\"0\"|\"30\"|\"gov.va.vinci.leo.whitespace.types.Token\"|\"012345678901234567890123456789\"|\"[TokenType = 1]\"", b.toString());
+    }
+
+    @Test
+    public void testRunSimpleCsvListenerTest() throws Exception {
+        StringWriter writer = new StringWriter();
+        SimpleCsvListener listener = new SimpleCsvListener(writer);
+        assertNotNull(listener);
+        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(
+                SampleService.simpleServiceDefinition().getAnalysisEngineDescription()
+        );
+        RandomStringCollectionReader reader = new RandomStringCollectionReader(10).setMaxStringLength(16);
+        int counter = 0;
+        ProcessTrace pTrace = null;
+        while(reader.hasNext()) {
+            CAS cas = ae.newCAS();
+            reader.getNext(cas);
+            listener.onBeforeMessageSend(new UimaASProcessStatusImpl(new ProcessTrace_impl(), cas, "" + counter++));
+            pTrace = ae.process(cas);
+            listener.entityProcessComplete(cas, new EntityProcessStatusImpl(pTrace));
+        }
+        listener.collectionProcessComplete(new EntityProcessStatusImpl(pTrace));
+        assertEquals(counter, listener.getNumReceived());
+        assertTrue(StringUtils.isNotBlank(writer.toString()));
     }
 
 }

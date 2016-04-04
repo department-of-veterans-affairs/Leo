@@ -3,11 +3,14 @@ package gov.va.vinci.leo.listener;
 import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.cr.FileCollectionReader;
 import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
+import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import org.apache.commons.io.FileUtils;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.collection.impl.EntityProcessStatusImpl;
+import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.impl.ProcessTrace_impl;
 import org.junit.After;
 import org.junit.Before;
@@ -74,8 +77,8 @@ public class SimpleXmiListenerTest {
             CAS cas = ae.newCAS();
             reader.getNext(cas);
             listener.onBeforeMessageSend(new UimaASProcessStatusImpl(new ProcessTrace_impl(), cas, "" + counter++));
-            ae.process(cas);
-            listener.entityProcessComplete(cas, null);
+            ProcessTrace pTrace = ae.process(cas);
+            listener.entityProcessComplete(cas, new EntityProcessStatusImpl(pTrace));
         }
         listener.collectionProcessComplete(null);
         File[] files = outDir.listFiles();
@@ -84,6 +87,17 @@ public class SimpleXmiListenerTest {
             String xmiText = FileUtils.readFileToString(files[0]);
             assertTrue(xmiText.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?><xmi:XMI xmlns:tcas=\"http:///uima/tcas.ecore\""));
         }
+    }
+
+    @Test
+    public void testSimpleXmiListenerWithTypeSystem() throws Exception {
+        SimpleXmiListener listener = new SimpleXmiListener(outDir)
+                .setTypeSystemDescriptor(new File(rootDirectory + "src/test/resources/xmi-corpus-good/type_system_desc.xml"))
+                .setLaunchAnnotationViewer(true);
+        LeoTypeSystemDescription typeSystemDescription = listener.getTypeSystemDescriptor();
+        assertNotNull(typeSystemDescription);
+        assertEquals(3, typeSystemDescription.getTypes().length);
+        assertTrue(listener.isLaunchAnnotationViewer());
     }
 
     @After
