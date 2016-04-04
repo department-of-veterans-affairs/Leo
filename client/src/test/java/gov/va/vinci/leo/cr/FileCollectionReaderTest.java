@@ -22,6 +22,7 @@ package gov.va.vinci.leo.cr;
 
 import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.types.CSI;
+import org.apache.commons.lang3.CharSet;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
@@ -33,6 +34,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
@@ -103,7 +105,10 @@ public class FileCollectionReaderTest {
     public void testGetNext() throws Exception {
         FileCollectionReader fsr =
                 (FileCollectionReader) new FileCollectionReader(new File(rootDirectory + "src/test/resources/inputDirectory"), false)
+                        .setEncoding(Charset.defaultCharset().displayName())
                         .produceCollectionReader();
+        assertEquals(Charset.defaultCharset().displayName(), fsr.getEncoding());
+        assertEquals(new File(rootDirectory + "src/test/resources/inputDirectory").getAbsolutePath(), fsr.getInputDirectory().getAbsolutePath());
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(SampleService
                 .simpleServiceDefinition()
                 .getAnalysisEngineDescription());

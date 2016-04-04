@@ -127,10 +127,10 @@ public class BatchDatabaseCollectionReaderTest {
         assertTrue(query.equals(reader.baseQuery));
         assertTrue(reader.noteColumn.equals("note"));
         assertTrue(reader.idColumn.equals("id"));
-        assertTrue(reader.randomBatches == 2);
-        assertTrue(reader.minRecordNumber == MIN_RECORD_NUMBER);
-        assertTrue(reader.maxRecordNumber == TEST_CORPUS_SIZE);
-        assertTrue(reader.batchSize == BATCH_SIZE);
+        assertEquals(2, reader.getRandomBatches());
+        assertEquals(MIN_RECORD_NUMBER, reader.getMinRecordNumber());
+        assertEquals(TEST_CORPUS_SIZE, reader.getMaxRecordNumber());
+        assertEquals(BATCH_SIZE, reader.getBatchSize());
         //Init the listener and mock client
         DoNothingListener listener = new DoNothingListener();
         MockClient client = new MockClient(listener);

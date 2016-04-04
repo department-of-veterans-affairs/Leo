@@ -104,6 +104,8 @@ public class LeoRemoteAEDescriptorTest {
         lrae.toXML("myRemoteTestFile");
         String lraeXmlPath = lrae.getDescriptorLocator();
         assertFalse(StringUtils.isBlank(lraeXmlPath));
+        lrae.setIsDeleteOnExit(true);
+        assertTrue(lrae.isDeleteOnExit());
         LeoRemoteAEDescriptor importLRAE = new LeoRemoteAEDescriptor(lraeXmlPath, false);
         assertNotNull(importLRAE);
         assertTrue(importLRAE.getName().startsWith("myRemoteTestDescriptor"));
