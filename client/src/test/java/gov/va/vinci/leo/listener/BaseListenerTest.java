@@ -64,6 +64,7 @@ public class BaseListenerTest {
 
         MyTestListener listener = new MyTestListener();
         listener.setLogErrors(true);
+        assertTrue(listener.isLogErrors());
 
         listener.entityProcessComplete(cas, new EntityProcessStatus() {
             @Override

@@ -36,9 +36,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class BaseDatabaseListenerTest {
@@ -49,10 +51,10 @@ public class BaseDatabaseListenerTest {
 
     DatabaseConnectionInformation dbConnectionInfoWithValidation = new DatabaseConnectionInformation("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:" + dbName + "2112testdb;sql.enforce_strict_size=true", "sa", "", "select count(*) from dummy_table");
 
-    Connection conn = null;
     CAS cas = null;
     String rootDirectory = "";
 
+    Connection conn = null;
 
     /**
      * Setup an in-memory db to test against with a simple schema.
@@ -66,10 +68,6 @@ public class BaseDatabaseListenerTest {
             rootDirectory = "client/";
         }
 
-        Class.forName(dbConnectionInfo.getDriver()).newInstance();
-
-        conn = DriverManager.getConnection(dbConnectionInfo.getUrl(), dbConnectionInfo.getUsername(), dbConnectionInfo.getPassword());
-        conn.createStatement().execute("CREATE TABLE DUMMY_TABLE ( col1 varchar(100), col2 varchar(100), col3 varchar(100))");
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(
                 SampleService.simpleServiceDefinition().getAnalysisEngineDescription()
         );
@@ -81,6 +79,10 @@ public class BaseDatabaseListenerTest {
         csi.setEnd(5);
         csi.addToIndexes();
         ae.process(cas);
+        Class.forName(dbConnectionInfo.getDriver()).newInstance();
+
+        conn = DriverManager.getConnection(dbConnectionInfo.getUrl(), dbConnectionInfo.getUsername(), dbConnectionInfo.getPassword());
+        conn.createStatement().execute("CREATE TABLE DUMMY_TABLE ( col1 varchar(100), col2 varchar(100), col3 varchar(100))");
     }
 
     @Test
@@ -195,6 +197,22 @@ public class BaseDatabaseListenerTest {
                 .setBatchSize(2)
                 .setValidateConnectionEachBatch(false);
         listener.validateConnection();
+    }
+
+    @Test
+    public void testCreateTable() throws Exception {
+        TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfo, "INSERT INTO DUMMY_TABLE (col1, col2, col3) values (?, ?, ?)")
+                .setBatchSize(2)
+                .setValidateConnectionEachBatch(false);
+        assertNotNull(listener);
+        HashMap<String, String> colMap = new HashMap<String, String>(2);
+        colMap.put("id", "integer");
+        colMap.put("note", "varchar(1000)");
+        listener.createTable(false, "PUBLIC", "create_test_table", colMap);
+        ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM create_test_table");
+        assertNotNull(rs);
+        int numCols = rs.getMetaData().getColumnCount();
+        assertEquals(2, numCols);
     }
 
     public class TestDatabaseListener extends BaseDatabaseListener {

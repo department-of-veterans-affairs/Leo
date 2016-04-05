@@ -126,6 +126,8 @@ public class SimpleCsvListenerTest {
         StringWriter writer = new StringWriter();
         SimpleCsvListener listener = new SimpleCsvListener(writer);
         assertNotNull(listener);
+        listener.setInputType(Token.class.getCanonicalName());
+        assertTrue(listener.getInputType()[0].equals(Token.class.getCanonicalName()));
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(
                 SampleService.simpleServiceDefinition().getAnalysisEngineDescription()
         );
