@@ -54,8 +54,6 @@ public class GenerateDescriptors {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             System.exit(2);
         }
-
-        System.exit(0);
     }
 
     /**

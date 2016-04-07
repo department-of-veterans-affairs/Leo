@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -65,6 +66,12 @@ public class BaseListenerTest {
         MyTestListener listener = new MyTestListener();
         listener.setLogErrors(true);
         assertTrue(listener.isLogErrors());
+
+        File outputDir = new File(rootDirectory + "src/test/resources/results");
+        listener.setOutputDir(outputDir);
+        assertEquals(outputDir.getAbsolutePath(), listener.getOutputDir().getAbsolutePath());
+        listener.setExitOnError(true);
+        assertEquals(true, listener.isExitOnError());
 
         listener.entityProcessComplete(cas, new EntityProcessStatus() {
             @Override

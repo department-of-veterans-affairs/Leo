@@ -46,6 +46,23 @@ public class GenerateDescriptorsTest {
                 "<analysisEngineDescription xmlns=\"http://uima.apache.org/resourceSpecifier\">"));
     }
 
+    @Test
+    public void testMainGenerate() throws Exception {
+        File outputDir = new File(rootDirectory + "src/test/resources/test-main-generate");
+        outputDir.mkdirs();
+        GenerateDescriptors.main(
+                new String[]{ExampleWhitespaceTokenizer.class.getCanonicalName(), outputDir.getAbsolutePath()}
+        );
+        File destDir = new File(outputDir, "gov/va/vinci/leo/ae");
+        File[] files = destDir.listFiles();
+        assertNotNull(files);
+        assertEquals(3, files.length);
+        String descriptorText = FileUtils.readFileToString(new File(destDir, "ExampleWhitespaceTokenizerDescriptor.xml"));
+        assertTrue(StringUtils.isNotBlank(descriptorText));
+        assertTrue(descriptorText.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<analysisEngineDescription xmlns=\"http://uima.apache.org/resourceSpecifier\">"));
+    }
+
     @After
     public void cleanup() throws Exception {
         if(outDir != null && outDir.exists())
