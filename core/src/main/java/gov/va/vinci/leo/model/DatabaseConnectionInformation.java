@@ -64,7 +64,6 @@ public class DatabaseConnectionInformation {
      */
     public DatabaseConnectionInformation(String driver, String url,
                                          String username, String password) {
-        super();
         this.driver = driver;
         this.url = url;
         this.username = username;
@@ -99,8 +98,9 @@ public class DatabaseConnectionInformation {
      *
      * @param driver the java driver name (ie "com.mysql.jdbc.Driver")
      */
-    public void setDriver(String driver) {
+    public DatabaseConnectionInformation setDriver(String driver) {
         this.driver = driver;
+        return this;
     }
 
     /**
@@ -117,8 +117,9 @@ public class DatabaseConnectionInformation {
      *
      * @param url the jdbc connection url
      */
-    public void setUrl(String url) {
+    public DatabaseConnectionInformation setUrl(String url) {
         this.url = url;
+        return this;
     }
 
     /**
@@ -135,8 +136,9 @@ public class DatabaseConnectionInformation {
      *
      * @param username the connection username
      */
-    public void setUsername(String username) {
+    public DatabaseConnectionInformation setUsername(String username) {
         this.username = username;
+        return this;
     }
 
     /**
@@ -153,8 +155,9 @@ public class DatabaseConnectionInformation {
      *
      * @param password the connection password.
      */
-    public void setPassword(String password) {
+    public DatabaseConnectionInformation setPassword(String password) {
         this.password = password;
+        return this;
     }
 
     /**
@@ -171,8 +174,9 @@ public class DatabaseConnectionInformation {
      *
      * @param validationQuery the validation query for this connection.
      */
-    public void setValidationQuery(String validationQuery) {
+    public DatabaseConnectionInformation setValidationQuery(String validationQuery) {
         this.validationQuery = validationQuery;
+        return this;
     }
 
 }

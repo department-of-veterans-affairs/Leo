@@ -65,8 +65,9 @@ public class NameValue {
      *
      * @param name the name of this name/value to set.
      */
-    public void setName(String name) {
+    public NameValue setName(String name) {
         this.name = name;
+        return this;
     }
 
     /**
@@ -83,7 +84,8 @@ public class NameValue {
      *
      * @param value the value of this name/value to set.
      */
-    public void setValue(Object value) {
+    public NameValue setValue(Object value) {
         this.value = value;
+        return this;
     }
 }//NameValue class
