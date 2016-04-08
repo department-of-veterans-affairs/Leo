@@ -6,6 +6,7 @@ import gov.va.vinci.leo.cr.FileCollectionReader;
 import gov.va.vinci.leo.cr.RandomStringCollectionReader;
 import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
+import gov.va.vinci.leo.types.CSI;
 import org.apache.commons.io.FileUtils;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
@@ -79,6 +80,30 @@ public class SimpleXmiListenerTest {
             String xmiText = FileUtils.readFileToString(files[0]);
             assertTrue(xmiText.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?><xmi:XMI xmlns:tcas=\"http:///uima/tcas.ecore\""));
         }
+    }
+
+    @Test
+    public void testListenerDocInfo() throws Exception {
+        SimpleXmiListener listener = new SimpleXmiListener(outDir)
+                .setTypeSystemDescriptor(aggDesc.getTypeSystemDescription())
+                .setLaunchAnnotationViewer(false);
+        RandomStringCollectionReader reader = new RandomStringCollectionReader(1).setMaxStringLength(16);
+        CAS cas = ae.newCAS();
+        reader.getNext(cas);
+        listener.onBeforeMessageSend(new UimaASProcessStatusImpl(new ProcessTrace_impl(), cas, "" + 1));
+        listener.entityProcessComplete(cas, null);
+        CSI csi = listener.docInfo;
+        assertEquals(0, csi.getBegin());
+        assertEquals(cas.getDocumentText().length(), csi.getEnd());
+        //Test Row Data
+        for(int i = 0; i < csi.getRowData().size(); i++)
+            assertTrue(csi.getRowData(i).startsWith("testRowData"));
+        //Test PropertiesKeys
+        for(int i = 0; i < csi.getPropertiesKeys().size(); i++)
+            assertTrue(csi.getPropertiesKeys(i).startsWith("testKeys"));
+        //Test PropertiesValues
+        for(int i = 0; i < csi.getPropertiesValues().size(); i++)
+            assertTrue(csi.getPropertiesValues(i).startsWith("testValues"));
     }
 
     @Test

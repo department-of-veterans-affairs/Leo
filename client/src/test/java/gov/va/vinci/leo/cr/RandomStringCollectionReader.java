@@ -3,10 +3,14 @@ package gov.va.vinci.leo.cr;
 import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import gov.va.vinci.leo.tools.LeoUtils;
+import gov.va.vinci.leo.types.CSI;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.CASException;
 import org.apache.uima.collection.CollectionException;
 import org.apache.uima.collection.CollectionReader;
+import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.util.Progress;
@@ -16,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * This reader populates a specified number of CAS objects with random strings.  Useful primarily as an example of the
@@ -84,6 +89,31 @@ public class RandomStringCollectionReader extends BaseLeoCollectionReader {
     public void getNext(CAS aCAS) throws CollectionException, IOException {
         int length = random.nextInt(MAX_STRING_LENGTH);
         aCAS.setDocumentText(RandomStringUtils.randomAlphanumeric(length));
+
+        //Create the CSI annotation and set the properties
+        try {
+            JCas jCas = aCAS.getJCas();
+            CSI csi = new CSI(jCas);
+            csi.setBegin(0);
+            csi.setEnd(length);
+            csi.setID("" + currentString);
+            csi.addToIndexes();
+
+            csi.setRowData(new StringArray(jCas, length));
+            for(int i = 0; i < length; i++)
+                csi.setRowData(i, "testRowData" + UUID.randomUUID().toString());
+
+            csi.setPropertiesKeys(new StringArray(jCas, length));
+            for(int i = 0; i < length; i++)
+                csi.setPropertiesKeys(i, "testKeys" + UUID.randomUUID().toString());
+
+            csi.setPropertiesValues(new StringArray(jCas, length));
+            for(int i = 0; i < length; i++)
+                csi.setPropertiesValues(i, "testValues" + UUID.randomUUID().toString());
+        } catch (CASException e) {
+            throw new CollectionException(e);
+        }
+
         currentString++;
     }
 
