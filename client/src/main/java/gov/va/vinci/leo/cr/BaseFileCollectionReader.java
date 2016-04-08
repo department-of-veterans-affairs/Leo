@@ -266,8 +266,9 @@ public abstract class BaseFileCollectionReader extends BaseLeoCollectionReader {
      * @param recurse  if true, sub directories are also searched, otherwise just the specified directory is
      *                 used for input.
      */
-    public void setRecurseFlag(boolean recurse) {
+    public <T extends BaseFileCollectionReader> T setRecurseFlag(boolean recurse) {
         mRecurse = recurse;
+        return (T) this;
     }//setRecurseFlag method
 
     /**

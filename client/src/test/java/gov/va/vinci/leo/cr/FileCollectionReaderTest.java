@@ -22,6 +22,7 @@ package gov.va.vinci.leo.cr;
 
 import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.types.CSI;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.CharSet;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
@@ -33,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -104,16 +106,24 @@ public class FileCollectionReaderTest {
     @Test
     public void testGetNext() throws Exception {
         FileCollectionReader fsr =
-                (FileCollectionReader) new FileCollectionReader(new File(rootDirectory + "src/test/resources/inputDirectory"), false)
+                (FileCollectionReader) new FileCollectionReader(new File(rootDirectory + "src/test/resources/inputDirectory"), true)
                         .setEncoding(Charset.defaultCharset().displayName())
+                        .setRecurseFlag(false)
                         .produceCollectionReader();
+        assertNotNull(fsr);
         assertEquals(Charset.defaultCharset().displayName(), fsr.getEncoding());
         assertEquals(new File(rootDirectory + "src/test/resources/inputDirectory").getAbsolutePath(), fsr.getInputDirectory().getAbsolutePath());
+        FilenameFilter filenameFilter = fsr.getFilenameFilter();
+        assertTrue(filenameFilter instanceof SuffixFileFilter);
+        assertFalse(fsr.mRecurse);
+
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(SampleService
                 .simpleServiceDefinition()
                 .getAnalysisEngineDescription());
         CAS mockCas = ae.newCAS();
+        assertTrue(fsr.hasNext());
         fsr.getNext(mockCas);
+        assertEquals(1, fsr.getCurrentIndex());
         FSIterator<AnnotationFS> csiIterator = mockCas.getAnnotationIndex(mockCas.getTypeSystem().getType(CSI.class.getCanonicalName())).iterator();
         assertTrue(csiIterator.hasNext());
         CSI csi = (CSI) csiIterator.next();
