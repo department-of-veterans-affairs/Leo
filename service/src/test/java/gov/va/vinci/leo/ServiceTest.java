@@ -21,6 +21,7 @@ package gov.va.vinci.leo;
  */
 
 import gov.va.vinci.leo.ae.Example2Annotator;
+import gov.va.vinci.leo.ae.ExampleAnnotator;
 import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
 import gov.va.vinci.leo.descriptors.LeoDeployDescriptor;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
@@ -49,86 +50,86 @@ public class ServiceTest {
         }
     }
 
-	@Test
-	public void emptyConstructor() throws Exception {
-		Service s = new Service();
-		assertNotNull(s);
-		assertTrue("tcp://localhost:61616".equals(s.getBrokerURL()));
-		assertTrue("mySimpleQueueName".equals(s.getEndpoint()));
-		assertNull(s.getServiceName());
-	}
+    @Test
+    public void emptyConstructor() throws Exception {
+        Service s = new Service();
+        assertNotNull(s);
+        assertTrue("tcp://localhost:61616".equals(s.getBrokerURL()));
+        assertTrue("mySimpleQueueName".equals(s.getEndpoint()));
+        assertNull(s.getServiceName());
+    }
 
-	@Test
-	public void badPropertiesFile() throws Exception {
-		Service s = new Service("junk-file");
-		assertNotNull(s);
-		assertTrue("tcp://localhost:61616".equals(s.getBrokerURL()));
-		assertTrue("mySimpleQueueName".equals(s.getEndpoint()));
-		assertNull(s.getServiceName());
-	}
-	
-	@Test
-	public void testPropertiesFileValues() throws Exception {
-		//Test loading properties initially in constructor
-		Service s = new Service(rootDirectory + "src/test/resources/conf/test.properties");
-		assertNotNull(s);
-		assertTrue("tcp://testhost:61616".equals(s.getBrokerURL()));
-		assertTrue("myTestQueueName".equals(s.getEndpoint()));
-		assertTrue("myAwesomeTestServiceDude".equals(s.getServiceName()));
-		assertTrue("http://testhost:8080/jam".equals(s.getJamServerBaseUrl()));
-		assertTrue(s.getJamQueryIntervalInSeconds() == 30);
-		
-		//Test loading properties after initially creating service
-		s = new Service();
-		assertNotNull(s);
-		s.loadprops(rootDirectory + "src/test/resources/conf/test.properties");
-		assertTrue("tcp://testhost:61616".equals(s.getBrokerURL()));
-		assertTrue("myTestQueueName".equals(s.getEndpoint()));
-		assertTrue("myAwesomeTestServiceDude".equals(s.getServiceName()));
-		assertTrue("http://testhost:8080/jam".equals(s.getJamServerBaseUrl()));
-		assertTrue(s.getJamQueryIntervalInSeconds() == 30);
-	}//testPropertiesFileValues method
-	
-	@Test
-	public void testNoPropertiesFile() throws Exception {
-		Service s = new Service();
-		assertNotNull(s);
-		s.setBrokerURL("tcp://testhost:61616");
-		s.setEndpoint("myTestQueueName");
-		s.setServiceName("myAwesomeTestServiceDude");
-		s.setJamServerBaseUrl("http://testhost:8080/jam");
-		s.setJamQueryIntervalInSeconds(30);
-		
-		//Confirm that the settings actually got set
-		assertTrue("tcp://testhost:61616".equals(s.getBrokerURL()));
-		assertTrue("myTestQueueName".equals(s.getEndpoint()));
-		assertTrue("myAwesomeTestServiceDude".equals(s.getServiceName()));
-		assertTrue("http://testhost:8080/jam".equals(s.getJamServerBaseUrl()));
-		assertTrue(s.getJamQueryIntervalInSeconds() == 30);
-	}//testNoPropertiesFile method
-	
-	@Test
-	public void testDeployStringPrimitivesList() throws Exception {
-		//import by name
-		Service s = new Service();
-		s.mUAEngine = EasyMock.createMock(UimaAsynchronousEngine.class);
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("desc.gov.va.vinci.leo.ae.WhitespaceTokenizerDescriptor");
-		list.add("desc.gov.va.vinci.leo.ae.WordTokenizerDescriptor");
-		s.deploy(list, true);
-		assertTrue(StringUtils.isNotBlank(s.getAggregateDescriptorFile()));
-		assertNotNull(s.mAppCtx);
-		
-		//import by location
-		s = new Service();
-		s.mUAEngine = EasyMock.createMock(UimaAsynchronousEngine.class);
-		list = new ArrayList<String>();
-		list.add(rootDirectory + "src/test/resources/desc/gov/va/vinci/leo/ae/WhitespaceTokenizerDescriptor.xml");
-		list.add(rootDirectory + "src/test/resources/desc/gov/va/vinci/leo/ae/WordTokenizerDescriptor.xml");
-		s.deploy(list, false);
-		assertTrue(StringUtils.isNotBlank(s.getAggregateDescriptorFile()));
-		assertNotNull(s.mAppCtx);
-	}//testDeployStringPrimitives method
+    @Test
+    public void badPropertiesFile() throws Exception {
+        Service s = new Service("junk-file");
+        assertNotNull(s);
+        assertTrue("tcp://localhost:61616".equals(s.getBrokerURL()));
+        assertTrue("mySimpleQueueName".equals(s.getEndpoint()));
+        assertNull(s.getServiceName());
+    }
+
+    @Test
+    public void testPropertiesFileValues() throws Exception {
+        //Test loading properties initially in constructor
+        Service s = new Service(rootDirectory + "src/test/resources/conf/test.properties");
+        assertNotNull(s);
+        assertTrue("tcp://testhost:61616".equals(s.getBrokerURL()));
+        assertTrue("myTestQueueName".equals(s.getEndpoint()));
+        assertTrue("myAwesomeTestServiceDude".equals(s.getServiceName()));
+        assertTrue("http://testhost:8080/jam".equals(s.getJamServerBaseUrl()));
+        assertTrue(s.getJamQueryIntervalInSeconds() == 30);
+
+        //Test loading properties after initially creating service
+        s = new Service();
+        assertNotNull(s);
+        s.loadprops(rootDirectory + "src/test/resources/conf/test.properties");
+        assertTrue("tcp://testhost:61616".equals(s.getBrokerURL()));
+        assertTrue("myTestQueueName".equals(s.getEndpoint()));
+        assertTrue("myAwesomeTestServiceDude".equals(s.getServiceName()));
+        assertTrue("http://testhost:8080/jam".equals(s.getJamServerBaseUrl()));
+        assertTrue(s.getJamQueryIntervalInSeconds() == 30);
+    }//testPropertiesFileValues method
+
+    @Test
+    public void testNoPropertiesFile() throws Exception {
+        Service s = new Service();
+        assertNotNull(s);
+        s.setBrokerURL("tcp://testhost:61616");
+        s.setEndpoint("myTestQueueName");
+        s.setServiceName("myAwesomeTestServiceDude");
+        s.setJamServerBaseUrl("http://testhost:8080/jam");
+        s.setJamQueryIntervalInSeconds(30);
+
+        //Confirm that the settings actually got set
+        assertTrue("tcp://testhost:61616".equals(s.getBrokerURL()));
+        assertTrue("myTestQueueName".equals(s.getEndpoint()));
+        assertTrue("myAwesomeTestServiceDude".equals(s.getServiceName()));
+        assertTrue("http://testhost:8080/jam".equals(s.getJamServerBaseUrl()));
+        assertTrue(s.getJamQueryIntervalInSeconds() == 30);
+    }//testNoPropertiesFile method
+
+    @Test
+    public void testDeployStringPrimitivesList() throws Exception {
+        //import by name
+        Service s = new Service();
+        s.mUAEngine = EasyMock.createMock(UimaAsynchronousEngine.class);
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("desc.gov.va.vinci.leo.ae.WhitespaceTokenizerDescriptor");
+        list.add("desc.gov.va.vinci.leo.ae.WordTokenizerDescriptor");
+        s.deploy(list, true);
+        assertTrue(StringUtils.isNotBlank(s.getAggregateDescriptorFile()));
+        assertNotNull(s.mAppCtx);
+
+        //import by location
+        s = new Service();
+        s.mUAEngine = EasyMock.createMock(UimaAsynchronousEngine.class);
+        list = new ArrayList<String>();
+        list.add(rootDirectory + "src/test/resources/desc/gov/va/vinci/leo/ae/WhitespaceTokenizerDescriptor.xml");
+        list.add(rootDirectory + "src/test/resources/desc/gov/va/vinci/leo/ae/WordTokenizerDescriptor.xml");
+        s.deploy(list, false);
+        assertTrue(StringUtils.isNotBlank(s.getAggregateDescriptorFile()));
+        assertNotNull(s.mAppCtx);
+    }//testDeployStringPrimitives method
 
     @Test
     public void testDeployLeoAnnotators() throws Exception {
@@ -136,6 +137,20 @@ public class ServiceTest {
         Service s = new Service();
         s.mUAEngine = EasyMock.createMock(UimaAsynchronousEngine.class);
         s.deploy(new Example2Annotator("gov.va.vinci.leo.types.myOutputType").setName("Example").getLeoAEDescriptor());
+        assertTrue(StringUtils.isNotBlank(s.getAggregateDescriptorFile()));
+        assertNotNull(s.mAppCtx);
+
+        //Test LeoAnnotator deployment
+        s = new Service();
+        s.mUAEngine = EasyMock.createMock(UimaAsynchronousEngine.class);
+        s.deploy(new ExampleAnnotator("myParamValue", "myReqParamValue"));
+        assertTrue(StringUtils.isNotBlank(s.getAggregateDescriptorFile()));
+        assertNotNull(s.mAppCtx);
+
+        //Test AnalysisEngineDescription deployment
+        s = new Service();
+        s.mUAEngine = EasyMock.createMock(UimaAsynchronousEngine.class);
+        s.deploy(new ExampleAnnotator("myParamValue", "myReqParamValue").getLeoAEDescriptor().getAnalysisEngineDescription());
         assertTrue(StringUtils.isNotBlank(s.getAggregateDescriptorFile()));
         assertNotNull(s.mAppCtx);
 
@@ -156,12 +171,12 @@ public class ServiceTest {
         LeoAEDescriptor example = (LeoAEDescriptor) gen_agg_desc.getDelegates()[0];
         assertNotNull(example.getTypeSystemDescription().getType("gov.va.vinci.leo.types.myOutputType"));
     }
-	
-	@Test(expected=Exception.class)
-	public void testNullDeploy() throws Exception {
-		Service s = new Service();
-		s.deploy((LeoAEDescriptor)null);
-	}//testNullDeploy method
+
+    @Test(expected = Exception.class)
+    public void testNullDeploy() throws Exception {
+        Service s = new Service();
+        s.deploy((LeoAEDescriptor) null);
+    }//testNullDeploy method
 
     @Test
     public void testCasPoolSettings() throws Exception {
@@ -187,5 +202,5 @@ public class ServiceTest {
         assertTrue(casPoolSize == 1);
         assertTrue(s.getCasPoolSize() > casPoolSize);
     }
-	
+
 }//ServiceTest class
