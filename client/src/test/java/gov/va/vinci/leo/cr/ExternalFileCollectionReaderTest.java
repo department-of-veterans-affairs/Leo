@@ -9,14 +9,14 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.text.AnnotationFS;
 import org.apache.uima.collection.CollectionReader;
+import org.apache.uima.collection.CollectionReader_ImplBase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * User: Thomas Ginter
@@ -25,19 +25,33 @@ import static org.junit.Assert.assertTrue;
  */
 public class ExternalFileCollectionReaderTest extends FileCollectionReader {
 
-    File descriptor = new File("client/src/test/resources/ExternalFileCollectionReaderDesc.xml");
+    File descriptor = null;
     ExternalFileCollectionReader externalReader = null;
     private static String RESULTS = "this is a test";
-    String rootDirectory = "client/";
+    String rootDirectory = "";
 
     @Before
     public void setup() throws Exception {
-        if (new File("client/src/test/resources/inputDirectory").exists()) {
-            externalReader = new ExternalFileCollectionReader(descriptor, new File("client/src/test/resources/inputDirectory"), false);
-        } else {
-            externalReader = new ExternalFileCollectionReader(descriptor, new File("src/test/resources/inputDirectory"), false);
+        String path = new File(".").getCanonicalPath();
+        if (!path.endsWith("client")) {
+            rootDirectory = "client/";
         }
+        descriptor = new File(rootDirectory + "src/test/resources/ExternalFileCollectionReaderDesc.xml");
+        externalReader = new ExternalFileCollectionReader(descriptor, new File(rootDirectory + "src/test/resources/inputDirectory"), false);
         externalReader.produceCollectionReader();
+    }
+
+    @Test
+    public void testConstructors() throws Exception {
+        ExternalCollectionReader reader = new ExternalCollectionReader(descriptor.getAbsolutePath());
+        assertNotNull(reader);
+        CollectionReader generatedReader = reader.produceCollectionReader();
+        assertNotNull(generatedReader);
+        assertTrue(generatedReader instanceof ExternalFileCollectionReader);
+
+        reader = new ExternalCollectionReader((CollectionReader_ImplBase) generatedReader);
+        assertNotNull(reader);
+        assertEquals(generatedReader, reader.produceCollectionReader());
     }
 
     @Test

@@ -60,6 +60,8 @@ public class JdbcScriptRunner {
     private boolean stopOnError;
     private boolean autoCommit;
 
+    private boolean consoleOut = false;
+
     private PrintWriter logWriter = new PrintWriter(System.out);
     private PrintWriter errorLogWriter = new PrintWriter(System.err);
 
@@ -76,9 +78,10 @@ public class JdbcScriptRunner {
         this.stopOnError = stopOnError;
     }
 
-    public void setDelimiter(String delimiter, boolean fullLineDelimiter) {
+    public JdbcScriptRunner setDelimiter(String delimiter, boolean fullLineDelimiter) {
         this.delimiter = delimiter;
         this.fullLineDelimiter = fullLineDelimiter;
+        return this;
     }
 
     /**
@@ -87,8 +90,9 @@ public class JdbcScriptRunner {
      * @param logWriter
      *            - the new value of the logWriter property
      */
-    public void setLogWriter(PrintWriter logWriter) {
+    public JdbcScriptRunner setLogWriter(PrintWriter logWriter) {
         this.logWriter = logWriter;
+        return this;
     }
 
     /**
@@ -97,8 +101,29 @@ public class JdbcScriptRunner {
      * @param errorLogWriter
      *            - the new value of the errorLogWriter property
      */
-    public void setErrorLogWriter(PrintWriter errorLogWriter) {
+    public JdbcScriptRunner setErrorLogWriter(PrintWriter errorLogWriter) {
         this.errorLogWriter = errorLogWriter;
+        return this;
+    }
+
+    /**
+     * If true then results will be written to the console.
+     *
+     * @return true if console output is true
+     */
+    public boolean isConsoleOut() {
+        return consoleOut;
+    }
+
+    /**
+     * Set the console output flag.  If true then echo results to the console.  Defaults to false.
+     *
+     * @param consoleOut true if results should be echoed to the console
+     * @return reference to this JdbcScriptRunner object
+     */
+    public JdbcScriptRunner setConsoleOut(boolean consoleOut) {
+        this.consoleOut = consoleOut;
+        return this;
     }
 
     /**
@@ -191,13 +216,13 @@ public class JdbcScriptRunner {
                     if (hasResults && rs != null) {
                         ResultSetMetaData md = rs.getMetaData();
                         int cols = md.getColumnCount();
-                        for (int i = 0; i < cols; i++) {
+                        for (int i = 1; i <= cols; i++) {
                             String name = md.getColumnLabel(i);
                             print(name + "\t");
                         }
                         println("");
                         while (rs.next()) {
-                            for (int i = 0; i < cols; i++) {
+                            for (int i = 1; i <= cols; i++) {
                                 String value = rs.getString(i);
                                 print(value + "\t");
                             }
@@ -231,7 +256,6 @@ public class JdbcScriptRunner {
             printlnError(e);
             throw e;
         } finally {
-            conn.rollback();
             flush();
         }
     }
@@ -241,15 +265,17 @@ public class JdbcScriptRunner {
     }
 
     private void print(Object o) {
-        if (logWriter != null) {
+        if (logWriter != null)
+            logWriter.print(o);
+        if(consoleOut)
             System.out.print(o);
-        }
     }
 
     private void println(Object o) {
-        if (logWriter != null) {
+        if (logWriter != null)
             logWriter.println(o);
-        }
+        if(consoleOut)
+            System.out.println(o);
     }
 
     private void printlnError(Object o) {

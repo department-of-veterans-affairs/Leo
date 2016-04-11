@@ -156,10 +156,9 @@ An example of this is:
          new SimpleAnnotationSchemaDataSourceConfiguration(dci, "", "validation", "_20130221", "[", "]"),
          new String[] { BedHzValidation.class.getCanonicalName()});
 
-## Using the Reader (Getting results out of the databsase)
+## Using the Reader (Getting results out of the database)
 
 The reader consists of two parts. The first is **gov.va.vinci.leo.tools.SimpeAnnotationSchemaDAO**. This class does
 database selects and returns POJO objects. It can be used outside of the UIMA environment.
 
 The second part is the actual UIMA Reader **gov.va.vinci.leo.cr.OldManSimanDatabaseReader**.
-

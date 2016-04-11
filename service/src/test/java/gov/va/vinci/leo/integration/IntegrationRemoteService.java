@@ -20,13 +20,6 @@ package gov.va.vinci.leo.integration;
  * #L%
  */
 
-import gov.va.vinci.leo.Service;
-import gov.va.vinci.leo.ae.ExampleWhitespaceTokenizer;
-import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
-import gov.va.vinci.leo.descriptors.LeoRemoteAEDescriptor;
-import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
-import gov.va.vinci.leo.regex.ae.RegexAnnotator;
-
 public class IntegrationRemoteService {
     protected static boolean GENERATE_TYPES=false;
 
@@ -37,7 +30,7 @@ public class IntegrationRemoteService {
     protected static String BROKER_URL="tcp://localhost:61616";
 
     protected static String TEST_REGEX_OUTPUT_TYPE = "gov.va.vinci.leo.types.TR";
-
+    /**
     public void run(boolean generateTypes) throws Exception {
         Service localService = new Service();
         localService.setBrokerURL(BROKER_URL);
@@ -109,5 +102,5 @@ public class IntegrationRemoteService {
             e1.printStackTrace();
         }
     }
-
+    **/
 }

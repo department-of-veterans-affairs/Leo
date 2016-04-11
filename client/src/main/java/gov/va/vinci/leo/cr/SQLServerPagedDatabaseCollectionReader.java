@@ -20,6 +20,7 @@ package gov.va.vinci.leo.cr;
  * #L%
  */
 
+import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.model.DataQueryInformation;
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
@@ -50,23 +51,27 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
     /**
      * Size of each batch to pull.
      */
+    @LeoConfigurationParameter(mandatory = true)
     protected int pageSize = -1;
 
     /**
      * the first row to start with. Generally this will be 0.
      */
+    @LeoConfigurationParameter(mandatory = true)
     protected int firstOffset=0;
 
     /**
      * The maximum record offset to get. If (currentBatch * pageSize) + firstOffset > [this value], then
      * the collection reader is finished. If -1, no max is set.
      */
+    @LeoConfigurationParameter(mandatory = true)
     protected int maxOffset;
 
     /**
      * Current batch number we are executing.
      */
     protected int currentBatch = 0;
+
     /**
      * The SQLServerPageQuery that creates the query for the specific page of records needed at any given time.
      */
@@ -176,6 +181,67 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
         this.firstOffset = firstOffset;
         this.maxOffset = maxOffset;
     }
+
+    /**
+     * Get the page size.
+     *
+     * @return page size
+     */
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    /**
+     * Set the page size.
+     *
+     * @param pageSize page size
+     * @return reference to this reader instance
+     */
+    public SQLServerPagedDatabaseCollectionReader setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+        return this;
+    }
+
+    /**
+     * Get the first row offset.
+     *
+     * @return first offset
+     */
+    public int getFirstOffset() {
+        return firstOffset;
+    }
+
+    /**
+     * Set the first row offset.
+     *
+     * @param firstOffset first row offset
+     * @return reference to this reader instance
+     */
+    public SQLServerPagedDatabaseCollectionReader setFirstOffset(int firstOffset) {
+        this.firstOffset = firstOffset;
+        return this;
+    }
+
+    /**
+     * Get the max offset.
+     *
+     * @return max offset
+     */
+    public int getMaxOffset() {
+        return maxOffset;
+    }
+
+    /**
+     * Set the max offset.
+     *
+     * @param maxOffset max offset
+     * @return reference to this reader instance
+     */
+    public SQLServerPagedDatabaseCollectionReader setMaxOffset(int maxOffset) {
+        this.maxOffset = maxOffset;
+        return this;
+    }
+
     /**
      * This method is called during initialization. Subclasses should override it to perform one-time startup logic.
      *
@@ -184,14 +250,8 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
     @Override
     public void initialize() throws ResourceInitializationException {
         super.initialize();
-        this.pageSize = (Integer) getConfigParameterValue(Param.PAGE_SIZE.getName());
-
-        this.firstOffset = (Integer)getConfigParameterValue(Param.FIRST_OFFSET.getName());
-        this.maxOffset = (Integer)getConfigParameterValue(Param.MAX_OFFSET.getName());
-
 
         sqlServerPagedQuery= new SQLServerPagedQuery(query, pageSize, firstOffset, maxOffset);
-
     }
 
     /**
@@ -212,48 +272,4 @@ public class SQLServerPagedDatabaseCollectionReader extends DatabaseCollectionRe
         return super.hasNext();
     }
 
-    /**
-     * Generate the UIMA Collection reader with resources.
-     *
-     * @return a uima collection reader.
-     * @throws org.apache.uima.resource.ResourceInitializationException
-     */
-    @Override
-    public CollectionReader produceCollectionReader() throws ResourceInitializationException {
-        Map<String, Object> parameterValues = produceBaseDatabaseCollectionReaderParams();
-        parameterValues.put(Param.QUERY.getName(), query);
-        parameterValues.put(Param.ID_COLUMN.getName(), idColumn);
-        parameterValues.put(Param.NOTE_COLUMN.getName(), noteColumn);
-        parameterValues.put(Param.PAGE_SIZE.getName(), pageSize);
-        parameterValues.put(Param.FIRST_OFFSET.getName(), firstOffset);
-        parameterValues.put(Param.MAX_OFFSET.getName(), maxOffset);
-        return produceCollectionReader(LeoUtils.getStaticConfigurationParameters(Param.class), parameterValues);
-    }
-
-    /**
-     * Static inner class for holding parameters information.
-     */
-    public static class Param extends DatabaseCollectionReader.Param {
-        /**
-         * Number of records to retrieve in each batch.
-         */
-        public static ConfigurationParameter PAGE_SIZE =
-                new ConfigurationParameterImpl("PageSize", "Number of records to retrieve in each page",
-                        ConfigurationParameter.TYPE_INTEGER, true, false, new String[] {} );
-
-        /**
-         * the first row to start with. Generally this will be 0.
-         */
-        public static ConfigurationParameter FIRST_OFFSET =
-                new ConfigurationParameterImpl("FirstOffset", "the first row to start with. Generally this will be 0.",
-                        ConfigurationParameter.TYPE_INTEGER, true, false, new String[] {} );
-
-        /**
-         * the first row to start with. Generally this will be 0.
-         */
-        public static ConfigurationParameter MAX_OFFSET =
-                new ConfigurationParameterImpl("MaxOffset", "The maximum record offset to get. If (currentBatch * pageSize) + firstOffset > [this value], then" +
-                        " the collection reader is finished. If -1, no max is set.",
-                        ConfigurationParameter.TYPE_INTEGER, true, false, new String[] {} );
-    }
 }

@@ -80,7 +80,7 @@ public class IntegrationWhitespaceClient {
         OUT_DIR.deleteOnExit();
 
         UimaAsBaseCallbackListener[] list = new UimaAsBaseCallbackListener[1];
-        list[0] = new SimpleXmiListener(OUT_DIR, true) ;
+        list[0] = new SimpleXmiListener(OUT_DIR).setLaunchAnnotationViewer(true) ;
         System.out.println("OUT_DIR: " + OUT_DIR);
         return list;
     }

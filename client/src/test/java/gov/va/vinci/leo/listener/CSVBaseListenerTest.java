@@ -21,7 +21,8 @@ package gov.va.vinci.leo.listener;
  */
 
 
-
+import gov.va.vinci.leo.SampleService;
+import gov.va.vinci.leo.types.CSI;
 import gov.va.vinci.leo.whitespace.ae.WhitespaceTokenizer;
 import gov.va.vinci.leo.whitespace.types.Token;
 import gov.va.vinci.leo.whitespace.types.WordToken;
@@ -42,129 +43,119 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class CSVBaseListenerTest {
-	CAS cas = null;
-	
-	
-	/**
-	 * Setup an in-memory db to test against with a simple schema.
-	 * @throws Exception
-	 */
-	@Before
-	public void setup() throws Exception {
-        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(new WhitespaceTokenizer().getLeoAEDescriptor()
-                .setParameterSetting("tokenOutputType", Token.class.getCanonicalName())
-                .setParameterSetting("wordOutputType", WordToken.class.getCanonicalName())
-                .setParameterSetting("tokenOutputTypeFeature", new Integer(3))
-                .setTypeSystemDescription(new WhitespaceTokenizer().getLeoTypeSystemDescription())
-                .getAnalysisEngineDescription());
-		cas = CasCreationUtils.createCas(ae.getAnalysisEngineMetaData());
-	
-	}
-	
-	@Test 
-	public void testSimple() throws IOException {
+    protected static CAS cas = null;
+
+    @Before
+    public void setup() throws Exception {
+        if(cas != null)
+            return;
+        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(
+                SampleService.simpleServiceDefinition().getAnalysisEngineDescription()
+        );
+        cas = ae.newCAS();
+        cas.setDocumentText("a b c");
+        CSI csi = new CSI(cas.getJCas());
+        csi.setID("1");
+        csi.setBegin(0);
+        csi.setEnd(29);
+        csi.addToIndexes();
+        ae.process(cas);
+    }
+
+    @Test
+    public void testSimple() throws IOException {
         File f = File.createTempFile("testSimple", "txt");
-		TestCsvListener listener = new TestCsvListener(f);
-		listener.entityProcessComplete(cas, null);
+        TestCsvListener listener = new TestCsvListener(f);
+        listener.entityProcessComplete(cas, null);
         String b = FileUtils.readFileToString(f).trim();
-		assertEquals("\"a\",\"b\",\"\"\"c\"", b.toString());
-	}
-	
-	@Test 
-	public void testCharSeprarator() throws IOException {
+        assertEquals("\"a\",\"b\",\"\"\"c\"", b.toString());
+    }
+
+    @Test
+    public void testCharSeprarator() throws IOException {
         File f = File.createTempFile("testCharSeprarator", "txt");
-		TestCsvListener listener = new TestCsvListener(f, '-');
-		listener.entityProcessComplete(cas, null);
+        TestCsvListener listener = new TestCsvListener(f)
+                .setSeparator('-');
+        listener.entityProcessComplete(cas, null);
         String b = FileUtils.readFileToString(f).trim();
-		assertEquals("\"a\"-\"b\"-\"\"\"c\"", b.toString());
-	}
+        assertEquals("\"a\"-\"b\"-\"\"\"c\"", b.toString());
+    }
 
-	@Test 
-	public void testCharSepraratorQuoteChar() throws IOException {
+    @Test
+    public void testCharSepraratorQuoteChar() throws IOException {
         File f = File.createTempFile("testCharSepraratorQuoteCharEscapeChar", "txt");
-		TestCsvListener listener = new TestCsvListener(f, '-', '\'');
-		listener.entityProcessComplete(cas, null);
+        TestCsvListener listener = new TestCsvListener(f)
+                .setSeparator('-')
+                .setQuotechar('\'');
+        listener.entityProcessComplete(cas, null);
         String b = FileUtils.readFileToString(f).trim();
-		assertEquals("\'a\'-\'b\'-\'\"\"c\'", b.toString());
-	}
+        assertEquals("\'a\'-\'b\'-\'\"\"c\'", b.toString());
+    }
 
-	
-	@Test 
-	/**
-	 * Test NOT escaping quotes.
-	 */
-	public void testCharSepraratorQuoteCharEscapeChar() throws IOException {
+
+    @Test
+    /**
+     * Test NOT escaping quotes.
+     */
+    public void testCharSepraratorQuoteCharEscapeChar() throws IOException {
         File f = File.createTempFile("testCharSepraratorQuoteCharEscapeChar", "txt");
-        TestCsvListener listener = new TestCsvListener(f, '-', '\'', '~');
-		listener.entityProcessComplete(cas, null);
+        TestCsvListener listener = new TestCsvListener(f)
+                .setSeparator('-')
+                .setQuotechar('\'')
+                .setEscapechar('~');
+        listener.entityProcessComplete(cas, null);
         String b = FileUtils.readFileToString(f).trim();
-		assertEquals("\'a\'-\'b\'-\'\"c\'", b.toString());
-	}
+        assertEquals("\'a\'-\'b\'-\'\"c\'", b.toString());
+    }
 
-	@Test
-	/**
-	 * Test NOT escaping quotes.
-	 */
-	public void testCharSepraratorQuoteCharEscapeCharNewLine() throws IOException {
-		File f = File.createTempFile("testCharSepraratorQuoteCharEscapeCharNewLine", "txt");
-		TestCsvListener listener = new TestCsvListener(f, '-', '\'', '~', "<CRLF>");
-		listener.entityProcessComplete(cas, null);
-		String b = FileUtils.readFileToString(f).trim();
-		assertEquals("\'a\'-\'b\'-\'\"c\'<CRLF>", b);
-	}
+    @Test
+    /**
+     * Test NOT escaping quotes.
+     */
+    public void testCharSepraratorQuoteCharEscapeCharNewLine() throws IOException {
+        File f = File.createTempFile("testCharSepraratorQuoteCharEscapeCharNewLine", "txt");
+        TestCsvListener listener = new TestCsvListener(f)
+                .setSeparator('-')
+				.setQuotechar('\'')
+                .setLineEnd("<CRLF>")
+                .setEscapechar('~');
+        listener.entityProcessComplete(cas, null);
+        String b = FileUtils.readFileToString(f).trim();
+        assertEquals("\'a\'-\'b\'-\'\"c\'<CRLF>", b);
+    }
 
-	@Test
-	/**
-	 * Test NOT escaping quotes.
-	 */
-	public void testCharSepraratorQuoteCharNewLine() throws IOException {
+    @Test
+    /**
+     * Test NOT escaping quotes.
+     */
+    public void testCharSepraratorQuoteCharNewLine() throws IOException {
         File f = File.createTempFile("testCharSepraratorQuoteCharNewLine", "txt");
-        TestCsvListener listener = new TestCsvListener(f, '-', '\'', "<CRLF>");
-		listener.entityProcessComplete(cas, null);
+        TestCsvListener listener = new TestCsvListener(f)
+                .setSeparator('-')
+				.setQuotechar('\'')
+				.setLineEnd("<CRLF>");
+        listener.entityProcessComplete(cas, null);
         String b = FileUtils.readFileToString(f).trim();
-		assertEquals("\'a\'-\'b\'-\'\"\"c\'<CRLF>", b.toString());
-	}
-	
-	public class TestCsvListener extends BaseCsvListener {
+        assertEquals("\'a\'-\'b\'-\'\"\"c\'<CRLF>", b.toString());
+    }
 
-		public TestCsvListener(File pw, char separator, char quotechar,
-                               char escapechar, String lineend) throws FileNotFoundException {
-			super(pw, separator, quotechar, escapechar, lineend);
-		}
+    public class TestCsvListener extends BaseCsvListener {
 
-		public TestCsvListener(File pw, char separator, char quotechar,
-                               char escapechar) throws FileNotFoundException {
-			super(pw, separator, quotechar, escapechar);
-		}
+        public TestCsvListener(File pw) throws FileNotFoundException {
+            super(pw);
+        }
 
-		public TestCsvListener(File pw, char separator, char quotechar,
-                               String lineend) throws FileNotFoundException {
-			super(pw, separator, quotechar, lineend);
-		}
+        @Override
+        protected List<String[]> getRows(CAS aCas) {
+            List<String[]> results = new ArrayList<String[]>();
+            results.add(new String[]{"a", "b", "\"c"});
+            return results;
+        }
 
-		public TestCsvListener(File pw, char separator, char quotechar) throws FileNotFoundException {
-			super(pw, separator, quotechar);
-		}
+        @Override
+        protected String[] getHeaders() {
+            return new String[]{"co1", "col2", "col3"};
+        }
 
-		public TestCsvListener(File pw, char separator) throws FileNotFoundException {
-			super(pw, separator);
-		}
-
-		public TestCsvListener(File pw) throws FileNotFoundException {
-			super(pw);
-		}
-
-		@Override
-		protected List<String[]> getRows(CAS aCas) {
-			List<String[]> results = new ArrayList<String[]>();
-			results.add(new String[] {"a", "b", "\"c"});
-			return results;
-		}
-
-		@Override
-		protected String[] getHeaders() {
-			return new String[] {"co1", "col2", "col3"};
-		}
-		
-	}
+    }
 }

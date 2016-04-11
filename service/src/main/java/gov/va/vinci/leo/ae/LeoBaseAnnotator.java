@@ -20,14 +20,11 @@ package gov.va.vinci.leo.ae;
  * #L%
  */
 
-import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
-import gov.va.vinci.leo.descriptors.LeoDelegate;
-import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
+import gov.va.vinci.leo.descriptors.*;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.reflect.FieldUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.GenericValidator;
 import org.apache.log4j.Logger;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
@@ -35,14 +32,14 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
+import org.apache.uima.cas.Type;
+import org.apache.uima.cas.text.AnnotationIndex;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -56,24 +53,31 @@ import java.util.*;
 public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements LeoAnnotator {
 
     /**
-     * logging object.
+     * Logger object for messaging.
      */
-    protected static Logger logger = Logger.getLogger(LeoBaseAnnotator.class.getCanonicalName());
+    private static Logger  logger = Logger.getLogger(LeoBaseAnnotator.class.getCanonicalName());
 
     /**
-     * The types of annotations to use as "anchors".
+     * The types of annotations to use as "anchors" or to be processed.
      */
+    @LeoConfigurationParameter
     protected String[] inputTypes = null;
 
     /**
      * The output type that will be created for each matching window.
      */
+    @LeoConfigurationParameter
     protected String outputType = null;
 
     /**
      * Counter for the number of CASes this annotator has processed.
      */
     protected long numberOfCASesProcessed = 0;
+
+    /**
+     * Counter for the number of CASes that made it past the filter for processing.
+     */
+    protected long numberOfFilteredCASesProcessed = 0;
 
     /**
      * Number of replication instances for this annotator.
@@ -86,17 +90,21 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     protected String name = null;
 
     /**
-     * Type system description of this annotator.
+     * Type system for this annotator, defaults to an empty type system.
      */
     protected LeoTypeSystemDescription typeSystemDescription = new LeoTypeSystemDescription();
 
     /**
-     * A map of parameters that is loaded during the initialization of this annotator.
+     * Optional, only process CAS if it includes instances of one of the types in the list.
      */
-    @Deprecated
-    protected Map<ConfigurationParameter, Object> parameters
-            = new HashMap<ConfigurationParameter, Object>();
+    @LeoConfigurationParameter
+    protected String[] includeTypesFilter = null;
 
+    /**
+     * Optional, only process a CAS if it does not include instances of one of the types in this list.
+     */
+    @LeoConfigurationParameter
+    protected String[] excludeTypesFilter = null;
 
     /**
      * Default constructor for initialization by the UIMA Framework.
@@ -115,15 +123,43 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     }
 
     /**
-     * Constructor setting the initial values for the number of instances, inputTypes, and outputType parameters.
+     * Get the input types list this annotator will use.
      *
-     * @param numInstances Number of replication instances for this annotator in the pipeline
-     * @param outputType Annotation type to be used as output for this annotator
-     * @param inputTypes One or more annotation types on which processing will occur
+     * @return list of input types
      */
-    public LeoBaseAnnotator(int numInstances, String outputType, String...inputTypes) {
-        this(outputType, inputTypes);
-        this.numInstances = numInstances;
+    public String[] getInputTypes() {
+        return inputTypes;
+    }
+
+    /**
+     * Set the input types list.
+     *
+     * @param inputTypes input types list
+     * @return reference to this annotator instance
+     */
+    public <T extends LeoBaseAnnotator> T setInputTypes(String...inputTypes) {
+        this.inputTypes = inputTypes;
+        return (T) this;
+    }
+
+    /**
+     * Get the output type name this annotator will use.
+     *
+     * @return output type name
+     */
+    public String getOutputType() {
+        return outputType;
+    }
+
+    /**
+     * Set the output type name.
+     *
+     * @param outputType output type name
+     * @return reference to this annotator instance
+     */
+    public <T extends LeoBaseAnnotator> T setOutputType(String outputType) {
+        this.outputType = outputType;
+        return (T) this;
     }
 
     /**
@@ -168,7 +204,46 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
         return (T) this;
     }
 
-    @Override
+    /**
+     * Return the types filter array of type names.  Null if not set.
+     *
+     * @return list of type names to filter on
+     */
+    public String[] getIncludeTypesFilter() {
+        return includeTypesFilter;
+    }
+
+    /**
+     * Set one or more types to filter on.
+     *
+     * @param includeTypesFilterNames One or more type names to filter on
+     * @return reference to this annotation instance
+     */
+    public <T extends LeoBaseAnnotator> T setIncludeTypesFilter(String...includeTypesFilterNames) {
+        this.includeTypesFilter = includeTypesFilterNames;
+        return (T) this;
+    }
+
+    /**
+     * Get the exclude types list.
+     *
+     * @return exclude types list
+     */
+    public String[] getExcludeTypesFilter() {
+        return excludeTypesFilter;
+    }
+
+    /**
+     * Set the list of exclude types.
+     *
+     * @param excludeTypesFilterNames one or more type names to exclude
+     * @return reference to this annotation instance
+     */
+    public <T extends LeoBaseAnnotator> T setExcludeTypesFilter(String...excludeTypesFilterNames) {
+        this.excludeTypesFilter = excludeTypesFilterNames;
+        return (T) this;
+    }
+
     /**
      * Initialize this annotator.
      *
@@ -177,60 +252,12 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      * @see org.apache.uima.analysis_component.JCasAnnotator_ImplBase#initialize(org.apache.uima.UimaContext)
      *
      */
+    @Override
     public void initialize(UimaContext aContext)
             throws ResourceInitializationException {
-        try {
-            initialize(aContext, this.getAnnotatorParams());
-        } catch (Exception e) {
-            throw new ResourceInitializationException(e);
-        }
-    }// initialize method
-
-    /**
-     * Initialize this annotator.
-     *
-     * @param aContext the UimaContext to initialize with.
-     * @param params the annotator params to load from the descriptor.
-     *
-     * @see org.apache.uima.analysis_component.JCasAnnotator_ImplBase#initialize(org.apache.uima.UimaContext)
-     * @param aContext
-     * @param params
-     * @throws ResourceInitializationException  if any exception occurs during initialization.
-     */
-    public void initialize(UimaContext aContext, ConfigurationParameter[] params)
-            throws ResourceInitializationException {
         super.initialize(aContext);
-
-        if (params != null) {
-            for (ConfigurationParameter param : params) {
-                if (param.isMandatory()) {
-                    /** Check for null value **/
-                    if (aContext.getConfigParameterValue(param.getName()) == null) {
-                        throw new ResourceInitializationException(new IllegalArgumentException("Required parameter: " + param.getName() + " not set."));
-                    }
-                    /** Check for empty as well if it is a plain string. */
-                    if (    ConfigurationParameter.TYPE_STRING.equals(param.getType()) &&
-                            !param.isMultiValued() &&
-                            GenericValidator.isBlankOrNull((String) aContext.getConfigParameterValue(param.getName()))) {
-                        throw new ResourceInitializationException(new IllegalArgumentException("Required parameter: " + param.getName() + " cannot be blank."));
-                    }
-                }
-
-                parameters.put(param, aContext.getConfigParameterValue(param.getName()));
-
-                /** Set the parameter value in the class field variable **/
-                try {
-                    Field field = FieldUtils.getField(this.getClass(), param.getName(), true);
-                    if(field != null) {
-                        FieldUtils.writeField(field, this, aContext.getConfigParameterValue(param.getName()), true);
-                    }
-                } catch (IllegalAccessException e) {
-                    logger.warn("Could not set field (" + param.getName() + "). Field not found on annotator class to reflectively set.");
-                }
-            }
-        }
+        ConfigurationParameterUtils.initParameterValues(this, aContext);
     }// initialize method
-
 
     /**
      * Gets a resource as an input stream.
@@ -406,11 +433,29 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
 
     /**
      * Set the number of CASes this annotator has processed.
-     *
-     * @param numberOfCASesProcessed  the number of documents this annotator has processed.
      */
-    public void setNumberOfCASesProcessed(long numberOfCASesProcessed) {
-        this.numberOfCASesProcessed = numberOfCASesProcessed;
+    public <T extends LeoBaseAnnotator> T resetNumberOfCASesProcessed() {
+        this.numberOfCASesProcessed = 0;
+        return (T) this;
+    }
+
+    /**
+     * Get the number of CASes that were processed once getting through the filter.
+     *
+     * @return number of filtered CASes processed
+     */
+    public long getNumberOfFilteredCASesProcessed() {
+        return numberOfFilteredCASesProcessed;
+    }
+
+    /**
+     * Reset the number of filtered CASes processed.
+     *
+     * @return reference to this
+     */
+    public <T extends LeoBaseAnnotator> T resetNumberOfFilteredCASesProcessed() {
+        this.numberOfFilteredCASesProcessed = 0;
+        return (T) this;
     }
 
     /**
@@ -426,35 +471,90 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
      *
      */
     @Override
-    public void process(JCas aJCas) throws AnalysisEngineProcessException {
+    public final void process(JCas aJCas) throws AnalysisEngineProcessException {
         numberOfCASesProcessed++;
+        if(hasFilteredAnnotation(aJCas) && hasInputTypesAnnotation(aJCas)) {
+            numberOfFilteredCASesProcessed++;
+            annotate(aJCas);
+        }
     }
 
     /**
-     * Returns a LeoAEDescriptor based on Param defined in the Annotator either via an Enum
-     * that implements AnnotatorParam, or a static class named Param with static AnnotatorParam object.
-     * <p/>
-     * For Example:
-     * <p/>
-     * <pre>
-     * {@code
-     * public enum Param implements AnnotatorParam {
-     *      RESOURCE("resource", true, false, "String"),
-     *      ...
-     * }
-     * }</pre>
+     * This method is called by the LeoBaseAnnotator process method if the CAS meets the filter requirements and either
+     * has not input types defined or else contains one or more instances of the input types.
      *
-     * or
+     * @param aJCas CAS for processing
+     * @throws AnalysisEngineProcessException if there is an error processing the CAS
+     */
+    public abstract void annotate(JCas aJCas) throws AnalysisEngineProcessException;
+
+    @Override
+    public void collectionProcessComplete() throws AnalysisEngineProcessException {
+        super.collectionProcessComplete();
+
+    }
+
+    /**
+     * If includeTypesFilter is not set then return true.  If there is a includeTypesFilter and includeFilter is true then return true
+     * only if one of the includeTypesFilter types have been found and false if not.  If includeFilter is false then return true
+     * when all of the types in the filter list have not been found or true otherwise.
      *
-     * <pre>
-     * {@code
-     * public static class Param {
-     *      public static ConfigurationParameter PARAMETER_NAME = new ConfigurationParameterImpl("name", "description", "type", isMandatory, isMultivalued, new String[]{});
-     * }
-     * }</pre>
+     * @param jCas CAS to check for filtered types
+     * @return true if the filter is met, false otherwise
+     * @throws AnalysisEngineProcessException if one of the type names in the tyepsFilter is not found in the type system
+     */
+    protected boolean hasFilteredAnnotation(JCas jCas) throws AnalysisEngineProcessException {
+        if(containsAnnotationInList(jCas, includeTypesFilter, true) &&
+            !containsAnnotationInList(jCas, excludeTypesFilter, false)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * If the input types list is empty or one or more of the types are found in the CAS then return true, return false
+     * otherwise.
      *
-     * @return  the descriptor for this annotator.
-     * @throws Exception if there is an error getting the descriptor.
+     * @param jCas CAS to check
+     * @return true if types are found, false otherwise
+     * @throws AnalysisEngineProcessException If one of the type names in the inputTypes list is not found in the type system
+     */
+    protected boolean hasInputTypesAnnotation(JCas jCas) throws AnalysisEngineProcessException {
+        if(containsAnnotationInList(jCas, inputTypes, true))
+            return true;
+        return false;
+    }
+
+    /**
+     * Checks the CAS for instances of the annotation types in the list. If the list is empty return the value of the
+     * isEmpty flag.
+     *
+     * @param jCas CAS to check
+     * @param typeList list of types to check for
+ *     @param isEmpty if this list is empty then return the value of this boolean flag
+     * @return true if a type instance if found, false if not found, isEmpty if the list is empty
+     * @throws AnalysisEngineProcessException If one of the types is not in the type system of the CAS
+     */
+    protected boolean containsAnnotationInList(JCas jCas, String[] typeList, boolean isEmpty) throws AnalysisEngineProcessException {
+        if(ArrayUtils.isNotEmpty(typeList)) {
+            for(String typeName : typeList) {
+                Type type = jCas.getTypeSystem().getType(typeName);
+                if (type == null)
+                    throw new AnalysisEngineProcessException("Type " + typeName + " was not found in the CAS type system.", null);
+                if (jCas.getAnnotationIndex(type).size() > 0)
+                    return true;
+            }
+            return false;
+        }
+        return isEmpty;
+    }
+
+    /**
+     * Generate a descriptor from this annotator object.  Parameters are grabbed from class variables and values with
+     * LeoConfigurationParameter annotations.
+     *
+     * @return descriptor for this annotator
+     * @throws Exception if there is an error getting the descriptor
      */
     public LeoDelegate getDescriptor() throws Exception {
         String annotatorName = (StringUtils.isBlank(name))? this.getClass().getSimpleName() : name;
@@ -462,8 +562,8 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
         descriptor.setNumberOfInstances(this.numInstances);
         descriptor.setTypeSystemDescription(getLeoTypeSystemDescription());
         //Add and set parameter values based on the map for this object
-        Map<ConfigurationParameter, Object> parameterMap = this.getParametersToValuesMap();
-        for(ConfigurationParameter parameter : parameterMap.keySet()) {
+        Map<ConfigurationParameterImpl, ?> parameterMap = ConfigurationParameterUtils.getParamsToValuesMap(this);
+        for(ConfigurationParameterImpl parameter : parameterMap.keySet()) {
             descriptor.addParameterSetting(
                     parameter.getName(),
                     parameter.isMandatory(),
@@ -476,40 +576,11 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     }
 
     /**
-     * Returns a LeoAEDescriptor a static class named Param with static ConfigurationParameter objects.  Descriptor
-     * generation is further facilitated by creating a class variable to store the parameter value whose name is the
-     * same as the parameter name set in the ConfigurationParameter object.
-     * <p/>
-     * For Example:
-     * <p/>
-     * <pre>
-     * {@code
-     * protected String parameterName = "parameter value";
+     * Generate a descriptor from this annotator object.  Parameters are grabbed from class variables with
+     * LeoConfigurationParameter annotations.
      *
-     * public static class Param {
-     *      public static ConfigurationParameter PARAMETER_NAME
-     *          = new ConfigurationParameterImpl(
-     *              "parameterName", "Description", "String", false, true, new String[] {}
-     *          );
-     * }
-     * }</pre>
-     *
-     * Parameters from parent classes can be used, including those from the LeoBaseAnnotator, by extending the parent
-     * class Params.
-     *
-     * <p>
-     * For Example:
-     * </p>
-     * <pre>
-     * {@code
-     * public static class Param extends LeoBaseAnnotator.Param {
-     *     ...
-     * }
-     * }
-     * </pre>
-     *
-     * @return  the descriptor for this annotator.
-     * @throws Exception if there is an error getting the descriptor.
+     * @return  the descriptor for this annotator
+     * @throws Exception if there is an error getting the descriptor
      */
     public LeoAEDescriptor getLeoAEDescriptor() throws Exception {
         return (LeoAEDescriptor) this.getDescriptor();
@@ -549,115 +620,4 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
         return (T) this;
     }
 
-    /**
-     * Returns parameters defined in a static class named Param with static ConfigurationParameter objects.
-     * <p/>
-     * For Example:
-     * <p/>
-     * <pre>
-     * {@code
-     * protected String parameterName = "parameter value";
-     *
-     * public static class Param {
-     *      public static ConfigurationParameter PARAMETER_NAME
-     *          = new ConfigurationParameterImpl(
-     *              "parameterName", "Description", "String", false, true, new String[] {}
-     *          );
-     * }
-     * }</pre>
-     *
-     * @return  the annotator parameters this annotator can accept.
-     * @throws IllegalAccessException  if there is an exception trying to get annotator parameters via reflection.
-     */
-    protected ConfigurationParameter[] getAnnotatorParams() throws IllegalAccessException {
-        ConfigurationParameter params[] = null;
-
-        for (Class c : this.getClass().getDeclaredClasses()) {
-            if (c.isEnum() && Arrays.asList(c.getInterfaces()).contains(ConfigurationParameter.class)) {
-                params = new ConfigurationParameter[EnumSet.allOf(c).size()];
-                int counter = 0;
-                for (Object o : EnumSet.allOf(c)) {
-                    params[counter] = ((ConfigurationParameter) o);
-                    counter++;
-                }
-                break;
-            } else if (c.getCanonicalName().endsWith(".Param")) {
-                Field[] fields = c.getFields();
-                List<ConfigurationParameter> paramList = new ArrayList<ConfigurationParameter>();
-
-                for (Field f : fields) {
-                    if (ConfigurationParameter.class.isAssignableFrom(f.getType())) {
-                        paramList.add((ConfigurationParameter) f.get(null));
-                    }
-                }
-                params = paramList.toArray(new ConfigurationParameter[paramList.size()]);
-            }
-        }
-        return params;
-    }
-
-    /**
-     * Get a map of parameters and their values.  Parameter list is retrieved from the inner Param class. Values are
-     * retrieved by matching the name of the ConfigurationParameter to the name of a variable set in the class.
-     *
-     * @return  a map of parameters and their values that is created during initialization.
-     */
-    protected Map<ConfigurationParameter, Object> getParametersToValuesMap() {
-        Map<ConfigurationParameter, Object> parameterObjectMap = new HashMap<ConfigurationParameter, Object>();
-        ConfigurationParameter[] params;
-        try {
-            params = this.getAnnotatorParams();
-            for(ConfigurationParameter parameter : params) {
-                try {
-                    Field field = FieldUtils.getField(this.getClass(), parameter.getName(), true);
-                    parameterObjectMap.put(parameter, FieldUtils.readField(field, this, true));
-                } catch (Exception eField) {
-                    parameterObjectMap.put(parameter, null);
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return parameterObjectMap;
-    }
-
-    /**
-     * Get a map of parameters and their values.  Parameter list is retrieved from the inner Param class.  Values are
-     * retrieved by matching the name of the ConfigurationParameter to the name of a variable set in the class.
-     *
-     * @return a map of parameters and their values that is created during initialization.
-     * @deprecated This method has been replaced with LeoBaseAnnotator#getParametersToValuesMap
-     */
-    @Deprecated
-    public Map<ConfigurationParameter, Object> getParameters() {
-        return parameters;
-    }
-
-    /**
-     * A set of default parameters for the base annotation.
-     *
-     * Extending annotators may use persist parameters from a parent class by extending the inner Param from the parent as in:
-     * <code>public static class Param extends LeoBaseAnnotator.param {}</code>
-     *
-     * Each field represents an annotation parameter and utilizes the UIMA ConfigurationParameter as in the declaration:
-     * <p>
-     * <code>public static ConfigurationParameter PARAMETER_NAME = new ConfigurationParameterImpl("name", "description", "type", isMandatory, isMultivalued, new String[]{});</code>
-     */
-    public static class Param {
-        /**
-         * The type output by this annotator.
-         */
-        public static ConfigurationParameter OUTPUT_TYPE
-                = new ConfigurationParameterImpl(
-                    "outputType", "outputType", "String", false, false, new String[] {}
-                );
-        /**
-         * the type of annotation to be searched. Default is uima.tcas.DocumentAnnotation. This is an array of strings,
-         * and can contain multiple types.
-         */
-        public static ConfigurationParameter INPUT_TYPE
-                = new ConfigurationParameterImpl(
-                    "inputTypes", "inputType", "String", false, true, new String[] {}
-                );
-    }
 }

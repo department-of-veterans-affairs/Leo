@@ -140,8 +140,9 @@ public class LeoDeployDescriptor {
      *
      * @param name the name of the deployment
      */
-    public void setName(String name) {
+    public LeoDeployDescriptor setName(String name) {
         this.mName = name;
+        return this;
     }//setName method
 
     /**
@@ -158,8 +159,9 @@ public class LeoDeployDescriptor {
      *
      * @param description the description of this deployment
      */
-    public void setDescription(String description) {
+    public LeoDeployDescriptor setDescription(String description) {
         this.mDescription = description;
+        return this;
     }//setDescription method
 
     /**
@@ -185,8 +187,9 @@ public class LeoDeployDescriptor {
      *
      * @param casPoolSize the size of the CAS pool to set
      */
-    public void setCasPoolSize(int casPoolSize) {
+    public LeoDeployDescriptor setCasPoolSize(int casPoolSize) {
         this.mCasPoolSize = casPoolSize;
+        return this;
     }//setCasPoolSize method
 
     /**
@@ -203,8 +206,9 @@ public class LeoDeployDescriptor {
      *
      * @param initialFsHeapSize the initialFsHeapSize to set
      */
-    public void setInitialFsHeapSize(int initialFsHeapSize) {
+    public LeoDeployDescriptor setInitialFsHeapSize(int initialFsHeapSize) {
         this.initialFsHeapSize = initialFsHeapSize;
+        return this;
     }//setInitialFsHeapSize method
 
     /**
@@ -221,8 +225,9 @@ public class LeoDeployDescriptor {
      *
      * @param brokerURL the BrokerURL for the queue services to set
      */
-    public void setBrokerURL(String brokerURL) {
+    public LeoDeployDescriptor setBrokerURL(String brokerURL) {
         this.mBrokerURL = brokerURL;
+        return this;
     }//setBrokerURL method
 
     /**
@@ -239,8 +244,9 @@ public class LeoDeployDescriptor {
      *
      * @param endpoint the Endpoint queue name to set
      */
-    public void setEndpoint(String endpoint) {
+    public LeoDeployDescriptor setEndpoint(String endpoint) {
         this.mEndpoint = endpoint;
+        return this;
     }//setEndpoint method
 
     /**
@@ -261,8 +267,9 @@ public class LeoDeployDescriptor {
      * @throws java.io.IOException if the descriptor cannot created.
      * @throws org.apache.uima.util.InvalidXMLException if there is a problem creating the xml.
      */
-    public void setTopDescriptor(String filename, boolean byName) throws IOException, InvalidXMLException {
+    public LeoDeployDescriptor setTopDescriptor(String filename, boolean byName) throws IOException, InvalidXMLException {
         this.setTopDescriptor(new LeoAEDescriptor(filename, byName));
+        return this;
     }//setTopDescriptor method filename input
 
     /**
@@ -270,9 +277,10 @@ public class LeoDeployDescriptor {
      *
      * @param faed the LeoAEDescriptor object to set as the top Descriptor
      */
-    public void setTopDescriptor(LeoAEDescriptor faed) {
+    public LeoDeployDescriptor setTopDescriptor(LeoAEDescriptor faed) {
         if (faed != null) this.mTopDescriptor = faed;
         this.mCasPoolSize = this.mTopDescriptor.getMaxNumberOfInstances();
+        return this;
     }//setTopDescriptor method LeoAEDescriptor input
 
     /**

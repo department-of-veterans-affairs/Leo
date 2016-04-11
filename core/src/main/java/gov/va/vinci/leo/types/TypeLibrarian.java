@@ -56,7 +56,6 @@ public class TypeLibrarian {
                 .getTypeDescription();
     }
 
-
     /**
      * Get the standard CSI TypeSystem Description used within most leo projects.
      *
@@ -71,9 +70,6 @@ public class TypeLibrarian {
                 .addFeature("PropertiesValues", "Property Values", "uima.cas.StringArray")
                 .getTypeDescription();
     }
-
-
-
 
     /**
      * A method for easily building simple type system descriptions. For example:

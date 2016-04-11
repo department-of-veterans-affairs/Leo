@@ -20,7 +20,9 @@ package gov.va.vinci.leo.listener;
  * #L%
  */
 
+import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
+import gov.va.vinci.leo.types.CSI;
 import gov.va.vinci.leo.whitespace.ae.WhitespaceTokenizer;
 import gov.va.vinci.leo.whitespace.types.Token;
 import gov.va.vinci.leo.whitespace.types.WordToken;
@@ -41,7 +43,7 @@ import java.util.List;
  * @author ryancornia
  */
 public class BaseDatabaseInsertErrorTest {
-    CAS cas = null;
+    protected static CAS cas = null;
 
     /**
      * Setup an in-memory db to test against with a simple schema.
@@ -50,14 +52,19 @@ public class BaseDatabaseInsertErrorTest {
      */
     @Before
     public void setup() throws Exception {
-        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(new WhitespaceTokenizer().getLeoAEDescriptor()
-                .setParameterSetting("tokenOutputType", Token.class.getCanonicalName())
-                .setParameterSetting("wordOutputType", WordToken.class.getCanonicalName())
-                .setParameterSetting("tokenOutputTypeFeature", 3)
-                .setTypeSystemDescription(new WhitespaceTokenizer().getLeoTypeSystemDescription())
-                .getAnalysisEngineDescription());
-        cas = CasCreationUtils.createCas(ae.getAnalysisEngineMetaData());
-
+        if(cas != null)
+            return;
+        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(
+                SampleService.simpleServiceDefinition().getAnalysisEngineDescription()
+        );
+        cas = ae.newCAS();
+        cas.setDocumentText("a b c");
+        CSI csi = new CSI(cas.getJCas());
+        csi.setID("1");
+        csi.setBegin(0);
+        csi.setEnd(5);
+        csi.addToIndexes();
+        ae.process(cas);
     }
 
     /**
@@ -70,7 +77,7 @@ public class BaseDatabaseInsertErrorTest {
         Connection c = DriverManager.getConnection("jdbc:hsqldb:mem:aname", "sa", "");
         DatabaseConnectionInformation databaseConnectionInformation = new DatabaseConnectionInformation("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:aname", "sa", "");
 
-        TestDatabaseListener listener = new TestDatabaseListener(databaseConnectionInformation, "insert into TEST_TABLE values (?, ?, ?);", 1, false);
+        TestDatabaseListener listener = new TestDatabaseListener(databaseConnectionInformation, "insert into TEST_TABLE values (?, ?, ?);");
 
         listener.entityProcessComplete(cas, null);
     }
@@ -78,8 +85,8 @@ public class BaseDatabaseInsertErrorTest {
 
     protected class TestDatabaseListener extends BaseDatabaseListener {
 
-        public TestDatabaseListener(DatabaseConnectionInformation databaseConnectionInformation, String preparedStatementSQL, int batchSize, boolean validateConnectionEachBatch) {
-            super(databaseConnectionInformation, preparedStatementSQL, batchSize, validateConnectionEachBatch);
+        public TestDatabaseListener(DatabaseConnectionInformation databaseConnectionInformation, String preparedStatementSQL) {
+            super(databaseConnectionInformation, preparedStatementSQL);
         }
 
         public List<Object[]> getRows(CAS aCas) {

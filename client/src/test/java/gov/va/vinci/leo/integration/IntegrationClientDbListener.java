@@ -51,7 +51,9 @@ public class IntegrationClientDbListener  extends IntegrationClient{
         }
         DatabaseConnectionInformation databaseConnectionInformation = new DatabaseConnectionInformation("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:aname", "sa", "");
 
-        TestDatabaseListener listener = new TestDatabaseListener(databaseConnectionInformation, "insert into TEST_TABLE values (?, ?, ?);", 1, false);
+        TestDatabaseListener listener = new TestDatabaseListener(databaseConnectionInformation, "insert into TEST_TABLE values (?, ?, ?);")
+                .setBatchSize(1)
+                .setValidateConnectionEachBatch(false);
         listener.setExitOnError(true);
 
         UimaAsBaseCallbackListener[] list = new UimaAsBaseCallbackListener[1];
@@ -69,8 +71,8 @@ public class IntegrationClientDbListener  extends IntegrationClient{
 
     protected class TestDatabaseListener extends BaseDatabaseListener {
 
-        public TestDatabaseListener(DatabaseConnectionInformation databaseConnectionInformation, String preparedStatementSQL, int batchSize, boolean validateConnectionEachBatch) {
-            super(databaseConnectionInformation, preparedStatementSQL, batchSize, validateConnectionEachBatch);
+        public TestDatabaseListener(DatabaseConnectionInformation databaseConnectionInformation, String preparedStatementSQL) {
+            super(databaseConnectionInformation, preparedStatementSQL);
         }
 
         public List<Object[]> getRows(CAS aCas) {

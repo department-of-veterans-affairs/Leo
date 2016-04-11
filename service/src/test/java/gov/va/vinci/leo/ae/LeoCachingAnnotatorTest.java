@@ -50,7 +50,7 @@ public class LeoCachingAnnotatorTest {
 	public class MyTestAnnotator extends LeoCachingAnnotator {
 
 		@Override
-		public void process(JCas arg0) throws AnalysisEngineProcessException {
+		public void annotate(JCas arg0) throws AnalysisEngineProcessException {
 			// TODO Auto-generated method stub
 			
 		}

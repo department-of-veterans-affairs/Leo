@@ -7,12 +7,12 @@
     <artifactId>leo-client</artifactId>
     <packaging>jar</packaging>
     <name>Leo Client</name>
-    <version>2015.04.1-SNAPSHOT</version>
+    <version>2016.03.0-SNAPSHOT</version>
  
     <parent>
         <groupId>gov.va.vinci</groupId>
         <artifactId>leo</artifactId>
-        <version>2015.04.1-SNAPSHOT</version>
+        <version>2016.03.0-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>gov.va.vinci.leo</groupId>
             <artifactId>leo-core</artifactId>
-            <version>2015.04.1-SNAPSHOT</version>
+            <version>2016.03.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -32,24 +32,18 @@
             <version>${uima-as-version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>net.sf.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>2.3</version>
-        </dependency>
         <!-- other dependencies -->
         <dependency>
             <groupId>args4j</groupId>
             <artifactId>args4j</artifactId>
-            <version>2.0.29</version>
+            <version>2.33</version>
         </dependency>
-
 
         <!-- Testing dependencies below here -->
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>2.2.7</version>
+            <version>2.3.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

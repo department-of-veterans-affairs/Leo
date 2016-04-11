@@ -66,6 +66,11 @@ public class CommandLineClient {
     File[] listenerConfigFileList;
 
     /**
+     * Leo Client what will be configured and run using the config files provided.
+     */
+    Client myClient = new Client();
+
+    /**
      * Default constructor.
      */
     public CommandLineClient() {
@@ -167,9 +172,8 @@ public class CommandLineClient {
 
 
             /**
-             * Create the client.
+             * Configure the client.
              */
-            gov.va.vinci.leo.Client myClient = new gov.va.vinci.leo.Client();
             setClientProperties(myClient);
 
 

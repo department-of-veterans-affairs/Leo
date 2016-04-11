@@ -48,7 +48,6 @@ public class DataQueryInformation {
      * @param idColumn  the column name for the id
      */
     public DataQueryInformation(String query, String noteColumn, String idColumn) {
-        super();
         this.query = query;
         this.noteColumn = noteColumn;
         this.idColumn = idColumn;
@@ -66,8 +65,9 @@ public class DataQueryInformation {
      * Set the query.
      * @param query  the database query, ie select id, note from my_table;
      */
-    public void setQuery(String query) {
+    public DataQueryInformation setQuery(String query) {
         this.query = query;
+        return this;
     }
 
     /**
@@ -82,8 +82,9 @@ public class DataQueryInformation {
      * Set the note column index, 0 based.
      * @param noteColumn the note column index, 0 based.
      */
-    public void setNoteColumn(String noteColumn) {
+    public DataQueryInformation setNoteColumn(String noteColumn) {
         this.noteColumn = noteColumn;
+        return this;
     }
 
     /**
@@ -98,8 +99,9 @@ public class DataQueryInformation {
      * Set the id column index, 0 based.
      * @param idColumn column index, 0 based.
      */
-    public void setIdColumn(String idColumn) {
+    public DataQueryInformation setIdColumn(String idColumn) {
         this.idColumn = idColumn;
+        return this;
     }
 
 }

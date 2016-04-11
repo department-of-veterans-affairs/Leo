@@ -13,9 +13,11 @@ import static org.junit.Assert.assertTrue;
 public class LeoRemoteAnnotatorTest {
     @Test
     public void testCreateDescriptor() throws Exception {
-        LeoRemoteAnnotator remoteAnnotator = new LeoRemoteAnnotator("tcp://localhost:61616", "myInputQueue", "BOB");
+        LeoRemoteAnnotator remoteAnnotator = new LeoRemoteAnnotator("tcp://localhost:61616", "myInputQueue")
+                .setName("BOB");
         assertNotNull(remoteAnnotator);
         assertNotNull(remoteAnnotator.getDescriptor());
+        String name = remoteAnnotator.getName();
         assertTrue(remoteAnnotator.getName().startsWith("BOB"));
     }
 }

@@ -57,11 +57,12 @@ public class IntegrationWhitespaceService {
 
     public static LeoAEDescriptor createExampleWhitespacePipeline(boolean generateTypes) throws Exception {
         LeoAEDescriptor aggregate = new LeoAEDescriptor();
-        aggregate.addDelegate(((LeoAEDescriptor) new ExampleWhitespaceTokenizer().getDescriptor())
-                .setTypeSystemDescription(createTypeSystem(generateTypes))
-                .setParameterSetting(ExampleWhitespaceTokenizer.Param.TOKEN_OUTPUT_TYPE.getName(), ExampleWhitespaceTokenizer.TOKEN_OUTPUT_TYPE_NAME)
-                .setParameterSetting(ExampleWhitespaceTokenizer.Param.TOKEN_OUTPUT_TYPE_FEATURE.getName(), ExampleWhitespaceTokenizer.TOKEN_OUTPUT_TYPE_FEATURE_NAME)
-                .setParameterSetting(ExampleWhitespaceTokenizer.Param.WORD_OUTPUT_TYPE.getName(), ExampleWhitespaceTokenizer.WORD_OUTPUT_TYPE_NAME));
+        aggregate.addDelegate(((LeoAEDescriptor) new ExampleWhitespaceTokenizer(
+                                ExampleWhitespaceTokenizer.TOKEN_OUTPUT_TYPE_NAME,
+                                ExampleWhitespaceTokenizer.TOKEN_OUTPUT_TYPE_FEATURE_NAME,
+                                ExampleWhitespaceTokenizer.WORD_OUTPUT_TYPE_NAME, null)
+                                .getDescriptor())
+                                .setTypeSystemDescription(createTypeSystem(generateTypes)));
         return aggregate;
     }
 

@@ -20,19 +20,19 @@ package gov.va.vinci.leo.ae;
  * #L%
  */
 
+import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
-import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
+import gov.va.vinci.leo.descriptors.TypeDescriptionBuilder;
+import gov.va.vinci.leo.types.ExampleType;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class ExampleAnnotator extends LeoBaseAnnotator {
-
+    @LeoConfigurationParameter(description="My Param")
     protected String myParam = null;
-
+    @LeoConfigurationParameter(description="My Required Param",mandatory=true)
     protected String myParamRequired = null;
 
     public ExampleAnnotator() {
@@ -44,29 +44,38 @@ public class ExampleAnnotator extends LeoBaseAnnotator {
         this.myParamRequired = myParamRequired;
     }
 
+    public ExampleAnnotator(String myParam, String myParamRequired, String outputType, String inputType) {
+        this.myParam = myParam;
+        this.myParamRequired = myParamRequired;
+        this.setOutputType(outputType);
+        this.setInputTypes(inputType);
+    }
+
     @Override
-    public void process(JCas arg0) throws AnalysisEngineProcessException {
-        // TODO Auto-generated method stub
+    public void annotate(JCas arg0) throws AnalysisEngineProcessException {
+        String docText = arg0.getDocumentText();
+        HashMap<String, Object> featureMap = new HashMap<>(2);
+        featureMap.put("numberOfCASesProcessed", new Integer((int) this.getNumberOfCASesProcessed()));
+        featureMap.put("numberOfFilteredCASesProcessed", new Integer((int) this.getNumberOfFilteredCASesProcessed()));
+        this.addOutputAnnotation(ExampleType.class.getCanonicalName(), arg0, 0, docText.length(), featureMap);
+//        ExampleType example = new ExampleType(arg0, 0, docText.length());
+//        example.setNumberOfCASesProcessed((int) this.numberOfCASesProcessed);
+//        example.setNumberOfFilteredCASesProcessed((int) this.numberOfFilteredCASesProcessed);
+//        example.addToIndexes();
     }
 
     @Override
     public LeoTypeSystemDescription getLeoTypeSystemDescription() {
-        return new LeoTypeSystemDescription();
+        return new LeoTypeSystemDescription().addType(
+                TypeDescriptionBuilder.create("gov.va.vinci.leo.types.ExampleType", "", "uima.tcas.Annotation")
+                        .addFeature("numberOfCASesProcessed", "", "uima.cas.Integer")
+                        .addFeature("numberOfFilteredCASesProcessed", "", "uima.cas.Integer")
+                        .getTypeDescription()
+        );
     }
 
-    public static class Param extends LeoBaseAnnotator.Param {
-        public static ConfigurationParameterImpl MY_PARAM
-                = new ConfigurationParameterImpl("myParam", "myParam", ConfigurationParameter.TYPE_STRING, false, false, new String[]{});
-        public static ConfigurationParameter MY_PARAM_REQUIRED
-                =  new ConfigurationParameterImpl("myParamRequired", "myParamRequired", ConfigurationParameter.TYPE_STRING, true, false, new String[]{});
-
-        public static ConfigurationParameter[] values() {
-            List<ConfigurationParameter> results = new ArrayList<ConfigurationParameter>();
-            results.add(MY_PARAM);
-            results.add(MY_PARAM_REQUIRED);
-            return results.toArray(new ConfigurationParameter[results.size()]);
-        }
-
+    public LeoTypeSystemDescription getTypeSystemDescription() {
+        return super.getLeoTypeSystemDescription();
     }
 
 }

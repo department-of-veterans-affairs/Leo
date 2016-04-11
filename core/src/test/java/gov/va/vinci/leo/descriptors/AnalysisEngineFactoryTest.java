@@ -21,17 +21,29 @@ package gov.va.vinci.leo.descriptors;
  */
 
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
+import org.apache.uima.util.InvalidXMLException;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class AnalysisEngineFactoryTest {
 
 
+    @Test
+    public void testGenerateAEDByName() throws Exception {
+        AnalysisEngineDescription d = AnalysisEngineFactory.generateAED("desc.gov.va.vinci.leo.ae.WhitespaceTokenizerDescriptor", true);
+        assertTrue(d.getImplementationName().equals("gov.va.vinci.marian.whitespace.ae.WhitespaceTokenizer"));
+    }
 
-	@Test
-	public void testGenerateAEDByName() throws Exception {
-		AnalysisEngineDescription d = AnalysisEngineFactory.generateAED("desc.gov.va.vinci.leo.ae.WhitespaceTokenizerDescriptor", true);
-		assertTrue(d.getImplementationName().equals("gov.va.vinci.marian.whitespace.ae.WhitespaceTokenizer"));
-	}
+    @Test
+    public void testGenerateEmptyDescriptor() throws Exception {
+        AnalysisEngineDescription d = AnalysisEngineFactory.generateAED();
+        assertNotNull(d);
+    }
+
+    @Test(expected = InvalidXMLException.class)
+    public void testGenerateNonAEDescriptor() throws Exception {
+        AnalysisEngineDescription d = AnalysisEngineFactory.generateAED("desc.gov.va.vinci.leo.types.CSI", true);
+    }
 }

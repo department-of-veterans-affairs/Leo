@@ -60,6 +60,11 @@ public class IntegrationClient {
             default:
                 dataDir = REMOTE_DATA_DIR;
         }
+
+        //Test xml retrieval
+        String typeSystemDesc = Client.getServiceTypeSystemDescriptionXml(serviceBrokerURL, serviceQueueName);
+        System.out.println("Type System Description = [\n" + typeSystemDesc + "\n]");
+
         //Init the client and process the data
         FileCollectionReader cr = new FileCollectionReader(dataDir, true);
 
@@ -67,6 +72,11 @@ public class IntegrationClient {
         myClient.setBrokerURL(serviceBrokerURL);
         myClient.setServiceName(serviceQueueName);
         myClient.setInputQueueName(serviceQueueName);
+
+        //Double check type system retrieval before running
+        String tsd = myClient.getServiceTypeSystemDescriptionXml();
+        System.out.println("Descriptions Match: " + tsd.equals(typeSystemDesc));
+
         try {
             myClient.run(cr);
         } catch (Exception e) {
@@ -79,12 +89,12 @@ public class IntegrationClient {
 
     protected UimaAsBaseCallbackListener[] getListeners() {
         //Setup the output directory
-        if(!OUT_DIR.mkdir())
+        if (!OUT_DIR.mkdir())
             throw new RuntimeException("Unable to create output directory: " + OUT_DIR.getAbsolutePath());
         OUT_DIR.deleteOnExit();
 
         UimaAsBaseCallbackListener[] list = new UimaAsBaseCallbackListener[1];
-        list[0] = new SimpleXmiListener(OUT_DIR, true) ;
+        list[0] = new SimpleXmiListener(OUT_DIR).setLaunchAnnotationViewer(true);
         return list;
     }
 

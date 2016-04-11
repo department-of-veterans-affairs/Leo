@@ -20,6 +20,7 @@ package gov.va.vinci.leo.cr;
  * #L%
  */
 
+import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.model.DataQueryInformation;
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
@@ -35,6 +36,7 @@ import org.apache.uima.jcas.cas.StringArray;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.util.Progress;
+import org.apache.uima.util.ProgressImpl;
 
 import java.io.IOException;
 import java.util.Map;
@@ -51,14 +53,19 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
     /**
      * Query to be used to get the data.
      */
+    @LeoConfigurationParameter(mandatory = true)
     protected String query = null;
+
     /**
      * Zero based index of the ID column in the query.
      */
+    @LeoConfigurationParameter(mandatory = true)
     protected String idColumn = null;
+
     /**
      * Zero based index of the note column in the query.
      */
+    @LeoConfigurationParameter(mandatory = true)
     protected String noteColumn = null;
 
     /**
@@ -121,6 +128,66 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
     }
 
     /**
+     * Get the database query used to pull data.
+     * 
+     * @return database query
+     */
+    public String getQuery() {
+        return query;
+    }
+
+    /**
+     * Set the database query used to pull data.
+     * 
+     * @param query database query
+     * @return reference to this reader instance
+     */
+    public <T extends DatabaseCollectionReader> T setQuery(String query) {
+        this.query = query;
+        return (T) this;
+    }
+
+    /**
+     * Get the ID Column name.
+     * 
+     * @return ID Column name
+     */
+    public String getIdColumn() {
+        return idColumn;
+    }
+
+    /**
+     * Set the ID column to be used.
+     * 
+     * @param idColumn ID column name
+     * @return reference to this reader instance
+     */
+    public <T extends DatabaseCollectionReader> T setIdColumn(String idColumn) {
+        this.idColumn = idColumn;
+        return (T) this;
+    }
+
+    /**
+     * Get the note column name.
+     * 
+     * @return note column name
+     */
+    public String getNoteColumn() {
+        return noteColumn;
+    }
+
+    /**
+     * Set the note column name.
+     * 
+     * @param noteColumn note column name
+     * @return reference to this reader instance
+     */
+    public <T extends DatabaseCollectionReader> T setNoteColumn(String noteColumn) {
+        this.noteColumn = noteColumn;
+        return (T) this;
+    }
+
+    /**
      * Validate the parameters for the DatabaseCollectionReader to ensure that none of the required arguments are
      * missing or invalid.
      *
@@ -144,19 +211,6 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
         if(!query.toLowerCase().contains(noteColumn.toLowerCase())) {
             throw new IllegalArgumentException("Note column, " + noteColumn + ", was not found in the query! " + query);
         }
-    }
-
-    /**
-     * This method is called during initialization. Subclasses should override it to perform one-time startup logic.
-     *
-     * @throws org.apache.uima.resource.ResourceInitializationException if a failure occurs during initialization.
-     */
-    @Override
-    public void initialize() throws ResourceInitializationException {
-        super.initialize();
-        this.query     = (String) getConfigParameterValue(Param.QUERY.getName());
-        this.idColumn = (String) getConfigParameterValue(Param.ID_COLUMN.getName());
-        this.noteColumn = (String) getConfigParameterValue(Param.NOTE_COLUMN.getName());
     }
 
     /**
@@ -252,45 +306,9 @@ public class DatabaseCollectionReader extends BaseDatabaseCollectionReader {
      */
     @Override
     public Progress[] getProgress() {
-        return new Progress[0];
+        int current = (mRowIndex > 0)? mRowIndex : 0;
+        int total = (mRecordList == null)? 0 : mRecordList.size();
+        return new Progress[]{ new ProgressImpl(current, total, "row(s)")};
     }
 
-    /**
-     * Generate the UIMA Collection reader with resources.
-     *
-     * @return a uima collection reader.
-     * @throws org.apache.uima.resource.ResourceInitializationException
-     */
-    @Override
-    public CollectionReader produceCollectionReader() throws ResourceInitializationException {
-        Map<String, Object> parameterValues = produceBaseDatabaseCollectionReaderParams();
-        parameterValues.put(Param.QUERY.getName(), query);
-        parameterValues.put(Param.ID_COLUMN.getName(), idColumn);
-        parameterValues.put(Param.NOTE_COLUMN.getName(), noteColumn);
-        return produceCollectionReader(LeoUtils.getStaticConfigurationParameters(Param.class), parameterValues);
-    }
-
-    /**
-     * Static inner class for holding parameters information.
-     */
-    public static class Param extends BaseDatabaseCollectionReader.Param {
-        /**
-         * SQL Query to be executed.
-         */
-        public static ConfigurationParameter QUERY =
-                new ConfigurationParameterImpl("Query", "SQL Query to be executed",
-                        ConfigurationParameter.TYPE_STRING, true, false, new String[] {} );
-        /**
-         * Column index for the id column in the query (zero based).
-         */
-        public static ConfigurationParameter ID_COLUMN =
-                new ConfigurationParameterImpl("IdIndex", "Column index for the id column in the query (zero based)",
-                        ConfigurationParameter.TYPE_STRING, true, false, new String[] {});
-        /**
-         * Column index for the note column in the query (zero based).
-         */
-        public static ConfigurationParameter NOTE_COLUMN =
-                new ConfigurationParameterImpl("NoteIndex", "Column index for the note column in the query (zero based)",
-                        ConfigurationParameter.TYPE_STRING, true, false, new String[]{});
-    }
 }

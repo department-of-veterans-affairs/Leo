@@ -70,6 +70,8 @@ public class XmiFileCollectionReader extends BaseFileCollectionReader {
      * Default constructor used during UIMA initialization.
      */
     public XmiFileCollectionReader() {
+        //Use a SuffixFileFilter by default
+        this.setFilenameFilter(new SuffixFileFilter(fileExtenstionString));
     }
 
     /**
@@ -77,13 +79,11 @@ public class XmiFileCollectionReader extends BaseFileCollectionReader {
      *
      * @param inputDirectory Path to the directory that will be searched for files to process
      * @param recurse        If true then recurse into subdirectories.
-     * @param  filterList   a list of text filters to apply to the document before returning it.
      */
-    public XmiFileCollectionReader(File inputDirectory, boolean recurse, TextFilter... filterList)  {
-        super(inputDirectory, recurse, new SuffixFileFilter(fileExtenstionString));
-        if (filterList != null) {
-            addFilters(filterList);
-        }
+    public XmiFileCollectionReader(File inputDirectory, boolean recurse)  {
+        super(inputDirectory, recurse);
+        //Use a SuffixFileFilter by default
+        this.setFilenameFilter(new SuffixFileFilter(fileExtenstionString));
     }
 
     /**
@@ -103,6 +103,8 @@ public class XmiFileCollectionReader extends BaseFileCollectionReader {
             file = new FileInputStream(next);
             XmiCasDeserializer.deserialize(file, aCAS);
         } catch (SAXException e) {
+            if(next != null)
+                LOG.error("Error reading file: " + next.getAbsolutePath());
             throw new CollectionException(e);
         } finally {
             try {
@@ -113,10 +115,4 @@ public class XmiFileCollectionReader extends BaseFileCollectionReader {
         }
     }
 
-    /**
-     * Collection reader params. Currently it just uses the same params as BaseFileCollectionReader.
-     */
-    public static class Param extends BaseFileCollectionReader.Param {
-
-    }
 }

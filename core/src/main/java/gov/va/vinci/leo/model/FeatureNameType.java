@@ -60,8 +60,9 @@ public class FeatureNameType {
      * Set the name of the feature.
      * @param name  Name of the feature.     e.g. - pattern
      */
-    public void setName(String name) {
+    public FeatureNameType setName(String name) {
         this.name = name;
+        return this;
     }
 
     /**
@@ -76,7 +77,8 @@ public class FeatureNameType {
      * Set the UIMA Type of the feature.
      * @param type the UIMA Type of the feature.  e.g. - uima.cas.String
      */
-    public void setType(String type) {
+    public FeatureNameType setType(String type) {
         this.type = type;
+        return this;
     }
 }

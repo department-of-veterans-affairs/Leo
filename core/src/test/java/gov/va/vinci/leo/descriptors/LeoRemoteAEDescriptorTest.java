@@ -26,7 +26,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.aae.jms_adapter.JmsAnalysisEngineServiceAdapter;
 import org.apache.uima.resource.Parameter;
 import org.apache.uima.resource.impl.Parameter_impl;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
@@ -37,6 +41,16 @@ import static org.junit.Assert.*;
  */
 public class LeoRemoteAEDescriptorTest {
     String descriptor = "desc.gov.va.vinci.leo.ae.RemoteExampleWhitespaceTokenizerDescriptor";
+    String rootDirectory = "";
+
+
+    @Before
+    public void setTestString() throws IOException {
+        String path = new File(".").getCanonicalPath();
+        if (!path.endsWith("client")) {
+            rootDirectory = "client/";
+        }
+    }
 
     @Test
     public void testEmptyConstructor() throws Exception {
@@ -46,8 +60,17 @@ public class LeoRemoteAEDescriptorTest {
 
     @Test
     public void testXmlImportConstructor() throws Exception {
-        LeoRemoteAEDescriptor lrae = new LeoRemoteAEDescriptor(descriptor, true);
+        NameValue nv = new NameValue("brokerURL", "tcp://somehost:61616");
+        LeoRemoteAEDescriptor lrae = new LeoRemoteAEDescriptor(descriptor, true, nv);
         assertNull(lrae.getName());
+        Parameter p = lrae.getParameterSetting("brokerURL");
+        assertNotNull(p);
+        assertEquals("tcp://somehost:61616", p.getValue());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullCRSConstructor() throws Exception {
+        new LeoRemoteAEDescriptor(null);
     }
 
     @Test
@@ -83,6 +106,7 @@ public class LeoRemoteAEDescriptorTest {
     public void testAddSetParameter() throws Exception {
         Parameter p = new Parameter_impl("bob", "dummy");
         LeoRemoteAEDescriptor lrae = new LeoRemoteAEDescriptor();
+        lrae.analysisEngineSection(null, true);
         lrae.addParameterSetting(p.getName(), p.getValue());
         assertEquals(lrae.getParameterValue(p.getName()), p.getValue());
         assertEquals(lrae.getParameterSetting(p.getName()).getValue(), p.getValue());
@@ -101,9 +125,14 @@ public class LeoRemoteAEDescriptorTest {
         lrae.setName("myRemoteTestDescriptor");
         lrae.addParameterSetting(LeoRemoteAEDescriptor.Param.ENDPOINT.getName(), "TestInputQueueName");
         lrae.addParameterSetting(LeoRemoteAEDescriptor.Param.BROKER_URL.getName(), "tcp://localhost:61616");
+        File descDir = new File(rootDirectory + "src/test/resources/results");
+        lrae.setDescriptorLocator(descDir.toURI());
         lrae.toXML("myRemoteTestFile");
         String lraeXmlPath = lrae.getDescriptorLocator();
+        assertTrue(lraeXmlPath.contains(descDir.getAbsolutePath()));
         assertFalse(StringUtils.isBlank(lraeXmlPath));
+        lrae.setIsDeleteOnExit(true);
+        assertTrue(lrae.isDeleteOnExit());
         LeoRemoteAEDescriptor importLRAE = new LeoRemoteAEDescriptor(lraeXmlPath, false);
         assertNotNull(importLRAE);
         assertTrue(importLRAE.getName().startsWith("myRemoteTestDescriptor"));
