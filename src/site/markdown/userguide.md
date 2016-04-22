@@ -3,14 +3,13 @@
 
 The [VINCI](http://www.hsrd.research.va.gov/for_researchers/vinci/)-developed Natural Language Processing(NLP) infrastructure, is a set of services and libraries that facilitate the rapid creation and deployment of Apache UIMA-AS annotators focused on NLP.  Leo is separated into three main components; Leo-client, Leo-core, and Leo-service.  
 
-**Leo-Client** contains the components that send requests to the services. Setting up a client is as simple as picking the collection reader and listener required; plugging in the input directory you're using, and specifying the output that you'd like to use.  
+**leo-client** contains the components that send requests to the services. Setting up a client is as simple as picking the collection reader and listener required.  
 
-**Leo-core** contains the core tools that have been developed in conjunction with Leo to facilitate various NLP and annotation needs. 
+**leo-core** contains the core tools that have been developed in conjunction with Leo to facilitate various NLP and annotation needs. 
 
+**leo-service** contains the core server functionality for launching UIMA_AS services.  All three packages can be found together in leo-base.
 
-**Leo-service** contains the core server functionality for launching UIMA_AS services.  All three packages can be found together in Leo-base.
-
-Leo also contains a collection of packages that provide different functionalities for creating custom pipelines for distributed NLP systems.  The Basic architecture of Leo is shown in the following image with the flow beginning at the reader.
+Leo also contains a collection of packages that provide additional functionalities for creating custom pipelines for distributed NLP systems.  The Basic architecture of Leo is shown in the following image with the flow beginning at the reader.
 
 <img src="images/IntroFigure1.png" alt="" style="width: 750px;"/>
 
@@ -21,7 +20,7 @@ If you're already familiar with UIMA and Maven, you can go to the Download page 
 A list of relevant tools and packages used by Leo can be found in the [Components and Tools](components.html) page. 
 
 ###1.1 Leo-Client
-The client is used to define the readers and listeners needed to execute a pipeline via the client API for UIMA_AS.  In Leo-client will initialize and execute a pipeline via the client API for UIMA AS which has been created via the Service object.  Setting up a client is as simple as picking the collection reader and listener required; plugging in the input directory you're using, and specifying the output that you'd like to use.  An example of the code requiring your input can be found in the "Understanding and Adapting the Leo-Example Project" section of the User-guide.  
+The client is used to define the readers and listeners needed to execute a pipeline via the client API for UIMA_AS.  In Leo-client will initialize and execute a pipeline via the client API for UIMA AS which has been created via the Service object.  Setting up a client is as simple as picking the collection reader and listener required; plugging in the input directory you're using, and specifying the output listener that you'd like to use.  An example of the code requiring your input can be found in the "Understanding and Adapting the Leo-Example Project" section of the User-guide.  
 
 #### CollectionReaders: Fountains of knowledge
 
@@ -75,9 +74,10 @@ to pull in each batch or page size as in the following code:
 
 ```java
 SQLServerPagedDatabaseCollectionReader reader = new SQLServerPagedDatabaseCollectionReader("com.microsoft.sqlserver.jdbc.SQLServerDriver",
+                                                "jdbc:mysql://localhost/test",
                                                 "testuser", "password",
                                                 "select id, document from example_document order by id",
-                                                50000, 0);
+                                                "id", "document", 50000, 0);
                                                 
 ```
 

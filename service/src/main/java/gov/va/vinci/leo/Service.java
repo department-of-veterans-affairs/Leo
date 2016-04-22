@@ -134,17 +134,6 @@ public class Service extends LeoProperties {
      * Initialize a pipeline by generating the aggregate descriptor file from the list of LeoAnnotator objects then
      * deploy it in the UIMA-AS framework.
      *
-     * @param annotators one or more annotators to deploy as a pipeline in the service.
-     * @throws Exception if any error occurs during deployment.
-     */
-    public void deploy(LeoAnnotator...annotators) throws Exception {
-        deploy(new LeoTypeSystemDescription(), annotators);
-    }
-
-    /**
-     * Initialize a pipeline by generating the aggregate descriptor file from the list of LeoAnnotator objects then
-     * deploy it in the UIMA-AS framework.
-     *
      * @param leoTypeSystemDescription the type system to add to each delegate.
      * @param annotators one or more annotators to deploy as a pipeline in the service.
      * @throws Exception if any error occurs during deployment.
@@ -183,12 +172,6 @@ public class Service extends LeoProperties {
             leoTypeSystemDescription = new LeoTypeSystemDescription();
         }
         LeoAEDescriptor aggregate = new LeoAEDescriptor();
-        //Grab the default type systems from the annotators.
-        for(LeoAnnotator annotator : annotators) {
-            if(annotator instanceof  LeoBaseAnnotator) {
-                leoTypeSystemDescription.addTypeSystemDescription(((LeoBaseAnnotator) annotator).getLeoTypeSystemDescription());
-            }
-        }
         //Set the type system in each annotator and add it as a delegate.
         for(LeoAnnotator annotator : annotators) {
             LeoDelegate descriptor = annotator.getDescriptor();
