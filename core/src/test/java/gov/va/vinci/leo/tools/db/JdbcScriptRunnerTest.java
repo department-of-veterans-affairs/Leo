@@ -1,7 +1,7 @@
 package gov.va.vinci.leo.tools.db;
 
-import clover.org.apache.commons.lang3.StringUtils;
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,7 +11,6 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLSyntaxErrorException;
 
 import static org.junit.Assert.assertNotNull;
@@ -24,11 +23,11 @@ public class JdbcScriptRunnerTest {
 
     public static String scriptText
             = "-- Comment to be ignored\n" +
-                "CREATE TABLE PUBLIC.notes (id INTEGER NOT NULL, note VARCHAR(1000), PRIMARY KEY (id));\n" +
-                "INSERT INTO PUBLIC.notes (id, note) VALUES (1, '" + new BigInteger(130, new SecureRandom()).toString(32) + "');\n" +
-                "INSERT INTO PUBLIC.notes (id, note) VALUES (2, '" + new BigInteger(130, new SecureRandom()).toString(32) + "');\n" +
-                "INSERT INTO PUBLIC.notes (id, note) VALUES (3, '" + new BigInteger(130, new SecureRandom()).toString(32) + "');\n" +
-                "SELECT id, note FROM notes;";
+            "CREATE TABLE PUBLIC.notes (id INTEGER NOT NULL, note VARCHAR(1000), PRIMARY KEY (id));\n" +
+            "INSERT INTO PUBLIC.notes (id, note) VALUES (1, '" + new BigInteger(130, new SecureRandom()).toString(32) + "');\n" +
+            "INSERT INTO PUBLIC.notes (id, note) VALUES (2, '" + new BigInteger(130, new SecureRandom()).toString(32) + "');\n" +
+            "INSERT INTO PUBLIC.notes (id, note) VALUES (3, '" + new BigInteger(130, new SecureRandom()).toString(32) + "');\n" +
+            "SELECT id, note FROM notes;";
 
     protected StringWriter writer = new StringWriter();
     protected static Connection connection = null;
@@ -36,7 +35,7 @@ public class JdbcScriptRunnerTest {
     @Before
     public void setup() throws Exception {
         writer = new StringWriter();
-        if(connection != null) return;
+        if (connection != null) return;
         DatabaseConnectionInformation dbConnectionInfo = new DatabaseConnectionInformation("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:JdbcScriptRunnerTest;sql.enforce_strict_size=true", "sa", "");
         connection = new DataManager(dbConnectionInfo).getDataSource().getConnection();
     }
