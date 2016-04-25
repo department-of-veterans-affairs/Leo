@@ -78,7 +78,7 @@ public class SimpleXmiListenerTest {
         assertEquals(counter+1, files.length);
         if(files.length > 0) {
             String xmiText = FileUtils.readFileToString(files[0]);
-            assertTrue(xmiText.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?><xmi:XMI xmlns:tcas=\"http:///uima/tcas.ecore\""));
+            assertTrue("Bad Header in " + files[0].getAbsolutePath(), xmiText.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?><xmi:XMI xmlns:tcas=\"http:///uima/tcas.ecore\""));
         }
     }
 
