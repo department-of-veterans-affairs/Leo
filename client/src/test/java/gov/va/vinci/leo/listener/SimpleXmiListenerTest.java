@@ -1,6 +1,5 @@
 package gov.va.vinci.leo.listener;
 
-import clover.org.apache.commons.lang3.StringUtils;
 import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.cr.FileCollectionReader;
 import gov.va.vinci.leo.cr.RandomStringCollectionReader;
@@ -8,6 +7,7 @@ import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.types.CSI;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.analysis_engine.AnalysisEngine;

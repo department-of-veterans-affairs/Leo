@@ -22,13 +22,13 @@ package gov.va.vinci.leo.listener;
 
 
 import au.com.bytecode.opencsv.CSVWriter;
-import clover.org.apache.commons.lang3.StringUtils;
 import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.cr.RandomStringCollectionReader;
 import gov.va.vinci.leo.types.CSI;
 import gov.va.vinci.leo.whitespace.types.Token;
 import gov.va.vinci.leo.whitespace.types.WordToken;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.analysis_engine.AnalysisEngine;
