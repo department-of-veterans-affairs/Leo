@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
 <!--suppress MavenModelInspection -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>gov.va.vinci</groupId>
     <artifactId>leo</artifactId>
     <packaging>pom</packaging>
-    <version>2016.04.1-SNAPSHOT</version>
+    <version>2016.04.1</version>
     <name>Leo Parent Project</name>
     <modules>
         <module>base</module>
@@ -290,7 +289,7 @@
     <scm>
         <connection>scm:git:http://decipher.chpc.utah.edu/gitblit/git/bones/leo.git/</connection>
         <url>http://decipher.chpc.utah.edu/gitblit/git/bones/leo.git/</url>
-        <tag>HEAD</tag>
+        <tag>leo-2016.04.1</tag>
     </scm>
     <distributionManagement>
         <site>
