@@ -52,10 +52,11 @@ public class SampleService {
 
     public static LeoAEDescriptor simpleServiceDefinition(LeoTypeSystemDescription typeSystemDescriptionToAdd) throws Exception {
         LeoTypeSystemDescription typeSystem = getTypeSystemDescription(typeSystemDescriptionToAdd);
-        LeoAEDescriptor ae = new WhitespaceTokenizer().getLeoAEDescriptor()
-                .setParameterSetting(WhitespaceTokenizer.Param.TOKEN_OUTPUT_TYPE.getName(), Token.class.getCanonicalName())
-                .setParameterSetting(WhitespaceTokenizer.Param.WORD_OUTPUT_TYPE.getName(), WordToken.class.getCanonicalName())
-                .setParameterSetting(WhitespaceTokenizer.Param.TOKEN_OUTPUT_TYPE_FEATURE.getName(), "TokenType")
+        LeoAEDescriptor ae = new WhitespaceTokenizer()
+                .setTokenOutputType(Token.class.getCanonicalName())
+                .setWordOutputType(WordToken.class.getCanonicalName())
+                .setTokenOutputTypeFeature("TokenType")
+                .getLeoAEDescriptor()
                 .setTypeSystemDescription(typeSystem);
         ae.addType(TypeLibrarian.getCSITypeSystemDescription());
         ae.setIsAsync(true);

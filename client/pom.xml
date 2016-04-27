@@ -46,5 +46,11 @@
             <version>2.3.3</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>gov.va.vinci.leo</groupId>
+            <artifactId>leo-service</artifactId>
+            <version>2016.04.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

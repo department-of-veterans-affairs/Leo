@@ -29,7 +29,6 @@ import gov.va.vinci.leo.ae.ExampleWhitespaceTokenizer;
 import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.types.TypeLibrarian;
-import gov.va.vinci.leo.whitespace.ae.WhitespaceTokenizer;
 import gov.va.vinci.leo.whitespace.types.Token;
 import gov.va.vinci.leo.whitespace.types.WordToken;
 
@@ -49,13 +48,13 @@ public class SampleService {
      */
     public static LeoAEDescriptor simpleServiceDefinition() throws Exception {
         LeoAEDescriptor ae = new LeoAEDescriptor();
-            ae.addDelegate(
+        ae.addDelegate(
                 new ExampleWhitespaceTokenizer(Token.class.getCanonicalName(), "TokenType",
                         WordToken.class.getCanonicalName(), null)
-                    .setNumInstances(4)
-                    .getLeoAEDescriptor()
-                    .setTypeSystemDescription(getSampleTypeSystemDescription())
-            );
+                        .setNumInstances(4)
+                        .getLeoAEDescriptor()
+                        .setTypeSystemDescription(getSampleTypeSystemDescription())
+        );
         ae.setIsAsync(true);
         return ae;
     }

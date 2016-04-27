@@ -80,12 +80,6 @@
       <version>2015.03.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>gov.va.vinci</groupId>
-      <artifactId>leo-whitespace-tokenizer</artifactId>
-      <version>2014.08.2</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
     <!--
