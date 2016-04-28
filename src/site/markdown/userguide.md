@@ -344,7 +344,7 @@ A base annotator with methods that implement caching via EHCache.
 
 Leo is geared towards processing machine-readable text. A base annotator class `gov.va.vinci.leo.ae.LeoBaseAnnotator` (which extends `org.apache.uima.analysis_component.JCasAnnotator_ImplBase` ) is provided to simplify and speed up development of an Analysis Engine for text processing. 
 
-In order to develop an annotator, write a new class that extends gov.va.vinci.leo.ae.LeoBaseAnnotator. Each AE has to have two main steps – initializing the AE parameters, and processing each document. When a service is deployed (see Service deployment methods section), for each annotator and AE object is created and initialized. When a document reaches the specific annotator in the pipeline, the document JCas is passed to process method.
+In order to develop an annotator, write a new class that extends gov.va.vinci.leo.ae.LeoBaseAnnotator. Each AE has to have two main steps – initializing the AE parameters, and processing each document. When a service is deployed (see Service deployment methods section), for each annotator and AE object is created and initialized. When a document reaches the specific annotator in the pipeline, the document JCas is passed to the annotate method.
 
 
 ```java
@@ -365,8 +365,7 @@ public class myAnnotator extends LeoBaseAnnotator {
 	}
 
 	@Override
-	public void process(JCas aJCas) throws AnalysisEngineProcessException {
-		super.process(aJCas);
+	public void annotate(JCas aJCas) throws AnalysisEngineProcessException {
 		< additional processing code >
 	}
 }
