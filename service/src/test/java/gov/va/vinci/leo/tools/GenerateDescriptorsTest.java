@@ -1,19 +1,15 @@
 package gov.va.vinci.leo.tools;
 
-import clover.org.apache.commons.lang3.StringUtils;
 import gov.va.vinci.leo.ae.ExampleWhitespaceTokenizer;
-import gov.va.vinci.leo.whitespace.types.Token;
-import gov.va.vinci.leo.whitespace.types.WordToken;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by thomasginter on 3/28/16.
@@ -65,7 +61,7 @@ public class GenerateDescriptorsTest {
 
     @After
     public void cleanup() throws Exception {
-        if(outDir != null && outDir.exists())
+        if (outDir != null && outDir.exists())
             FileUtils.forceDelete(outDir);
     }
 }

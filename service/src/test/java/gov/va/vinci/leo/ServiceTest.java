@@ -143,7 +143,8 @@ public class ServiceTest {
         //Test LeoAnnotator deployment
         s = new Service();
         s.mUAEngine = EasyMock.createMock(UimaAsynchronousEngine.class);
-        s.deploy(new ExampleAnnotator("myParamValue", "myReqParamValue"));
+        ExampleAnnotator exampleAnnotator = new ExampleAnnotator("myParamValue", "myReqParamValue");
+        s.deploy(exampleAnnotator.getLeoTypeSystemDescription(), exampleAnnotator);
         assertTrue(StringUtils.isNotBlank(s.getAggregateDescriptorFile()));
         assertNotNull(s.mAppCtx);
 

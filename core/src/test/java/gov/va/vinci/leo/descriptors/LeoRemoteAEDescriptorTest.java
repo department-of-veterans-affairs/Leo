@@ -47,8 +47,8 @@ public class LeoRemoteAEDescriptorTest {
     @Before
     public void setTestString() throws IOException {
         String path = new File(".").getCanonicalPath();
-        if (!path.endsWith("client")) {
-            rootDirectory = "client/";
+        if (!path.endsWith("core")) {
+            rootDirectory = "core/";
         }
     }
 

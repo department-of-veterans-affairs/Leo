@@ -3,14 +3,13 @@
 
 The [VINCI](http://www.hsrd.research.va.gov/for_researchers/vinci/)-developed Natural Language Processing(NLP) infrastructure, is a set of services and libraries that facilitate the rapid creation and deployment of Apache UIMA-AS annotators focused on NLP.  Leo is separated into three main components; Leo-client, Leo-core, and Leo-service.  
 
-**Leo-Client** contains the components that send requests to the services. Setting up a client is as simple as picking the collection reader and listener required; plugging in the input directory you're using, and specifying the output that you'd like to use.  
+**leo-client** contains the components that send requests to the services. Setting up a client is as simple as picking the collection reader and listener required.  
 
-**Leo-core** contains the core tools that have been developed in conjunction with Leo to facilitate various NLP and annotation needs. 
+**leo-core** contains the core tools that have been developed in conjunction with Leo to facilitate various NLP and annotation needs. 
 
+**leo-service** contains the core server functionality for launching UIMA_AS services.  All three packages can be found together in leo-base.
 
-**Leo-service** contains the core server functionality for launching UIMA_AS services.  All three packages can be found together in Leo-base.
-
-Leo also contains a collection of packages that provide different functionalities for creating custom pipelines for distributed NLP systems.  The Basic architecture of Leo is shown in the following image with the flow beginning at the reader.
+Leo also contains a collection of packages that provide additional functionalities for creating custom pipelines for distributed NLP systems.  The Basic architecture of Leo is shown in the following image with the flow beginning at the reader.
 
 <img src="images/IntroFigure1.png" alt="" style="width: 750px;"/>
 
@@ -21,7 +20,7 @@ If you're already familiar with UIMA and Maven, you can go to the Download page 
 A list of relevant tools and packages used by Leo can be found in the [Components and Tools](components.html) page. 
 
 ###1.1 Leo-Client
-The client is used to define the readers and listeners needed to execute a pipeline via the client API for UIMA_AS.  In Leo-client will initialize and execute a pipeline via the client API for UIMA AS which has been created via the Service object.  Setting up a client is as simple as picking the collection reader and listener required; plugging in the input directory you're using, and specifying the output that you'd like to use.  An example of the code requiring your input can be found in the "Understanding and Adapting the Leo-Example Project" section of the User-guide.  
+The client is used to define the readers and listeners needed to execute a pipeline via the client API for UIMA_AS.  In Leo-client will initialize and execute a pipeline via the client API for UIMA AS which has been created via the Service object.  Setting up a client is as simple as picking the collection reader and listener required; plugging in the input directory you're using, and specifying the output listener that you'd like to use.  An example of the code requiring your input can be found in the "Understanding and Adapting the Leo-Example Project" section of the User-guide.  
 
 #### CollectionReaders: Fountains of knowledge
 
@@ -75,9 +74,10 @@ to pull in each batch or page size as in the following code:
 
 ```java
 SQLServerPagedDatabaseCollectionReader reader = new SQLServerPagedDatabaseCollectionReader("com.microsoft.sqlserver.jdbc.SQLServerDriver",
+                                                "jdbc:mysql://localhost/test",
                                                 "testuser", "password",
                                                 "select id, document from example_document order by id",
-                                                50000, 0);
+                                                "id", "document", 50000, 0);
                                                 
 ```
 
@@ -153,8 +153,7 @@ public Progress[] getProgress() {
 variables marked with the @LeoConfigurationParameter annotation.  Values from those variables are propagated into the 
 descriptor and then a new CollectionReader instance is produced from the descriptor that is created.
 
-Here is the code for a complete CollectionReader implementation.  This code is also 
-included in the leo-examples public project:
+Here is the code for a complete CollectionReader implementation that extends the BaseLeoCollectionReader.
 
 ```java
 /**
@@ -228,31 +227,6 @@ public class RandomStringCollectionReader extends BaseLeoCollectionReader {
     @Override
     public Progress[] getProgress() {
         return new Progress[]{ new ProgressImpl(currentString, numberOfStrings, Progress.ENTITIES) };
-    }
-
-    /**
-     * Generate the UIMA Collection reader with resources.
-     *
-     * @return a uima collection reader.
-     * @throws org.apache.uima.resource.ResourceInitializationException
-     */
-    @Override
-    public CollectionReader produceCollectionReader() throws ResourceInitializationException {
-        Map<String, Object> parameterValues = new HashMap<String, Object>();
-        parameterValues.put(Param.NUMBER_OF_STRINGS.getName(), numberOfStrings);
-        return produceCollectionReader(LeoUtils.getStaticConfigurationParameters(Param.class), parameterValues);
-    }
-
-    /**
-     * Static inner class for holding parameter information.
-     */
-    public static class Param extends BaseLeoCollectionReader.Param {
-        /**
-         * Input directory to read from.
-         */
-        public static ConfigurationParameter NUMBER_OF_STRINGS =
-                new ConfigurationParameterImpl("numberOfStrings", "The number of random strings to generate",
-                        ConfigurationParameter.TYPE_INTEGER, true, false, new String[]{});
     }
 }
 
@@ -353,13 +327,13 @@ allows the Leo `Client` to use any third party listener in addition to listeners
 ***
 ###1.2 Leo-Service
 
-The Leo Service class can be used to define type system and annotators for the pipeline programmatically. Service class deploys the UIMA AS service from the list of primitive descriptor files provided by the caller.  Any modules that will be executed must be in the class path of the Server process, remote modules being the exception once those are implemented.  Setting up the Service, like most aspects of Leo, is as simple as editing a few directories to your specific files.
+The Leo Service class can be used to define type system and annotators for the pipeline programmatically. The Service class deploys the UIMA AS service from the list of primitive descriptor files or Annotator objects provided by the caller.  Any modules that will be executed must be in the class path of the Server process, remote modules being the exception once those are implemented.  Setting up the Service, like most aspects of Leo, is as simple as editing a few directories to your specific files.
 
 ####Analysis Engines
 
 **LeoBaseAnnotator:**
 
-This is a base annotator class for holding functions that all annotators might take advantage of, such as loading resources files, etc...
+This is a base annotator class for holding functions that all annotators might take advantage of, such as loading resources files, initializing parameters etc...
 
 
 **LeoCachingAnnotator:**
@@ -370,7 +344,7 @@ A base annotator with methods that implement caching via EHCache.
 
 Leo is geared towards processing machine-readable text. A base annotator class `gov.va.vinci.leo.ae.LeoBaseAnnotator` (which extends `org.apache.uima.analysis_component.JCasAnnotator_ImplBase` ) is provided to simplify and speed up development of an Analysis Engine for text processing. 
 
-In order to develop an annotator, write a new class that extends gov.va.vinci.leo.ae.LeoBaseAnnotator. Each AE has to have two main steps – initializing the AE parameters, and processing each document. When a service is deployed (see Service deployment methods section), for each annotator and AE object is created and initialized. When a document reaches the specific annotator in the pipeline, the document JCas is passed to process method.
+In order to develop an annotator, write a new class that extends gov.va.vinci.leo.ae.LeoBaseAnnotator. Each AE has to have two main steps – initializing the AE parameters, and processing each document. When a service is deployed (see Service deployment methods section), for each annotator and AE object is created and initialized. When a document reaches the specific annotator in the pipeline, the document JCas is passed to the annotate method.
 
 
 ```java
@@ -380,6 +354,10 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.jcas.JCas;
 
 public class myAnnotator extends LeoBaseAnnotator {
+	
+	@LeoConfigurationParameter
+	protected String myStringParam = null;
+	
 	@Override
 	public void initialize(UimaContext aContext) throws ResourceInitializationException {
 		super.initialize(aContext);
@@ -387,28 +365,24 @@ public class myAnnotator extends LeoBaseAnnotator {
 	}
 
 	@Override
-	public void process(JCas aJCas) throws AnalysisEngineProcessException {
-		super.process(aJCas);
+	public void annotate(JCas aJCas) throws AnalysisEngineProcessException {
 		< additional processing code >
 	}
 }
 
 ```
 
-Depending on the needs of your annotator, you may use one of the two default initialize methods:
+Annotator paramters are identified with the @LeoConfigurationParameter annotation.  The LeoBaseAnnotator will extract parameter values set in an annotator object and propagate them to the descriptor.  In addition values set in the descriptor will be initialized in the annotator when the pipeline is initialized.
+
+Depending on the needs of your annotator, you may use the default initialize method to validate values or perform additional initialization:
 
 ```
 initialize(org.apache.uima.UimaContext aContext);
 ```
-or 
 
-```
-initialize(org.apache.uima.UimaContext aContext, AnnotatorParam[] params);
-```
+When overriding the initialize(UimaContext aContext) method super.initialize(aContext) must be called in order for the base annotator values extraction to function properly.
 
-AnnotatorParam[] is an array of AnnotatorParam objects that contain information about the parameters for this specific annotator.
-
-When extending the base annotator, the only method to overwrite is process(org.apache.uima.jcas.JCas aJCas)
+When extending the base annotator, the only method required to overwrite is process(org.apache.uima.jcas.JCas aJCas)
 The CAS object that is passed by the system contains getDocumentText() method that gives access to the actual text of the document.
 
 ---
@@ -468,7 +442,7 @@ You will need a copy of the JDK on your system.
 
 * If you need to install the JDK for a linux machine, use your system's package manager. Example: sudo aptitude install default-jdk
 
-* The JDK is more than likely installed for a Mac OSX machine. 
+* The oracle JDK for Mac can be downloaded at [this site](http://www.oracle.com/technetwork/java/javase/downloads/index.html). 
 
 ---
 
@@ -497,11 +471,11 @@ Recommended Name| Location
 Eclipse Project Updates | <http://download.eclipse.org/eclipse/updates/3.7>
 Mylyn for Eclipse Indigo | <http://download.eclipse.org/mylyn/releases/indigo>
 Maven | <http://download.eclipse.org/technology/m2e/releases>
-Luna| <http://download.eclipse.org/releases/Luna>
+Luna| <http://download.eclipse.org/releases/Mars>
 
 
 
-*As a side note, Luna is the name of the current version of Eclipse, the link name may change with newer versions.
+*As a side note, Mars is the name of the current version of Eclipse, the link name may change with newer versions.
 
 Once you have added all of these sites, click OK on the Preferences dialog.  Now we can proceed to actually install the plugins.  To do this, click "Install New Software..." in the "Help" Menu.  In the "Install" dialog that pops up, there is a drop-down menu where you can select a site to work with.  
 
@@ -526,7 +500,7 @@ In order to use our maven repository, you need to update your settings.xml file.
 </project>
 ```
 
-Additionaly in th menu bar you can go to Window > Preferences.  Select Java > Build Path > Classpath Variables, click on the new button > MR_REPO variable and point it to your Maven repository.
+Additionaly in the menu bar you can go to Window > Preferences.  Select Java > Build Path > Classpath Variables, click on the new button > MR_REPO variable and point it to your Maven repository.
 
 ---
 
@@ -601,8 +575,6 @@ In the Eclipse File menu, select "Import...". A prompt will now show up, expand 
 
 A new dialog window will appear prompting you to select a wizard.  Expand the Java folder and pick "Java Project".  Click "Next and name the project "leo" or "leo_example" depending on which option you cloned. 
 
-
-
  ---
  
 ###**2.9 Running the Sample Project**
@@ -632,7 +604,7 @@ Change the first text field "input directory" to the *output directory* that you
 The second one is a little trickier. Scroll back through the SampleService output looking for a line that looks something like this:
 
 ~~~
-/var/folders/x9/r87vxc1s1fb6gl80r306hf7h0000gn/T/leoAggregate7687725334298388844.xml
+Aggregate: /var/folders/x9/r87vxc1s1fb6gl80r306hf7h0000gn/T/leoAggregate7687725334298388844.xml
 ~~~
 
 Copy the path to the aggregate descriptor into the second text field of the Annotation Viewer window.
@@ -773,11 +745,11 @@ From here, you can view the annotations created in your pipeline using the defau
 Several specialized annotators have been developed and optimized for general NLP tasks.  
 
 
-###Annotation Librarian
+### Annotation Librarian
 
 Building on Annotation Librarian ideas, the AnnotationPatternAnnotator mirrors regular expression functionality to manipulate annotations. It uses a resource file that contains regular expressions that include tagged annotation types combined with standard regular expressions syntax. Additionally, part of the pattern can be separated as an Anchor feature, where a new annotation is created for the tagged snippet.
 
-###Annotation Pattern Annotator(APA)
+### Annotation Pattern Annotator(APA)
 The behavior of Annotation Pattern is very similar to the Java Regex Package's Pattern and Matcher classes.
 The AnnotationPattern Object is created using the simple syntax :
 AnnotationPattern patternName = AnnotationPattern.compile(regex);
@@ -785,6 +757,10 @@ where
 - compile() - is a private static method which takes the annotationPattern to return an AnnotationPattern Object.
 - regex - is a String that will mention the Annotation annotationPattern which the user is expecting. Below are various examples
 to show different combination of patterns.
+
+### ConceptLink Annotator
+
+Creates output annotations covering related concepts.  Includes a MatchMaker annotator for concept value pair annotations.
 
 ### CONTEXT
 
@@ -805,9 +781,17 @@ The ContextAnnotation will span only the concept itself and not the window. So t
 
 We adopted it as a UIMA annotator, and made several changes to the algorithm. Such as a new rule category “adjacent”, which specifies rules for words that are immediately before or immediately after the anchor word; as well as several new rules to the resource file. 
 
+### Merge Annotator
+
+The Merge Annotator allows the user to easily merge overlapping or proximal annotations of the same type.
+
 ### REGEX Annotator
 
 The Regular Expression Annotator provides a UIMA based annotator for searching a corpus using regular Expressions. The Regular Expression Annotator can be configured via a simple configuration file, for processing a single group of patterns with the same configuration for each pattern, or via a more flexible Groovy configuration file that allows for multiple groups of patterns configured with different parameters per group of patterns. For a more detailed synopsis and download instructions, you can go the the Regular Expression site [here.](http://decipher.chpc.utah.edu/sites/gov.va.vinci/leo-regex/2014.09.1/)
+
+### Sentence Annotator
+
+Annotates sentences found in a covering annotation or on the document as a whole.
 
 ### Sherlock
 The Sherlock framework provides the base objects for implementing machine learning (ML) algorithms in a UIMA environment. It does not attempt to provide a specific ML implementation but rather the means to accessing existing implementations within a framework of objects that provide a common interface. This is accomplished by recognizing two primary workflows for learning tasks:
@@ -824,9 +808,6 @@ expressions using RegexWhitespaceTokenizer.
 ### Window Annotator
 
 The Window annotator takes an anchor annotation and builds a new annotation that is larger that the anchor annotation based on specified number of tokens to the left and to the right of the anchor annotation. If only a single window number is specified, the left and write window will be at the equal distance from the anchor annotation. A link to the anchor annotation gets stored in an output annotation as a feature.
-
-
-
 
 ---
 ## 5. Terminology

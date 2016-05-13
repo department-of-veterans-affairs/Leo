@@ -20,9 +20,9 @@ package gov.va.vinci.leo.descriptors;
  * #L%
  */
 
-import clover.org.apache.commons.lang3.StringUtils;
 import gov.va.vinci.leo.model.NameValue;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.resource.metadata.Capability;
 import org.apache.uima.resource.metadata.ConfigurationParameter;

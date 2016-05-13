@@ -20,7 +20,6 @@ package gov.va.vinci.leo.ae;
  * #L%
  */
 
-import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.types.ExampleType;
@@ -35,9 +34,7 @@ import org.apache.uima.cas.FSIterator;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.TypeDescription;
 import org.apache.uima.util.CasCreationUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -83,12 +80,12 @@ public class LeoBaseAnnotatorTest {
         ExampleAnnotator exampleAnnotator = new ExampleAnnotator("pvalue", "preqvalue")
                 .setIncludeTypesFilter(WordToken.class.getCanonicalName());
         aggregate.addDelegate(
-            new ExampleWhitespaceTokenizer(Token.class.getCanonicalName(), "TokenType",
-                    WordToken.class.getCanonicalName(), null)
-                .getLeoAEDescriptor()
-                .setTypeSystemDescription(typeSystemDescription)
+                new ExampleWhitespaceTokenizer(Token.class.getCanonicalName(), "TokenType",
+                        WordToken.class.getCanonicalName(), null)
+                        .getLeoAEDescriptor()
+                        .setTypeSystemDescription(typeSystemDescription)
         ).addDelegate(
-            exampleAnnotator.getLeoAEDescriptor().setTypeSystemDescription(typeSystemDescription)
+                exampleAnnotator.getLeoAEDescriptor().setTypeSystemDescription(typeSystemDescription)
         );
         AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(aggregate.getAnalysisEngineDescription());
         //Check includeTypes filter in the annotator
@@ -219,7 +216,7 @@ public class LeoBaseAnnotatorTest {
 
     protected ExampleType getExampleType(ExampleAnnotator exampleAnnotator, JCas jCas) {
         FSIterator iterator = exampleAnnotator.getAnnotationListForType(jCas, ExampleType.class.getCanonicalName());
-        if(iterator.hasNext()) {
+        if (iterator.hasNext()) {
             return (ExampleType) iterator.next();
         }
         return null;
