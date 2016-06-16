@@ -32,7 +32,7 @@ It should point to your .m2/repository directory, for example
 
 **Where can I access the sources for Leo standard readers and listeners?**
 
-Complete descriptions of all Leo components can be found in their respective javadocs [here](http://decipher.chpc.utah.edu/sites/gov.va.vinci.leo/leo-client/2014.08.0/leo-client/apidocs/).
+Complete descriptions of all Leo components can be found in their respective javadocs [here](http://decipher.chpc.utah.edu/sites/gov.va.vinci.leo/leo-client/2016.05.0/leo-client/apidocs/).
 
 If you use Eclipse and include leo as a dependency in your pom file, you can automatically download and link source code using maven:
 

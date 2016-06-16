@@ -45,87 +45,69 @@ For A complete leo and all of its components, use the Leo-Base Pom:
 <dependency>
     <groupId>gov.va.vinci.leo</groupId>
     <artifactId>leo-base</artifactId>
-    <packaging>pom</packaging>
-    <version>2014.08.1</version>
+    <version>2016.05.0</version>
+    <type>pom</type>
 </dependency>
 ```
+
 Leo-client:
-
 ```xml
-
-   <dependency>
-       <groupId>gov.va.vinci</groupId>
-       <artifactId>leo</artifactId>
-       <version>2014.08.1-SNAPSHOT</version>
-   </dependency>
+<dependency>
+    <groupId>gov.va.vinci.leo</groupId>
+    <artifactId>leo-client</artifactId>
+    <version>2016.05.0</version>
+</dependency>
 ```
+
 Leo-service:
-
 ```xml
-
-   <dependency>
-       <groupId>gov.va.vinci</groupId>
-       <artifactId>leo</artifactId>
-       <version>2014.08.1-SNAPSHOT</version>
-   </dependency>
+<dependency>
+    <groupId>gov.va.vinci.leo</groupId>
+    <artifactId>leo-service</artifactId>
+    <version>2016.05.0</version>
+</dependency>
 ```
-
 
 Leo-Core contains the descriptors and tools used with Leo projects.
 
 ```xml
-
-   <dependency>
-       <groupId>gov.va.vinci</groupId>
-       <artifactId>leo</artifactId>
-       <version>2014.08.1-SNAPSHOT</version>
-   </dependency>
+<dependency>
+    <groupId>gov.va.vinci.leo</groupId>
+    <artifactId>leo-core</artifactId>
+    <version>2016.05.0</version>
+</dependency>
 ```
+
 Below are the dependencies of annotators that are most likely going to be required in many projects.  Descriptions of each can be found in Annotator section of the [User guide](userguide.html).
 
 Whitespace Tokenizer:
-
-
 ```xml
 <dependency>
-  <groupId>gov.va.vinci</groupId>
-  <artifactId>leo-whitespace-tokenizer</artifactId>
-  <version>LATEST</version>
+    <groupId>gov.va.vinci</groupId>
+    <artifactId>leo-whitespace-tokenizer</artifactId>
+    <version>LATEST</version>
 </dependency>
 ```
+
 Regex:
-
-
 ```xml
 <dependency>
-  <groupId>gov.va.vinci</groupId>
-  <artifactId>leo-regex</artifactId>
-  <version>LATEST</version>
+    <groupId>gov.va.vinci</groupId>
+    <artifactId>leo-regex</artifactId>
+    <version>LATEST</version>
 </dependency>
 ```
 
 Annotation Librarian:
-
 ```xml
 <dependency>
-  <groupId>gov.va.vinci</groupId>
-  <artifactId>leo-annotation-librarian</artifactId>
-  <version>LATEST</version>
-</dependency>
-```
-
-Lookup:
-
-```xml
-<dependency>
-  <groupId>gov.va.vinci</groupId>
-  <artifactId>leo-lookup-annotator</artifactId>
-  <version>LATEST</version>
+    <groupId>gov.va.vinci</groupId>
+    <artifactId>leo-annotation-librarian</artifactId>
+    <version>LATEST</version>
 </dependency>
 ```
 
 AnnotationPattern:
-
 ```xml
 <dependency>
   <groupId>gov.va.vinci</groupId>
@@ -135,7 +117,6 @@ AnnotationPattern:
 ```
 
 Context:
-
 ```xml
 <dependency>
   <groupId>gov.va.vinci</groupId>
@@ -145,7 +126,6 @@ Context:
 ```
 
 Siman:
-
 ```xml
 <dependency>
   <groupId>gov.va.vinci</groupId>
