@@ -7,12 +7,12 @@
     <artifactId>leo-core</artifactId>
     <packaging>jar</packaging>
     <name>Leo Core</name>
-    <version>2016.05.2</version>
+    <version>2016.05.3-SNAPSHOT</version>
 
     <parent>
         <groupId>gov.va.vinci</groupId>
         <artifactId>leo</artifactId>
-        <version>2016.05.2</version>
+        <version>2016.05.3-SNAPSHOT</version>
     </parent>
 
     <properties>
