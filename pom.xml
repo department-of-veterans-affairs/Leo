@@ -28,6 +28,7 @@
         <uima-as-version>2.6.0</uima-as-version>
         <skipJavadoc>true</skipJavadoc>
         <github.global.server>github</github.global.server>
+        <additionalparam>-Xdoclint:none</additionalparam>
     </properties>
     <url>http://github.com/department-of-veterans-affairs/Leo</url>
     <developers>
@@ -131,6 +132,35 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <reportPlugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <version>2.9</version>
+                            <reportSets>
+                                <reportSet>
+                                    <id>aggregate</id>
+                                    <reports>
+                                        <report>aggregate</report>
+                                    </reports>
+                                </reportSet>
+                            </reportSets>
+                            <configuration>
+                                <!-- Here you can add special configurations for your javadoc, if needed -->
+                            </configuration>
+                        </plugin>
+                        <!-- Here you can also configure more report plugins -->
+                        <!-- for your site, such as maven-project-info-reports-plugin -->
+                    </reportPlugins>
+                </configuration>
+            </plugin>
+
         </plugins>
 
         <pluginManagement>

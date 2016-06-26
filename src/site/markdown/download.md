@@ -45,37 +45,37 @@ For A complete leo and all of its components, use the Leo-Base Pom:
 <dependency>
     <groupId>gov.va.vinci.leo</groupId>
     <artifactId>leo-base</artifactId>
-    <version>2016.05.0</version>
+    <version>2016.05.2</version>
     <type>pom</type>
 </dependency>
 ```
 
 Leo-client:
 ```xml
-<dependency>
-    <groupId>gov.va.vinci.leo</groupId>
-    <artifactId>leo-client</artifactId>
-    <version>2016.05.0</version>
-</dependency>
+   <dependency>
+       <groupId>gov.va.vinci</groupId>
+       <artifactId>leo</artifactId>
+       <version>2016.05.2</version>
+   </dependency>
 ```
 
 Leo-service:
 ```xml
-<dependency>
-    <groupId>gov.va.vinci.leo</groupId>
-    <artifactId>leo-service</artifactId>
-    <version>2016.05.0</version>
-</dependency>
+   <dependency>
+       <groupId>gov.va.vinci</groupId>
+       <artifactId>leo</artifactId>
+       <version>2016.05.2</version>
+   </dependency>
 ```
 
 Leo-Core contains the descriptors and tools used with Leo projects.
 
 ```xml
-<dependency>
-    <groupId>gov.va.vinci.leo</groupId>
-    <artifactId>leo-core</artifactId>
-    <version>2016.05.0</version>
-</dependency>
+   <dependency>
+       <groupId>gov.va.vinci</groupId>
+       <artifactId>leo</artifactId>
+       <version>2016.05.2</version>
+   </dependency>
 ```
 
 Below are the dependencies of annotators that are most likely going to be required in many projects.  Descriptions of each can be found in Annotator section of the [User guide](userguide.html).
