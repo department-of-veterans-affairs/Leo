@@ -47,10 +47,12 @@ import org.apache.uima.resource.metadata.ConfigurationParameterSettings;
 import org.apache.uima.resource.metadata.OperationalProperties;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.resource.metadata.impl.OperationalProperties_impl;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the CollectionReader interface object to the UIMA framework for implementations of SubReaders.

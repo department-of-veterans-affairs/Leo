@@ -28,11 +28,11 @@ To use our maven repository, you need to update your settings.xml (in
 Additionally, if using Eclipse, you need to set the M2_REPO variable in
 Eclipse->Preferences->Java->Build Path->Classpath Variables.
 It should point to your .m2/repository directory, for example
-/Users/vhaslcpatteo/.m2/repository
+/Users/MyUsername/.m2/repository
 
 **Where can I access the sources for Leo standard readers and listeners?**
 
-Complete descriptions of all Leo components can be found in their respective javadocs [here](http://decipher.chpc.utah.edu/sites/gov.va.vinci.leo/leo-client/2016.05.0/leo-client/apidocs/).
+Complete descriptions of all Leo components can be found in their respective javadocs [here](apidocs/index.html).
 
 If you use Eclipse and include leo as a dependency in your pom file, you can automatically download and link source code using maven:
 

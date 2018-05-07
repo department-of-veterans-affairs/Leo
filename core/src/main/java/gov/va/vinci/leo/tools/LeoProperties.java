@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -121,6 +122,13 @@ public abstract class LeoProperties {
     protected boolean mJamResetStatisticsAfterQuery = true;
 
     /**
+     * If registering with JAM, this is the port the local JMX Server will listen on. If this is -1,
+     * the service will find and use a local open port.
+     */
+    protected int mJamJmxPort = -1;
+
+
+    /**
      * Should the generated XML descriptors be deleted on program exit?  Default is true.
      */
     protected boolean mDeleteOnExit = true;
@@ -157,20 +165,41 @@ public abstract class LeoProperties {
     /**
      * Load the properties file specified by the user.
      *
+     *  Supported properties:
+     *
+     *      brokerURL
+     *      casPoolSize
+     *      ccTimeout
+     *      deleteOnExit
+     *      deploymentDescriptor
+     *      descriptorPath
+     *      endpoint
+     *      fsHeapSize
+     *      initTimeout
+     *      jamJmxPort
+     *      jamQueryIntervalInSeconds
+     *      jamResetStatisticsAfterQuery
+     *      jamServerBaseUrl
+     *      serviceName
+     *      timeout
+     *
      * @param propertiesFile Path to the properties file to be loaded
      * @throws Exception If unable to load the properties file
      */
     public void loadprops(String propertiesFile) throws Exception {
         if (StringUtils.isBlank(propertiesFile)) {
             LOG.warn("Properties file path required, unable to load properties file: " + propertiesFile);
-            return;
+            throw new IllegalArgumentException("Properties file path required, unable to load properties file: " + propertiesFile);
         }//if
+
         this.mPropertiesFile = propertiesFile;
         this.loadprops();
     }//loadprops method, string path input
 
     /**
      * Load the properties from the properties file that will be used for execution.
+     *
+     *
      * @throws java.lang.Exception if the properties file cannot be found or loaded.
      */
     protected void loadprops() throws Exception {
@@ -200,121 +229,171 @@ public abstract class LeoProperties {
         } finally {
             propsFileInputStream.close();
         }
+        loadProperties(properties);
+        LOG.info("Load Complete");
+    }//loadprops method
 
+    /**
+     * Load the properties from a properties object. Note, properties that are in the properties object, but
+     * not one of the below, are just ignored.
+     *
+     * Supported properties:
+     *
+     *      brokerURL
+     *      casPoolSize
+     *      ccTimeout
+     *      deleteOnExit
+     *      deploymentDescriptor
+     *      descriptorPath
+     *      endpoint
+     *      fsHeapSize
+     *      initTimeout
+     *      jamJmxPort
+     *      jamQueryIntervalInSeconds
+     *      jamResetStatisticsAfterQuery
+     *      jamServerBaseUrl
+     *      serviceName
+     *      timeout
+     *
+     * @param properties   The properties object to get properties from.
+     * @throws java.lang.Exception if the properties file cannot be found or loaded.
+     */
+    protected void loadProperties(Properties properties) throws FileNotFoundException {
         //Load the deployment descriptor
         String dd = properties.getProperty("deploymentDescriptor");
+//        dd = ESAPIValidator.validateStringInput(dd, ESAPIValidationType.PATH_MANIPULATION);
         if (StringUtils.isNotBlank(dd)) {
             File fileDD = new File(dd);
             if (!fileDD.exists() || !fileDD.isFile()) {
-                throw new Exception("Deployment descriptor: " + dd + " is either a directory or does not exist");
+                throw new FileNotFoundException("Deployment descriptor: " + dd + " is either a directory or does not exist");
             }//if file issue
             this.mDeploymentDescriptorFile = dd;
         }//if dd.isEmpty or null
-        LOG.info("mDeploymentDescriptorFile=" + this.mDeploymentDescriptorFile);
+        LOG.info(LeoUtils.getHeaderManipulationSafeString("mDeploymentDescriptorFile=" + this.mDeploymentDescriptorFile));
 
         //Load the brokerURL
         if (properties.getProperty("brokerURL") != null) {
             this.mBrokerURL = properties.getProperty("brokerURL");
         }//if
-        LOG.info("mBrokerURL=" + this.mBrokerURL);
+        LOG.info(LeoUtils.getHeaderManipulationSafeString("mBrokerURL=" + this.mBrokerURL));
 
         //Load the endpoint
         if (properties.getProperty("endpoint") != null) {
             this.mEndpoint = properties.getProperty("endpoint");
         }//if
-        LOG.info("mEndpoint=" + this.mEndpoint);
+        LOG.info(LeoUtils.getHeaderManipulationSafeString("mEndpoint=" + this.mEndpoint));
 
         //Load the directory where descriptors should be generated
         if(properties.getProperty("descriptorPath") != null) {
             this.mDescriptorDirectory = properties.getProperty("descriptorPath");
         }
-        LOG.info("descriptorPath=" + this.mDescriptorDirectory);
+        LOG.info(LeoUtils.getHeaderManipulationSafeString("descriptorPath=" + this.mDescriptorDirectory));
 
-        //Load jam variables
+        /**
+         * Load jam variables
+         */
         mJamServerBaseUrl = properties.getProperty("jamServerBaseUrl");
-        LOG.info("mJamServerBaseUrl=" + this.mJamServerBaseUrl);
+        LOG.info(LeoUtils.getHeaderManipulationSafeString("mJamServerBaseUrl=" + this.mJamServerBaseUrl));
 
-        if (properties.getProperty("jamQueryIntervalInSeconds") != null) {
+        if (properties.get("jamQueryIntervalInSeconds") != null) {
             try {
-                mJamQueryIntervalInSeconds = Integer.parseInt(properties.getProperty("jamQueryIntervalInSeconds"));
+                mJamQueryIntervalInSeconds = fromIntOrString(properties.get("jamQueryIntervalInSeconds"));
             } catch (Exception e) {
-                LOG.warn("Could not parse jamQueryIntervalInSeconds value. It should be an int, but was " + properties.getProperty("jamQueryIntervalInSeconds"));
+                LOG.warn("Could not parse jamQueryIntervalInSeconds value. It should be an int, but was not: "+e);// + properties.getProperty("jamQueryIntervalInSeconds"));
             }
         }
-        if (properties.getProperty("jamResetStatisticsAfterQuery") != null) {
+        if (properties.get("jamResetStatisticsAfterQuery") != null) {
             try {
-                mJamResetStatisticsAfterQuery = Boolean.parseBoolean(properties.getProperty("jamResetStatisticsAfterQuery"));
+                if (properties.get("jamResetStatisticsAfterQuery") instanceof Boolean) {
+                    mJamResetStatisticsAfterQuery = (boolean) properties.get("jamResetStatisticsAfterQuery");
+                } else {
+                    mJamResetStatisticsAfterQuery = Boolean.parseBoolean(properties.getProperty("jamResetStatisticsAfterQuery"));
+                }
+
             } catch (Exception e) {
-                LOG.warn("Could not parse jamResetStatisticsAfterQuery value. It should be a boolean, but was " + properties.getProperty("jamResetStatisticsAfterQuery"));
+                LOG.warn("Could not parse jamResetStatisticsAfterQuery value. It should be a boolean: " +e);// + properties.getProperty("jamResetStatisticsAfterQuery"));
             }
         }
+
+        if (properties.get("jamJmxPort") != null) {
+            try {
+                mJamJmxPort = fromIntOrString(properties.get("jamJmxPort"));
+            } catch (Exception e) {
+                LOG.warn("Could not parse jamJmxPort value. It should be an integer: " +e);// + properties.getProperty("jamResetStatisticsAfterQuery"));
+            }
+        }
+        /**
+         * End jam variables.
+         */
 
         //Get the service name
         if (properties.getProperty("serviceName") != null) {
             this.mServiceName = properties.getProperty("serviceName");
         }//if
-        LOG.info("this.mServiceName=" + this.mServiceName);
+        LOG.info(LeoUtils.getHeaderManipulationSafeString("this.mServiceName=" + this.mServiceName));
 
         //Set the casPoolSize
-        if (properties.getProperty("casPoolSize") != null) {
+        if (properties.get("casPoolSize") != null) {
             try {
-                this.mCasPoolSize = Integer.parseInt(properties.getProperty("casPoolSize"));
+                mCasPoolSize = fromIntOrString(properties.get("casPoolSize"));
             } catch (Exception e) {
-                LOG.warn("Could not parse the casPoolSize " + properties.getProperty("casPoolSize"));
+                LOG.warn("Could not parse the casPoolSize: "+e);// + properties.getProperty("casPoolSize")); FORTIFY LOG FORGING
             }
         }//if
         LOG.info("this.mCasPoolSize=" + this.mCasPoolSize);
 
         //Set the fsHeapSize
-        if (properties.getProperty("fsHeapSize") != null) {
+        if (properties.get("fsHeapSize") != null) {
             try {
-                this.mFSHeapSize = Integer.parseInt(properties.getProperty("fsHeapSize"));
+                mFSHeapSize = fromIntOrString(properties.get("fsHeapSize"));
             } catch (Exception e) {
-                LOG.warn("Could not parse the fsHeapSize " + properties.getProperty("fsHeapSize"));
+                LOG.warn("Could not parse the fsHeapSize: "+e);// + properties.getProperty("fsHeapSize"));FORTIFY LOG FORGING
             }
         }//if
         LOG.info("this.mFSHeapSize=" + this.mFSHeapSize);
 
         //Set the timeout value
-        if (properties.getProperty("timeout") != null) {
+        if (properties.get("timeout") != null) {
             try {
-                this.mTimeout = Integer.parseInt(properties.getProperty("timeout"));
+                mTimeout = fromIntOrString(properties.get("timeout"));
             } catch (Exception e) {
-                LOG.warn("Could not parse the timeout " + properties.getProperty("timeout"));
+                LOG.warn("Could not parse the timeout: " +e );// + properties.getProperty("timeout")); FORTIFY
             }
         }//if
         LOG.info("this.mTimeout=" + this.mTimeout);
 
         //Set the timeout value
-        if (properties.getProperty("initTimeout") != null) {
+        if (properties.get("initTimeout") != null) {
             try {
-                this.mInitTimeout = Integer.parseInt(properties.getProperty("initTimeout"));
+                mInitTimeout = fromIntOrString(properties.get("initTimeout"));
             } catch (Exception e) {
-                LOG.warn("Could not parse the initTimeout " + properties.getProperty("initTimeout"));
+                LOG.warn("Could not parse the initTimeout: " +e);// + properties.getProperty("initTimeout")); FORTIFY
             }//catch
         }//if
         LOG.info("this.mInitTimeout=" + this.mInitTimeout);
 
         //Set the timeout value
-        if (properties.getProperty("ccTimeout") != null) {
+        if (properties.get("ccTimeout") != null) {
             try {
-                this.mCCTimeout = Integer.parseInt(properties.getProperty("ccTimeout"));
+                mCCTimeout = fromIntOrString(properties.get("ccTimeout"));
             } catch (Exception e) {
-                LOG.warn("Could not parse the ccTimeout " + properties.getProperty("ccTimeout"));
+                LOG.warn("Could not parse the ccTimeout: " + e);// + properties.getProperty("ccTimeout"));
             }
         }//if
         LOG.info("this.mCCTimeout=" + this.mCCTimeout);
 
-        if(properties.getProperty("deleteOnExit") != null) {
+        if(properties.get("deleteOnExit") != null) {
             try {
-                this.mDeleteOnExit = Boolean.parseBoolean(properties.getProperty("deleteOnExit"));
+                if (properties.get("deleteOnExit") instanceof Boolean) {
+                    this.mDeleteOnExit = (boolean) properties.get("deleteOnExit");
+                } else {
+                    this.mDeleteOnExit = Boolean.parseBoolean(properties.getProperty("deleteOnExit"));
+                }
             } catch (Exception e) {
                 LOG.warn("Could not parse the deleteOnExit property as a boolean: " + properties.getProperty("deleteOnExit"));
             }
         }
-
-        LOG.info("Load Complete");
-    }//loadprops method
+    }
 
     /**
      * The deployment descriptor file path and name.
@@ -432,8 +511,8 @@ public abstract class LeoProperties {
      * @param mCasPoolSize the CasPoolSize to set
      * @return reference to this instance
      */
-    public <T extends LeoProperties> T setCasPoolSize(int mCasPoolSize) {
-        this.mCasPoolSize = mCasPoolSize;
+    public <T extends LeoProperties> T setCasPoolSize(Integer mCasPoolSize) {
+        this.mCasPoolSize = mCasPoolSize.intValue();
         return (T) this;
     }
 
@@ -508,15 +587,15 @@ public abstract class LeoProperties {
         return mCCTimeout;
     }
 
-    /**
+     /**
      * CAS complete timeout in seconds.  Once all CAS requests are complete a collection process complete
      * event is thrown.  Default is wait forever.
      *
      * @param mCCTimeout the CCTimeout to set
      * @return reference to this instance
      */
-    public <T extends LeoProperties> T setCCTimeout(int mCCTimeout) {
-        this.mCCTimeout = mCCTimeout;
+    public <T extends LeoProperties> T setCCTimeout(Integer mCCTimeout) {
+        this.mCCTimeout = mCCTimeout.intValue();
         return (T) this;
     }
 
@@ -555,8 +634,8 @@ public abstract class LeoProperties {
      * @param mJamQueryIntervalInSeconds the JamQueryIntervalInSeconds to set
      * @return reference to this instance
      */
-    public <T extends LeoProperties> T setJamQueryIntervalInSeconds(int mJamQueryIntervalInSeconds) {
-        this.mJamQueryIntervalInSeconds = mJamQueryIntervalInSeconds;
+    public <T extends LeoProperties> T setJamQueryIntervalInSeconds(Integer mJamQueryIntervalInSeconds) {
+        this.mJamQueryIntervalInSeconds = mJamQueryIntervalInSeconds.intValue();
         return (T) this;
     }
 
@@ -574,8 +653,8 @@ public abstract class LeoProperties {
      *
      * @param mJamResetStatisticsAfterQuery the JamResetStatisticsAfterQuery flag to set
      */
-    public <T extends LeoProperties> T setJamResetStatisticsAfterQuery(boolean mJamResetStatisticsAfterQuery) {
-        this.mJamResetStatisticsAfterQuery = mJamResetStatisticsAfterQuery;
+    public <T extends LeoProperties> T setJamResetStatisticsAfterQuery(Boolean mJamResetStatisticsAfterQuery) {
+        this.mJamResetStatisticsAfterQuery = mJamResetStatisticsAfterQuery.booleanValue();
         return (T) this;
     }
 
@@ -616,4 +695,58 @@ public abstract class LeoProperties {
         this.mDescriptorDirectory = mDescriptorDirectory;
         return (T) this;
     }
+
+
+    /**
+     * If registering with JAM, this is the port the local JMX Server will listen on. If this is -1,
+     * the service will find and use a local open port.
+     *
+     * @return the port the JMX Server will listener on. If -1, the port will be chosen automatically when
+     * the server starts up.
+     */
+    public int getJamJmxPort() {
+        return mJamJmxPort;
+    }
+
+    /**
+     * If registering with JAM, this is the port the local JMX Server will listen on. If this is -1,
+     * the service will find and use a local open port.
+     * @param port the port the JMX Server will listener on, or -1 to pick a port automatically.
+     */
+    public  <T extends LeoProperties> T setJamJmxPort(Integer port) {
+        this.mJamJmxPort = port;
+        return (T) this;
+    }
+
+    /**
+     * File path to the aggregate descriptor.
+     * @return File path to the aggregate descriptor.
+     */
+    public String getAggregateDescriptorFile() {
+        return mAggregateDescriptorFile;
+    }
+
+    /**
+     * Set the file path to the aggregate descriptor.
+     * @param mAggregateDescriptorFile File path to the aggregate descriptor.
+     */
+    public void setAggregateDescriptorFile(String mAggregateDescriptorFile) {
+        this.mAggregateDescriptorFile = mAggregateDescriptorFile;
+    }
+
+
+    /**
+     * Simple helper method that returns object as an int if it already is an int, or a Integer.parseInt if
+     * it is not an int.
+     * @param o
+     * @return o as an int
+     */
+    private Integer fromIntOrString(Object o) {
+        if (o instanceof Integer) {
+           return (Integer) o;
+        } else {
+            return Integer.parseInt(o.toString());
+        }
+    }
+
 }//LeoProps Class

@@ -58,6 +58,7 @@ public class SampleService {
                 .setTokenOutputTypeFeature("TokenType")
                 .getLeoAEDescriptor()
                 .setTypeSystemDescription(typeSystem);
+
         ae.addType(TypeLibrarian.getCSITypeSystemDescription());
         ae.setIsAsync(true);
         return ae;

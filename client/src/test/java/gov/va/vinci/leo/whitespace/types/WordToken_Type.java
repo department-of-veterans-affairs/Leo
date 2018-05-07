@@ -1,12 +1,12 @@
 
-/* First created by JCasGen Wed Oct 02 11:17:44 MDT 2013 */
+/* First created by JCasGen Mon Aug 08 14:23:56 MDT 2016 */
 package gov.va.vinci.leo.whitespace.types;
 
 /*
  * #%L
- * whitespaceTokenizer
+ * Leo Client
  * %%
- * Copyright (C) 2010 - 2014 Department of Veterans Affairs
+ * Copyright (C) 2010 - 2017 Department of Veterans Affairs
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,10 +32,12 @@ import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** Annotates collections of letters
- * Updated by JCasGen Wed Oct 02 11:17:44 MDT 2013
+ * Updated by JCasGen Mon Aug 08 14:23:56 MDT 2016
  * @generated */
 public class WordToken_Type extends Annotation_Type {
-  /** @generated */
+  /** @generated 
+   * @return the generator for this type
+   */
   @Override
   protected FSGenerator getFSGenerator() {return fsGenerator;}
   /** @generated */
@@ -65,7 +67,10 @@ public class WordToken_Type extends Annotation_Type {
 
 
   /** initialize variables to correspond with Cas Type and Features
-	* @generated */
+	 * @generated
+	 * @param jcas JCas
+	 * @param casType Type 
+	 */
   public WordToken_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());

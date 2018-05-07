@@ -23,7 +23,6 @@ package gov.va.vinci.leo.cr;
 import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.types.CSI;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.lang3.CharSet;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
@@ -128,7 +127,6 @@ public class FileCollectionReaderTest {
         assertTrue(csiIterator.hasNext());
         CSI csi = (CSI) csiIterator.next();
         assertTrue("text1.txt".equals(csi.getID()));
-        //System.out.println(csi.getLocator());
         assertTrue(csi.getLocator().endsWith("client/src/test/resources/inputDirectory/text1.txt"));
         assertNull(csi.getPropertiesKeys());
         assertNull(csi.getRowData());

@@ -60,14 +60,8 @@ public class IntegrationWhitespaceClient {
         myClient.setBrokerURL(serviceBrokerURL);
         myClient.setServiceName(serviceQueueName);
         myClient.setInputQueueName(serviceQueueName);
-        try {
-            myClient.run(cr);
-            //myClient.run("This is a test");
-        } catch (Exception e) {
-            System.out.println("Got exception." + e);
-            e.printStackTrace();
+        myClient.run(cr);
 
-        }
         System.out.println("Finished client processing, press any key to exit.");
         System.in.read();
         System.exit(0);
@@ -81,7 +75,6 @@ public class IntegrationWhitespaceClient {
 
         UimaAsBaseCallbackListener[] list = new UimaAsBaseCallbackListener[1];
         list[0] = new SimpleXmiListener(OUT_DIR).setLaunchAnnotationViewer(true) ;
-        System.out.println("OUT_DIR: " + OUT_DIR);
         return list;
     }
 

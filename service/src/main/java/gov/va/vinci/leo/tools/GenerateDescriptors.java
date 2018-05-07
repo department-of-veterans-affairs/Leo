@@ -43,7 +43,7 @@ public class GenerateDescriptors {
      */
     public static void main(String[] args) {
         if (args.length != 2) {
-            System.out.println("Usage: GenerateDescriptors <annotator class name> <root directory to write files to>");
+            System.err.println("Usage: GenerateDescriptors <annotator class name> <root directory to write files to>");
             System.exit(1);
         }
         String annotatorClassName = args[0];
@@ -54,6 +54,7 @@ public class GenerateDescriptors {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             System.exit(2);
         }
+
     }
 
     /**
@@ -79,18 +80,19 @@ public class GenerateDescriptors {
         if (annotatorClassName.contains(".")) {
             newOutputPath += annotatorClassName.substring(0, annotatorClassName.lastIndexOf(".")).replaceAll("\\.", File.separator) + File.separator;
         }
-
+//        newOutputPath = ESAPIValidator.validateStringInput(newOutputPath, ESAPIValidationType.PATH_MANIPULATION);
         FileUtils.forceMkdir(new File(newOutputPath));
         annotator.getLeoTypeSystemDescription().toXML(newOutputPath + shortName + "Type.xml");
 
-        LeoAEDescriptor desc = (LeoAEDescriptor) annotator.getDescriptor()
-                .setDescriptorLocator(new File(newOutputPath + shortName).toURI());
-        desc.toXML();
+        LeoAEDescriptor desc = (LeoAEDescriptor) annotator.getDescriptor();
+        desc.toXML(shortName);
         String descriptorPath = desc.getDescriptorLocator();
         if (descriptorPath.startsWith("file:")) {
             descriptorPath = descriptorPath.substring(5);
         }
-
+//        newOutputPath = ESAPIValidator.validateStringInput(newOutputPath, ESAPIValidationType.PATH_MANIPULATION);
+//        shortName = ESAPIValidator.validateStringInput(shortName, ESAPIValidationType.PATH_MANIPULATION);
+        
         FileUtils.copyFile(new File(descriptorPath), new File(newOutputPath + shortName + "Descriptor.xml"));
     }
 }

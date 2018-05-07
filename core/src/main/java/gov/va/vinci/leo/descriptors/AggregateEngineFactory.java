@@ -24,6 +24,7 @@ package gov.va.vinci.leo.descriptors;
  */
 
 import gov.va.vinci.leo.tools.LeoUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.Constants;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
@@ -183,10 +184,14 @@ public class AggregateEngineFactory {
                 fcd = (FlowControllerDescription) spec;
             } else if (spec instanceof CustomResourceSpecifier) {
                 //Add the delegate as an import
-                String component = getComponentName(((CustomResourceSpecifier) spec).getParameters());
+                String component = getComponentName(((CustomResourceSpecifier) spec).getParameters(), "leoRemoteServiceDelegate");
                 aed.getDelegateAnalysisEngineSpecifiersWithImports().put(component, spec);
 
                 //Add component name to the list
+                compNames.add(component);
+            } else if (spec instanceof PearSpecifier) {
+                String component = getComponentName(((PearSpecifier) spec).getParameters(), "leoPearServiceDelegate");
+                aed.getDelegateAnalysisEngineSpecifiersWithImports().put(component, spec);
                 compNames.add(component);
             }
         }//for
@@ -240,16 +245,19 @@ public class AggregateEngineFactory {
      * @param parameters Array of Parameter objects
      * @return component name string
      */
-    protected static String getComponentName(Parameter[] parameters) {
+    protected static String getComponentName(Parameter[] parameters, String...defaultName) {
         String componentName = null;
-        for(Parameter p : parameters) {
-            if(p.getName().equalsIgnoreCase("componentName")) {
-                componentName = p.getValue();
-                break;
+        if(ArrayUtils.isNotEmpty(parameters)) {
+            for (Parameter p : parameters) {
+                if (p.getName().equalsIgnoreCase("componentName")) {
+                    componentName = p.getValue();
+                    break;
+                }
             }
         }
         if(StringUtils.isBlank(componentName)) {
-            componentName = "leoRemoteDelegate2112" + LeoUtils.getUUID();
+            componentName = (ArrayUtils.isNotEmpty(defaultName))? defaultName[0] + "2112" : "leoDelegate2112";
+            componentName = componentName + LeoUtils.getUUID();
         }
         return componentName;
     }

@@ -19,7 +19,7 @@ Leo provides factories, base annotators, base readers, base listeners, and other
 *  Plug and Play Algorithm Modules
 *  Launch Services and Clients in UIMA-AS
 
-**UIMA** – [Unstructured Information Management Architecture](http://uima.apache.org/index.html ) – is a powerful and flexible software system designed to analyze large volumes of unstructured information. In order to accommodate all the available functionality, configuration and deployment of systems based on UIMA AS require a set of descriptor files in XML format. Creating and maintaining these descriptor files manually can be complicated and time consuming.   Apache uimaFit (http://uima.apache.org/uimafit.html ) is a library that enables programmatic instantiation of UIMA components.  
+**UIMA** – [Unstructured Information Management Architecture](http://uima.apache.org/index.html ) – is a powerful and flexible software system designed to analyze large volumes of unstructured information. In order to accommodate all the available functionality, configuration and deployment of systems based on UIMA AS require a set of descriptor files in XML format. Creating and maintaining these descriptor files manually can be complicated and time consuming.   [Apache uimaFit](http://uima.apache.org/uimafit.html) is a library that enables programmatic instantiation of UIMA components.  
 
 **UIMA AS** – [UIMA Asynchronous Scaleout]( http://uima.apache.org/doc-uimaas-what.html ) - is substantially different from UIMA and provides a range of additional functionality enabling scalable processing. While UIMA components can be run within UIMA AS with no descriptor changes, additional descriptor files are required to deploy systems based on UIMA AS.  
 

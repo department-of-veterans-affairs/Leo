@@ -26,8 +26,8 @@ package gov.va.vinci.leo.tools;
  */
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class AsciiFilterTest {
 		} catch (Exception e) {
 			TEST_STRING = "bad";
 			LOG.warn("Unable to slurp up the utf8toascii.txt file for Conversion results:\n"
-							+ ExceptionUtils.getFullStackTrace(e));
+							+ ExceptionUtils.getStackTrace(e));
 		}
 		LOG.info("TEST_STRING: " + TEST_STRING);
 
@@ -94,7 +94,7 @@ public class AsciiFilterTest {
 			assertTrue(TEST_STRING.equals(filtered));
 		} catch (Exception e) {
 			fail("Exception thrown testing unicode filter, reader input:\n" 
-					+ ExceptionUtils.getFullStackTrace(e));
+					+ ExceptionUtils.getStackTrace(e));
 		} finally {
 			if(fis != null)
 				fis.close();

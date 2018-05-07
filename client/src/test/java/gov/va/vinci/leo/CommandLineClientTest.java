@@ -1,10 +1,32 @@
 package gov.va.vinci.leo;
 
+/*
+ * #%L
+ * Leo Client
+ * %%
+ * Copyright (C) 2010 - 2017 Department of Veterans Affairs
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,11 +67,21 @@ public class CommandLineClientTest {
         mockCLClient.runClient();
 
         //Empty Constructor
-        mockCLClient = new MockCommandLineClient();
+        mockCLClient = new MockCommandLineClient(new String[] {});
         assertNotNull(mockCLClient);
         mockCLClient.clientConfigFile = new File[] {clientConfigFile};
         mockCLClient.readerConfigFile = new File[] {readerConfigFile};
         mockCLClient.listenerConfigFileList = new File[] { listenerConfigFile };
         mockCLClient.runClient();
+    }
+
+    @Test
+    public void testSetClientProperties() throws IllegalAccessException, InvocationTargetException, MalformedURLException, NoSuchMethodException {
+        CommandLineClient commandLineClient = new CommandLineClient(new String[] {"-clientConfigFile", "src/test/resources/conf/ClientConfig.groovy", "-readerConfigFile", "src/test/resources/ReaderConfig.groovy", "-listenerConfigFile", "src/test/resources/ListenerConfig.groovy"});
+        Client leoClient = new Client();
+        commandLineClient.setClientProperties(leoClient);
+        assertEquals("TestEndpoint", leoClient.getEndpoint());
+
+
     }
 }

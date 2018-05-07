@@ -89,7 +89,6 @@ public class LeoRemoteAEDescriptorTest {
         LeoRemoteAEDescriptor lrae = new LeoRemoteAEDescriptor();
         assertNull(lrae.getName());
         lrae.setName("myFunnyName");
-        System.out.println("remote name: " + lrae.getName());
         assertTrue(lrae.getName().startsWith("myFunnyName"));
     }
 

@@ -30,8 +30,6 @@ import gov.va.vinci.leo.cr.XmiFileCollectionReader;
 import gov.va.vinci.leo.listener.DoNothingListener;
 import gov.va.vinci.leo.listener.SimpleXmiListener;
 import org.apache.commons.io.IOUtils;
-import org.apache.uima.UIMAFramework;
-import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
 import org.junit.Before;
 import org.junit.Test;

@@ -25,6 +25,7 @@ import gov.va.vinci.leo.ae.ExampleAnnotator;
 import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
 import gov.va.vinci.leo.descriptors.LeoDeployDescriptor;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
@@ -33,8 +34,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -203,5 +206,63 @@ public class ServiceTest {
         assertTrue(casPoolSize == 1);
         assertTrue(s.getCasPoolSize() > casPoolSize);
     }
+
+    @Test
+    public void testUsingMapForConstructorProperties() throws FileNotFoundException {
+        Map<String, Object> o = new HashedMap();
+
+        // o.put("propertiesFile", "propertiesFile");
+        o.put("deploymentDescriptor", "pom.xml");
+        o.put("serviceName", "def");
+        o.put("brokerURL", "myUrl");
+        o.put("endpoint", "myEndPoint");
+        o.put("descriptorPath", "myDirectory");
+        o.put("casPoolSize", 1999);
+        o.put("fsHeapSize", 1234);
+        o.put("timeout", 1234567);
+        o.put("initTimeout", 98);
+        o.put("ccTimeout", -3);
+        o.put("jamServerBaseUrl", "myBaseUrl");
+        o.put("jamQueryIntervalInSeconds", 9 * 60 * 60);
+        o.put("jamResetStatisticsAfterQuery", false);
+        o.put("jamJmxPort", -100);
+        o.put("deleteOnExit", false);
+
+        Service testProperties = new Service(o);
+        assertEquals(testProperties.getDeploymentDescriptorFile(), "pom.xml");
+        assertEquals(testProperties.getServiceName(), "def");
+        assertEquals(testProperties.getBrokerURL(), "myUrl");
+        assertEquals(testProperties.getEndpoint(), "myEndPoint");
+        assertEquals(testProperties.getDescriptorDirectory(), "myDirectory");
+        assertEquals(testProperties.getCasPoolSize(), 1999);
+        assertEquals(testProperties.getFSHeapSize(), 1234);
+        assertEquals(testProperties.getTimeout(), 1234567);
+        assertEquals(testProperties.getInitTimeout(), 98);
+        assertEquals(testProperties.getCCTimeout(), -3);
+        assertEquals(testProperties.getJamServerBaseUrl(), "myBaseUrl");
+        assertEquals(testProperties.getJamQueryIntervalInSeconds(), 9 * 60 * 60);
+        assertEquals(testProperties.isJamResetStatisticsAfterQuery(), false);
+        assertEquals(testProperties.getJamJmxPort(), -100);
+        assertEquals(testProperties.isDeleteOnExit(), false);
+    }
+
+    public void testUndeploy() throws Exception {
+        Service service = new Service();
+
+        // Call undeploy without a running service.
+        service.undeploy();
+
+        // Call undeploy with a running service. 
+        service.uiamAsContainerId = "testId";
+        UimaAsynchronousEngine mock = EasyMock.createMock(UimaAsynchronousEngine.class);
+
+        mock.undeploy("testId");
+        EasyMock.expectLastCall();
+        EasyMock.replay(mock);
+        service.mUAEngine = mock;
+        service.undeploy();
+
+    }
+
 
 }//ServiceTest class

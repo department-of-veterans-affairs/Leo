@@ -25,19 +25,13 @@ package gov.va.vinci.leo.cr;
 
 import com.google.gson.Gson;
 import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
-import gov.va.vinci.leo.tools.LeoUtils;
-import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
 import org.apache.commons.io.filefilter.AbstractFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionException;
-import org.apache.uima.collection.CollectionReader;
-import org.apache.uima.pear.util.StringUtil;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.util.Progress;
 import org.apache.uima.util.ProgressImpl;
 
@@ -45,10 +39,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Get a list of the files in a directory and return them one at a time.  Optionally a

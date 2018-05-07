@@ -11,3 +11,4 @@ target/
 release.properties
 pom.xml.releaseBackup
 *.releaseBackup
+service/src/test/resources/test-main-generate/

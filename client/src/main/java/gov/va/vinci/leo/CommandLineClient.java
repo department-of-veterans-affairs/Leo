@@ -20,10 +20,11 @@ package gov.va.vinci.leo;
  * #L%
  */
 
-import gov.va.vinci.leo.cr.BaseLeoCollectionReader;
+import gov.va.vinci.leo.cr.LeoCollectionReaderInterface;
 import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.kohsuke.args4j.CmdLineException;
@@ -70,11 +71,32 @@ public class CommandLineClient {
      */
     Client myClient = new Client();
 
-    /**
-     * Default constructor.
+    /*
+     * Constructor for taking in the command line parameters directly as a string array.
+     * @param args the command line parameters.
      */
-    public CommandLineClient() {
+    public CommandLineClient(String[] args) {
+        if (args.length >= 3) {
+            CmdLineParser parser = new CmdLineParser(this);
+            try {
+                parser.parseArgument(args);
+            } catch (CmdLineException e) {
+                printUsage();
+                System.exit(1);
+            }
+        } else {
+            readerConfigFile = new File[]{new File(defaultCollectionReaderConfig())};
+            String[] listeners = defaultListenerConfig();
 
+            File[] listenerFiles = new File[listeners.length];
+            int c= 0;
+            for (String l: listeners) {
+                listenerFiles[c] = new File(l);
+                c++;
+            }
+            listenerConfigFileList = listenerFiles;
+            this.clientConfigFile = new File[]{new File(defaultClientConfig())};
+        }
     }
 
     /**
@@ -85,10 +107,35 @@ public class CommandLineClient {
      * @param listenerConfigFiles array of groovy config files for one or more listeners.
      */
     public CommandLineClient(File clientConfigFile, File readerConfig, File[] listenerConfigFiles) {
-        readerConfigFile = new File[] { readerConfig};
+        readerConfigFile = new File[]{readerConfig};
         listenerConfigFileList = listenerConfigFiles;
-        this.clientConfigFile = new File[] {clientConfigFile};
+        this.clientConfigFile = new File[]{clientConfigFile};
     }
+
+    /**
+     * The default client config file.
+     * @return the path to the default client config file if not overridden on the command line.
+     */
+    public String defaultClientConfig() {
+        return "config/ClientConfig.groovy";
+    }
+
+    /**
+     * The default collection reader config file.
+     * @return the path to the default collection reader config file if not overridden on the command line.
+     */
+    public String defaultCollectionReaderConfig() {
+        return "config/FileCollectionReaderConfig.groovy";
+    }
+
+    /**
+     * The default listener config files.
+     * @return the path to the default listener config files if not overridden on the command line.
+     */
+    public String[] defaultListenerConfig() {
+        return new String[] {"config/listeners/SimpleCsvListenerConfig.groovy"};
+    }
+
 
     /**
      * Parse the groovy config files, and return the listener objects that are defined in them.
@@ -111,18 +158,18 @@ public class CommandLineClient {
     }
 
     /**
-     * Parse the groovy config file, and return the reader object. This must be a BaseLeoCollectionReader.
+     * Parse the groovy config file, and return the reader object. This must be a LeoCollectionReaderInterface.
      *
      * @param config   the groovy config file to slurp
      * @return   the reader defined in the groovy config.
      * @throws MalformedURLException if the configuration file url that was set is invalid.
      */
-    public static BaseLeoCollectionReader getReader(File config) throws MalformedURLException {
+    public static LeoCollectionReaderInterface getReader(File config) throws MalformedURLException {
         ConfigSlurper configSlurper = new ConfigSlurper();
 
         ConfigObject configObject = configSlurper.parse(config.toURI().toURL());
         if (configObject.get("reader") != null ) {
-            return (BaseLeoCollectionReader) configObject.get("reader");
+            return (LeoCollectionReaderInterface) configObject.get("reader");
         }
       return null;
     }
@@ -136,7 +183,7 @@ public class CommandLineClient {
      * @throws InvocationTargetException if the groovy config refers to objects not in the classpath.
      * @throws IllegalAccessException if there is a rights issue accessing settings from the groovy config.
      */
-    protected Client setClientProperties(Client leoClient) throws MalformedURLException, InvocationTargetException, IllegalAccessException {
+    protected Client setClientProperties(Client leoClient) throws MalformedURLException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (clientConfigFile.length != 1) {
             return leoClient;
         }
@@ -147,7 +194,11 @@ public class CommandLineClient {
         Set<Map.Entry> entries = o.entrySet();
         for (Map.Entry e : entries) {
             System.out.println("Setting property " + e.getKey() + " on client to " + e.getValue() + ".");
-            BeanUtils.setProperty(leoClient, e.getKey().toString(), e.getValue());
+            try {
+                MethodUtils.invokeExactMethod(leoClient, "set" + StringUtils.capitalize(e.getKey().toString()), e.getValue());
+            } catch (NoSuchMethodException ex) {
+                System.out.println("!!WARNING!! Found property '" + e.getKey() + "' in config file with value '" + e.getValue() + "', but property could not set it on the client.");
+            }
         }
 
         return leoClient;
@@ -168,7 +219,7 @@ public class CommandLineClient {
              * There can be many listeners, but only one reader.
              */
             List<UimaAsBaseCallbackListener> listeners = getListeners(listenerConfigFileList);
-            BaseLeoCollectionReader reader = getReader(readerConfigFile[0]);
+            LeoCollectionReaderInterface reader = getReader(readerConfigFile[0]);
 
 
             /**
@@ -211,13 +262,7 @@ public class CommandLineClient {
      * @throws org.kohsuke.args4j.CmdLineException if there is an error parsing the command line arguments.
      */
     public static void main(String[] args) throws CmdLineException {
-        CommandLineClient bean = new CommandLineClient();
-        CmdLineParser parser = new CmdLineParser(bean);
-        try {
-            parser.parseArgument(args);
-        } catch (CmdLineException e) {
-            printUsage();
-        }
+        CommandLineClient bean = new CommandLineClient(args);
         bean.runClient();
     }
 
@@ -225,7 +270,7 @@ public class CommandLineClient {
      * Print the command line usage statement to the console and exit.
      */
     public static void printUsage() {
-        CmdLineParser parser = new CmdLineParser(new CommandLineClient());
+        CmdLineParser parser = new CmdLineParser(new CommandLineClient(new String[]{}));
         System.out.print("Usage: java " + CommandLineClient.class.getCanonicalName());
         parser.printSingleLineUsage(System.out);
         System.out.println();

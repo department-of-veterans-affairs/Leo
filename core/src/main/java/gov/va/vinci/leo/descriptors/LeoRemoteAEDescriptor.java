@@ -134,7 +134,7 @@ public class LeoRemoteAEDescriptor implements LeoDelegate {
      */
     @Override
     public ResourceSpecifier getResourceSpecifier() {
-        return (ResourceSpecifier) this.getRemoteDescriptor();
+        return this.getRemoteDescriptor();
     }
 
     /**
@@ -330,7 +330,17 @@ public class LeoRemoteAEDescriptor implements LeoDelegate {
                             : new File(mDescriptorLocator);
         if(deleteOnExit) { outFile.deleteOnExit(); }
         mDescriptorLocator = outFile.toURI();
-        mRemoteDescriptor.toXML(new FileOutputStream(outFile));
+        FileOutputStream fos=null;
+        try
+        {
+        	fos = new FileOutputStream(outFile);
+        	mRemoteDescriptor.toXML(fos);
+        }
+        finally
+        {
+        	if ( fos!=null ) fos.close();
+        }
+        	
     }
 
     @Override

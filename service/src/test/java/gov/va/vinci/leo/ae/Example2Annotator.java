@@ -44,7 +44,6 @@ public class Example2Annotator extends LeoBaseAnnotator
 
     @Override
     public void annotate(JCas arg0) throws AnalysisEngineProcessException {
-        System.out.println("In " + this.getClass().getCanonicalName());
         this.addOutputAnnotation("gov.va.vinci.leo.test.MyType", arg0, 3,3);
         this.addOutputAnnotation("gov.va.vinci.leo.test.MyType", arg0, 2,2);
         this.addOutputAnnotation("gov.va.vinci.leo.test.MyType", arg0, 1,1);

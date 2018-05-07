@@ -31,9 +31,7 @@ import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.Type;
 import org.apache.uima.collection.EntityProcessStatus;
-import org.apache.uima.examples.SourceDocumentInformation;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.jcas.tcas.Annotation;
 
 import java.io.File;
 import java.io.PrintWriter;

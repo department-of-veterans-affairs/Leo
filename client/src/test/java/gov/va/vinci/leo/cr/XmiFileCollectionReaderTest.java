@@ -135,7 +135,6 @@ public class XmiFileCollectionReaderTest {
 
         //Run the client
         client.run(reader, listener);
-        //System.out.println("xmiTestCorpus files: " + xmiTestCorpus.listFiles().length + ", listener.processed: " + listener.getNumReceived());
         assertEquals(xmiTestCorpus.listFiles().length - 1, listener.getNumReceived());
     }
 
@@ -155,7 +154,7 @@ public class XmiFileCollectionReaderTest {
         TypeDescription[] ar = ae.getAnalysisEngineMetaData().getTypeSystem().getTypes();
         JCas mockCas = ae.newJCas();
         xfsr.getNext(mockCas.getCas());
-        //System.out.println(mockCas.getDocumentText());
-        assertTrue(mockCas.getDocumentText().startsWith("this"));
+        String docText = mockCas.getDocumentText();
+        assertTrue(docText.startsWith("This"));
     }
 }

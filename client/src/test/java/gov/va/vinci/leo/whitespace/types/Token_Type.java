@@ -1,12 +1,12 @@
 
-/* First created by JCasGen Wed Oct 02 11:17:44 MDT 2013 */
+/* First created by JCasGen Mon Aug 08 14:23:56 MDT 2016 */
 package gov.va.vinci.leo.whitespace.types;
 
 /*
  * #%L
- * whitespaceTokenizer
+ * Leo Client
  * %%
- * Copyright (C) 2010 - 2014 Department of Veterans Affairs
+ * Copyright (C) 2010 - 2017 Department of Veterans Affairs
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,12 @@ import org.apache.uima.jcas.JCasRegistry;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Wed Oct 02 11:17:44 MDT 2013
+ * Updated by JCasGen Mon Aug 08 14:23:56 MDT 2016
  * @generated */
 public class Token_Type extends Annotation_Type {
-  /** @generated */
+  /** @generated 
+   * @return the generator for this type
+   */
   @Override
   protected FSGenerator getFSGenerator() {return fsGenerator;}
   /** @generated */
@@ -68,24 +70,57 @@ public class Token_Type extends Annotation_Type {
   final Feature casFeat_TokenType;
   /** @generated */
   final int     casFeatCode_TokenType;
-  /** @generated */ 
+  /** @generated
+   * @param addr low level Feature Structure reference
+   * @return the feature value 
+   */ 
   public int getTokenType(int addr) {
         if (featOkTst && casFeat_TokenType == null)
       jcas.throwFeatMissing("TokenType", "gov.va.vinci.leo.whitespace.types.Token");
     return ll_cas.ll_getIntValue(addr, casFeatCode_TokenType);
   }
-  /** @generated */    
+  /** @generated
+   * @param addr low level Feature Structure reference
+   * @param v value to set 
+   */    
   public void setTokenType(int addr, int v) {
         if (featOkTst && casFeat_TokenType == null)
       jcas.throwFeatMissing("TokenType", "gov.va.vinci.leo.whitespace.types.Token");
     ll_cas.ll_setIntValue(addr, casFeatCode_TokenType, v);}
     
   
+ 
+  /** @generated */
+  final Feature casFeat_AnnotationFeature;
+  /** @generated */
+  final int     casFeatCode_AnnotationFeature;
+  /** @generated
+   * @param addr low level Feature Structure reference
+   * @return the feature value 
+   */ 
+  public int getAnnotationFeature(int addr) {
+        if (featOkTst && casFeat_AnnotationFeature == null)
+      jcas.throwFeatMissing("AnnotationFeature", "gov.va.vinci.leo.whitespace.types.Token");
+    return ll_cas.ll_getRefValue(addr, casFeatCode_AnnotationFeature);
+  }
+  /** @generated
+   * @param addr low level Feature Structure reference
+   * @param v value to set 
+   */    
+  public void setAnnotationFeature(int addr, int v) {
+        if (featOkTst && casFeat_AnnotationFeature == null)
+      jcas.throwFeatMissing("AnnotationFeature", "gov.va.vinci.leo.whitespace.types.Token");
+    ll_cas.ll_setRefValue(addr, casFeatCode_AnnotationFeature, v);}
+    
+  
 
 
 
   /** initialize variables to correspond with Cas Type and Features
-	* @generated */
+	 * @generated
+	 * @param jcas JCas
+	 * @param casType Type 
+	 */
   public Token_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
@@ -93,6 +128,10 @@ public class Token_Type extends Annotation_Type {
  
     casFeat_TokenType = jcas.getRequiredFeatureDE(casType, "TokenType", "uima.cas.Integer", featOkTst);
     casFeatCode_TokenType  = (null == casFeat_TokenType) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_TokenType).getCode();
+
+ 
+    casFeat_AnnotationFeature = jcas.getRequiredFeatureDE(casType, "AnnotationFeature", "uima.tcas.Annotation", featOkTst);
+    casFeatCode_AnnotationFeature  = (null == casFeat_AnnotationFeature) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_AnnotationFeature).getCode();
 
   }
 }

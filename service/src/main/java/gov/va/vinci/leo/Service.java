@@ -24,7 +24,6 @@ package gov.va.vinci.leo;
  */
 
 import gov.va.vinci.leo.ae.LeoAnnotator;
-import gov.va.vinci.leo.ae.LeoBaseAnnotator;
 import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
 import gov.va.vinci.leo.descriptors.LeoDelegate;
 import gov.va.vinci.leo.descriptors.LeoDeployDescriptor;
@@ -38,6 +37,7 @@ import org.apache.uima.adapter.jms.client.BaseUIMAAsynchronousEngine_impl;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.util.*;
 
@@ -67,6 +67,15 @@ public class Service extends LeoProperties {
      */
     protected UimaAsynchronousEngine mUAEngine = null;
 
+
+    /**
+     * When a service is deployed, UIMA assigns it a unique container id to be used for undeploying.
+     * This is that container id, and will be null until a service is deployed, and reset to null
+     * if a service is undeployed.
+     */
+    protected String uiamAsContainerId = null;
+
+
     /**
      * Default constructor loads the application execution variables from the properties file.
      * If variables are not provided then default values are used where they can be.
@@ -75,6 +84,21 @@ public class Service extends LeoProperties {
      */
     public Service() throws Exception {
         this.loadDefaults();
+    }//Default constructor
+
+    /**
+     * Loads the application execution variables from the map.
+     *
+     * @param propertiesMap the map of properties to set.  Map should have the property
+     * name as the key, and value as the value. See LeoProperties for which
+     * properties can be set.
+     *
+     * @throws FileNotFoundException If deploymentDescriptor is specified, but not found or accessible.
+     */
+    public Service(Map<String, Object> propertiesMap) throws FileNotFoundException {
+        Properties properties = new Properties();
+        properties.putAll(propertiesMap);
+        this.loadProperties(properties);
     }//Default constructor
 
     /**
@@ -97,6 +121,7 @@ public class Service extends LeoProperties {
     public String getAggregateDescriptorFile() {
         return this.mAggregateDescriptorFile;
     }//getAggregateDescriptorFile method
+
 
     /**
      * Create a deployment descriptor and initialize the mAppCtx and mUAEngine objects then call
@@ -263,6 +288,8 @@ public class Service extends LeoProperties {
      * @throws Exception if any error occurs during deployment.
      */
     public void deploy() throws Exception {
+        registerWithJam();
+
         //Initialize the execution map
         mAppCtx = new HashMap<String, Object>();
 
@@ -282,11 +309,23 @@ public class Service extends LeoProperties {
             throw new Exception("No Deployment Descriptor File for initializing the Service");
         }//if mDeploymentDescriptorFile == null
 
-        mUAEngine.deploy(mDeploymentDescriptorFile, mAppCtx);
+        uiamAsContainerId = mUAEngine.deploy(mDeploymentDescriptorFile, mAppCtx);
         LOG.info("'Deployed' the AS service and containers");
-        registerWithJam();
+
     }//init method
 
+
+    /**
+     * Undeploys a running service from the UIMA AS engine. If no service is currently running, no error is thrown,
+     * the method simply returns.
+     * @throws Exception
+     */
+    public void undeploy() throws Exception {
+        if (uiamAsContainerId != null ) {
+            mUAEngine.undeploy(uiamAsContainerId);
+            uiamAsContainerId = null;
+        }
+    }
 
     /**
      * Call the appropriate JAM web services to register this service with jam.
@@ -297,25 +336,16 @@ public class Service extends LeoProperties {
             return;
         }
 
-        // First, see if this server is running JMX by seeing if a port is specified.
-        String port = System.getProperty("com.sun.management.jmxremote.port");
-
-        if (port == null) {
-            LOG.warn("com.sun.management.jmxremote.port is null, NOT trying to register with JAM.");
+        final JamService jamService = new JamService(this.mJamServerBaseUrl);
+        final int port;
+        try {
+            port = jamService.loadJMXAgent(mJamJmxPort);
+        } catch (Exception e) {
+            LOG.warn("Error starting JMX Agent. (" + e.getMessage() + ")");
             return;
         }
 
-
-        int intPort = -1;
-        try {
-            intPort = Integer.parseInt(port);
-        } catch (Exception e) {
-            LOG.warn("Could not register with Jam, invalid JMX port specified via com.management.jmxremote.port value " + port);
-        }
-        final int finalPort = intPort;
-
         // Next, register/add host.
-        final JamService jamService = new JamService(this.mJamServerBaseUrl);
         try {
             if (!jamService.doesServiceQueueExist(mEndpoint, this.mBrokerURL)) {
                 // register this queuename
@@ -323,7 +353,7 @@ public class Service extends LeoProperties {
             }
 
             // Add this server.
-            jamService.addServerToServiceQueue(mEndpoint, this.mBrokerURL, InetAddress.getLocalHost().getHostAddress(), intPort);
+            jamService.addServerToServiceQueue(mEndpoint, this.mBrokerURL, InetAddress.getLocalHost().getHostAddress(), port);
 
         } catch (Exception e) {
             LOG.error("Could not register with JAM server. Error:" + e);
@@ -334,7 +364,7 @@ public class Service extends LeoProperties {
             public void run() {
                 LOG.info("Un-registering this service with JAM.");
                 try {
-                    jamService.removeServerFromServiceQueue(mEndpoint, mBrokerURL, InetAddress.getLocalHost().getHostAddress(), finalPort);
+                    jamService.removeServerFromServiceQueue(mEndpoint, mBrokerURL, InetAddress.getLocalHost().getHostAddress(), port);
                 } catch (Exception e) {
                     LOG.warn(e.toString());
                 }

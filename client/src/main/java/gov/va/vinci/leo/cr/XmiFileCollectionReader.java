@@ -20,7 +20,6 @@ package gov.va.vinci.leo.cr;
  * #L%
  */
 
-import gov.va.vinci.leo.tools.TextFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.log4j.Logger;
 import org.apache.uima.cas.CAS;
@@ -53,7 +52,7 @@ import java.io.InputStream;
  *
  * XMI Sub reader
  *
- * @author vhaislcornir
+ * @author DNS   cornir
  */
 public class XmiFileCollectionReader extends BaseFileCollectionReader {
 

@@ -48,6 +48,7 @@ public class DataQueryInformation {
      * @param idColumn  the column name for the id
      */
     public DataQueryInformation(String query, String noteColumn, String idColumn) {
+        super();
         this.query = query;
         this.noteColumn = noteColumn;
         this.idColumn = idColumn;

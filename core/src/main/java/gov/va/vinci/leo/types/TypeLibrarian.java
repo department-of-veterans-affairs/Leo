@@ -50,7 +50,7 @@ public class TypeLibrarian {
      * @return the standard RelationshipAnnotation TypeSystem Description used within some leo projects.
      */
     public static TypeDescription getRelationshipAnnotationTypeSystemDescription() {
-        return TypeDescriptionBuilder.create("gov.va.vinci.leo.types.RelationshipAnnotation", "RelationshipAnnotation Annotation", "uima.tcas.Annotation")
+        return TypeDescriptionBuilder.create("gov.va.vinci.knowtator.types.RelationshipAnnotation", "RelationshipAnnotation Annotation", "uima.tcas.Annotation")
                 .addFeature("Source", "Source", "uima.tcas.Annotation")
                 .addFeature("Target", "Target", "uima.cas.FSArray", "uima.tcas.Annotation", Boolean.FALSE)
                 .getTypeDescription();

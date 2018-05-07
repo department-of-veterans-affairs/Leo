@@ -24,7 +24,6 @@ package gov.va.vinci.leo.cr;
  */
 
 import gov.va.vinci.leo.tools.LeoUtils;
-import gov.va.vinci.leo.tools.TextFilter;
 import gov.va.vinci.leo.types.CSI;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;

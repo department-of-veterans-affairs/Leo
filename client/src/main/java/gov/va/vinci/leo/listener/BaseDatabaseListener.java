@@ -21,8 +21,9 @@ package gov.va.vinci.leo.listener;
  */
 
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.validator.GenericValidator;
 import org.apache.log4j.Logger;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.EntityProcessStatus;
@@ -74,6 +75,27 @@ public abstract class BaseDatabaseListener extends BaseListener {
      */
     protected Logger LOG = Logger.getLogger(this.getClass());
 
+    /**
+     * Constructor for using a fieldList. When this constructor is used, the insert sql statement is created for the fieldList.
+     *
+     * Note: if databaseName is not empty or null, the database name is prepended to the table. ie, if database name="myDB"
+     * and databaseTable = "myTable", the insert statement would be in the format insert into myDb.myTable
+     *
+     * If databaseName is empty or null, the insert statement only contains the table name.
+     *
+     * @param databaseConnectionInformation information on the database to connect to
+     * @param databaseName                  The database name. This is prepended to the table in the insert statement.
+     * @param databaseTable                 The database table fieldList belongs to.
+     * @param fieldList                     The fields that will be inserted to from this listener.
+     */
+    public BaseDatabaseListener(DatabaseConnectionInformation databaseConnectionInformation, String databaseName, String databaseTable,  List<DatabaseField> fieldList) {
+        if (databaseConnectionInformation == null) {
+            throw new IllegalArgumentException("Database Connection Information cannot be null.");
+        }
+        this.databaseConnectionInformation = databaseConnectionInformation;
+        this.preparedStatementSQL = createPreparedStatementSQL(databaseName, databaseTable, fieldList);
+    }
+    
     /**
      * Base gov.va.vinci.leo.listener.
      *
@@ -288,6 +310,31 @@ public abstract class BaseDatabaseListener extends BaseListener {
                             String tableName,
                             Map<String, String> fieldList
     ) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+        List<DatabaseField> fields = new ArrayList<>();
+        for (Map.Entry<String, String> field: fieldList.entrySet()) {
+            fields.add(new DatabaseField(field.getKey(), field.getValue()));
+        }
+        String createStatement = createCreateStatement(dbsName, tableName, fields);
+        createTable(createStatement, dropFirst, tableName);
+    }//createTable method
+
+    /**
+     * Creates the table structure.
+     *
+     * @param dropFirst If drop, the table is dropped before creation.
+     * @param dbsName   The database name (needed by some databases for the create statement)
+     * @param tableName The resulting table name
+     * @param fieldList A map of column names (key) and types (value) for example "id", "varchar(20)"
+     * @throws java.lang.ClassNotFoundException if the driver class is not in the classpath.
+     * @throws java.sql.SQLException            if there is an error executing the SQL to drop or create the table.
+     * @throws java.lang.InstantiationException if there is an error creating the connection
+     * @throws java.lang.IllegalAccessException if there is an error executing the query due to insufficient rights or the database cannot be reached.
+     */
+    public void createTable(boolean dropFirst,
+                            String dbsName,
+                            String tableName,
+                            List<DatabaseField> fieldList
+    ) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
         String createStatement = createCreateStatement(dbsName, tableName, fieldList);
         createTable(createStatement, dropFirst, tableName);
     }//createTable method
@@ -301,11 +348,48 @@ public abstract class BaseDatabaseListener extends BaseListener {
      * @param fieldList A map of column names (key) and types (value) for example "id", "varchar(20)"
      * @return The sql create statement.
      */
-    protected String createCreateStatement(String dbsName, String tableName, Map<String, String> fieldList) {
+    protected String createCreateStatement(String dbsName, String tableName, List<DatabaseField> fieldList) {
         String statement = "CREATE TABLE " + dbsName + "." + tableName + " ( ";
-        for (String column : fieldList.keySet())
-            statement = statement + column + " " + fieldList.get(column) + ", ";
+        for (DatabaseField field : fieldList)
+            statement = statement + field.getName() + " " + field.getType() + ", ";
         statement = statement.substring(0, (statement.length() - 2)) + " ) ;";
         return statement;
     }
+
+    /**
+     * Creates an insert sql statement for the list of fields. This requires using a constructor for this object
+     * that sets database name and database table. If database name is null, the sql statement is in the format:
+     *
+     * insert into tablename ...
+     *
+     * if database name is not null, the insert statement is in the format:
+     *
+     * insert into databasename.tablename ...
+     *
+     * NOTE: No sql escaping is performed! If using special characters or reserved works for column names, this will not work!
+     *
+     * @param fields the field list to create the insert statement for.
+     *
+     * @return the sql insert statement.
+     */
+    protected String createPreparedStatementSQL(String databaseName, String tableName, List<DatabaseField> fields) {
+        String statement = "INSERT INTO ";
+        if (GenericValidator.isBlankOrNull(databaseName)) {
+            statement +=  tableName + " ( ";
+        } else {
+            statement +=  databaseName + "." + tableName + " ( ";
+        }
+
+        String values = "";
+        for (DatabaseField field : fields) {
+            statement = statement + field.getName() + ", ";
+            values = values + " ?,";
+        }
+        statement = statement.substring(0, statement.length() - 2)
+                + " ) VALUES ( " + values.substring(0, values.length() - 1)
+                + " ) ;";
+        return statement;
+    }
+
+
 }

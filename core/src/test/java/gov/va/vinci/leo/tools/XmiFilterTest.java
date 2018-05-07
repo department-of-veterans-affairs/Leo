@@ -25,8 +25,8 @@ package gov.va.vinci.leo.tools;
  * #L%
  */
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -76,7 +76,7 @@ public class XmiFilterTest {
 			assertTrue("this is a test. ".equals(filtered));
 		} catch (Exception e) {
 			fail("Exception thrown testing unicode filter, reader input:\n" 
-					+ ExceptionUtils.getFullStackTrace(e));
+					+ ExceptionUtils.getStackTrace(e));
 		} finally {
 			if(fis != null)
 				fis.close();

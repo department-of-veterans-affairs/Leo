@@ -24,6 +24,7 @@ package gov.va.vinci.leo.descriptors;
  */
 
 import gov.va.vinci.leo.tools.LeoUtils;
+import gov.va.vinci.leo.tools.StreamUtils;
 import gov.va.vinci.leo.tools.XMLSerializer;
 import org.apache.log4j.Logger;
 import org.apache.uima.util.InvalidXMLException;
@@ -283,15 +284,26 @@ public class LeoDeployDescriptor {
         return this;
     }//setTopDescriptor method LeoAEDescriptor input
 
-    /**
-     * Serialize this Deployment Descriptor to a file at the name and path provided.
-     *
-     * @param filename File name and path where the xml file will be serialized
-     * @throws Exception  if the file cannot be accessed or the xml not written.
-     */
-    public void toXML(String filename) throws Exception {
-        this.toXML(new FileOutputStream(filename));
-    }//toXML filename input param method
+	/**
+	 * Serialize this Deployment Descriptor to a file at the name and path provided.
+	 *
+	 * @param filename File name and path where the xml file will be serialized
+	 * @throws Exception  if the file cannot be accessed or the xml not written.
+	 */
+	public void toXML(String filename) throws Exception 
+	{
+		FileOutputStream fos =null;
+		try
+		{
+			fos = new FileOutputStream(filename);
+			toXML(fos);
+		}
+		finally
+		{
+			if ( fos!=null ) fos.close();	
+		}
+
+	}//toXML filename input param method
 
     /**
      * Serialize the deployment descriptor to xml using the output stream provided.
@@ -338,11 +350,14 @@ public class LeoDeployDescriptor {
         //deployment section
         this.deploymentSectionXML(thd);
 
-        //</analysisEngineDeploymentDescription>
-        thd.endElement("", "", "analysisEngineDeploymentDescription");
-        atts.clear();
-        thd.endDocument();
-    }//toXML OutputStream input param method
+		//</analysisEngineDeploymentDescription>
+		thd.endElement("", "", "analysisEngineDeploymentDescription");
+		atts.clear();
+		thd.endDocument();
+		os.flush();
+		StreamUtils.safeClose(os);
+
+	}//toXML OutputStream input param method
 
     /**
      * Serialize the deployment section.

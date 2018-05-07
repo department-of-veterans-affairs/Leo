@@ -1,5 +1,25 @@
 package gov.va.vinci.leo.ae;
 
+/*
+ * #%L
+ * Leo Service
+ * %%
+ * Copyright (C) 2010 - 2017 Department of Veterans Affairs
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import gov.va.vinci.leo.descriptors.LeoDelegate;
 import gov.va.vinci.leo.descriptors.LeoRemoteAEDescriptor;
 import gov.va.vinci.leo.tools.LeoUtils;
@@ -28,6 +48,18 @@ public class LeoRemoteAnnotator implements LeoAnnotator {
     public LeoRemoteAnnotator(String brokerURL, String endPoint) {
         this.descriptor = new LeoRemoteAEDescriptor(brokerURL, endPoint);
         this.descriptor.setName(endPoint + "_remote_" + LeoUtils.getUUID());
+    }
+
+    /**
+     * Create a new LeoRemoteAnnotator with the brokerURL, endPoint, and annotator name specified.
+     *
+     * @param brokerURL ActiveMQ broker URL for remote UIMA-AS service
+     * @param endPoint Input queue name to which the remote service responds
+     * @param name Name of the annotator in the pipeline
+     */
+    public LeoRemoteAnnotator(String brokerURL, String endPoint, String name) {
+        this.descriptor = new LeoRemoteAEDescriptor(brokerURL, endPoint);
+        this.descriptor.setName(name);
     }
 
     /**

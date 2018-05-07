@@ -7,12 +7,11 @@
     <artifactId>leo-client</artifactId>
     <packaging>jar</packaging>
     <name>Leo Client</name>
-    <version>2016.05.3-SNAPSHOT</version>
  
     <parent>
         <groupId>gov.va.vinci</groupId>
         <artifactId>leo</artifactId>
-        <version>2016.05.3-SNAPSHOT</version>
+        <version>2018.01.0</version>
     </parent>
 
     <properties>
@@ -23,7 +22,7 @@
         <dependency>
             <groupId>gov.va.vinci.leo</groupId>
             <artifactId>leo-core</artifactId>
-            <version>2016.05.3-SNAPSHOT</version>
+	    <version>2018.01.0</version>
         </dependency>
 
         <dependency>
@@ -49,7 +48,7 @@
         <dependency>
             <groupId>gov.va.vinci.leo</groupId>
             <artifactId>leo-service</artifactId>
-            <version>2016.05.3-SNAPSHOT</version>
+            <version>2018.01.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

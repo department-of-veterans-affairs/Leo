@@ -7,17 +7,16 @@
     <artifactId>leo-base</artifactId>
     <packaging>pom</packaging>
     <name>Leo Base Components</name>
-    <version>2016.05.3-SNAPSHOT</version>
  
     <parent>
         <groupId>gov.va.vinci</groupId>
         <artifactId>leo</artifactId>
-        <version>2016.05.3-SNAPSHOT</version>
+        <version>2018.01.0</version>
     </parent>
 
     <properties>
         <checkstyle.config.location>checkstyle_javadoc_only.xml</checkstyle.config.location>
-        <uima-as-version>2.6.0</uima-as-version>
+        <uima-as-version>2.9.0</uima-as-version>
         <skipJavadoc>true</skipJavadoc>
    </properties>
 
@@ -25,17 +24,17 @@
         <dependency>
             <groupId>gov.va.vinci.leo</groupId>
             <artifactId>leo-client</artifactId>
-            <version>2016.05.3-SNAPSHOT</version>
+            <version>2018.01.0</version>
         </dependency>
         <dependency>
             <groupId>gov.va.vinci.leo</groupId>
             <artifactId>leo-core</artifactId>
-            <version>2016.05.3-SNAPSHOT</version>
+            <version>2018.01.0</version>
         </dependency>
         <dependency>
             <groupId>gov.va.vinci.leo</groupId>
             <artifactId>leo-service</artifactId>
-            <version>2016.05.3-SNAPSHOT</version>
+            <version>2018.01.0</version>
         </dependency>
     </dependencies>
 </project>

@@ -27,6 +27,7 @@ import gov.va.vinci.leo.model.DataQueryInformation;
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
 import gov.va.vinci.leo.tools.db.DataManager;
 import gov.va.vinci.leo.types.CSI;
+import org.apache.commons.dbutils.DbUtils;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
@@ -67,8 +68,13 @@ public class BatchDatabaseCollectionReaderTest {
                 connection.createStatement().execute("INSERT INTO PUBLIC.notes (id, note) VALUES (" + i + ", '" + new BigInteger(130, new SecureRandom()).toString(32) + "')");
             }
         } catch(Exception e) {
-            if(!e.toString().contains("object name already exists:"))
-                System.out.println(e.getMessage());
+            if(!e.toString().contains("object name already exists:")) {
+                throw e;
+            }
+        }
+        finally
+        {
+            DbUtils.closeQuietly(connection);
         }
     }
 

@@ -20,6 +20,9 @@ package gov.va.vinci.leo.tools;
  * #L%
  */
 
+import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.AgentLoadException;
+import com.sun.tools.attach.AttachNotSupportedException;
 import org.apache.commons.httpclient.HttpClientMock;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Test;
@@ -142,6 +145,16 @@ public class JamServiceTest {
         jamService.setClient(mockHttpClient);
         jamService.removeServerFromServiceQueue("myQueueName", "broker://", "localhost", 1000);
         assertTrue(mockHttpClient.getLastMethodFromExecuteMethod().getURI().toString().equals("http://localhost/jam/webservice/removeServerFromServiceQueue"));
+
+    }
+
+    @Test
+    public void loadJmxTest() throws IOException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+
+        JamService jamService = new JamService("http://localhost/jam");
+        int port = jamService.loadJMXAgent(-1);
+
+        assert(port != -1);
 
     }
 

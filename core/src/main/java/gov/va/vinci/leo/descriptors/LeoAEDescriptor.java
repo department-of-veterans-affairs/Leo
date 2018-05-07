@@ -803,8 +803,17 @@ public class LeoAEDescriptor implements LeoDelegate {
         if(deleteOnExit) { outFile.deleteOnExit(); }
         mDescriptorLocator = outFile.toURI();
 
-        mAEDescriptor.toXML(new FileOutputStream(outFile), true);
-    }//toXML method
+		FileOutputStream fos=null;
+		try
+		{
+			fos = new FileOutputStream(outFile);
+			mAEDescriptor.toXML(fos, true);			
+		}
+		finally
+		{
+			if ( fos!=null ) fos.close();
+		}
+	}
 
     /**
      * Generate the XML for the analysisEngine section of the deployment descriptor.

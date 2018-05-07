@@ -20,7 +20,6 @@ package gov.va.vinci.leo.listener;
  * #L%
  */
 
-
 import au.com.bytecode.opencsv.CSVWriter;
 import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.cr.RandomStringCollectionReader;
@@ -50,6 +49,7 @@ public class SimpleCsvListenerTest {
     protected static CAS cas = null;
     protected static File inDir = new File("src/test/resources/inputDirectory");
     protected static String rootDirectory = "";
+    AnalysisEngine ae;
 
     @Before
     public void setup() throws Exception {
@@ -60,7 +60,9 @@ public class SimpleCsvListenerTest {
             rootDirectory = "client/";
             inDir = new File(rootDirectory + "src/test/resources/inputDirectory");
         }
-        AnalysisEngine ae = UIMAFramework.produceAnalysisEngine(
+
+
+        ae = UIMAFramework.produceAnalysisEngine(
                 SampleService.simpleServiceDefinition().getAnalysisEngineDescription()
         );
         cas = ae.newCAS();
@@ -118,8 +120,10 @@ public class SimpleCsvListenerTest {
         listener.entityProcessComplete(cas, null);
         String b = FileUtils.readFileToString(f).trim();
         assertEquals("\"1\"|\"0\"|\"29\"|\"gov.va.vinci.leo.types.CSI\"|\"01234567890123456789012345678\"|\"[ID = 1]\"|\"[Locator = null]\"|\"[RowData = null]\"|\"[PropertiesKeys = null]\"|\"[PropertiesValues = null]\"\n" +
-                "\"1\"|\"0\"|\"30\"|\"gov.va.vinci.leo.whitespace.types.Token\"|\"012345678901234567890123456789\"|\"[TokenType = 1]\"", b.toString());
+
+            "\"1\"|\"0\"|\"30\"|\"gov.va.vinci.leo.whitespace.types.Token\"|\"012345678901234567890123456789\"|\"[TokenType = 1]\"|\"[AnnotationFeature = 01234567890123456789012345678]\"", b.toString());
     }
+
 
     @Test
     public void testRunSimpleCsvListenerTest() throws Exception {

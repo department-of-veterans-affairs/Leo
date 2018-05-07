@@ -26,16 +26,17 @@ package gov.va.vinci.leo.whitespace.ae;
 import gov.va.vinci.leo.ae.LeoBaseAnnotator;
 import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
-import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
-import org.apache.commons.lang.StringUtils;
+import gov.va.vinci.leo.types.CSI;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.resource.metadata.TypeDescription;
 import org.apache.uima.resource.metadata.impl.TypeDescription_impl;
 
@@ -43,6 +44,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Create a series of tokens that ignore whitespace and identify the basic building blocks of
@@ -269,7 +271,14 @@ public class WhitespaceTokenizer extends LeoBaseAnnotator {
      * @param tokenType type of Token being created
      */
     private void createToken(JCas aJCas, int begin, int end, int tokenType, Feature tokenTypeFeature) throws AnalysisEngineProcessException {
-        Annotation token = this.addOutputAnnotation(tokenOutputType, aJCas, begin, end);
+        Map<String, Object> featureMap = new HashedMap();
+
+        CSI csi = null;
+        if (aJCas.getAnnotationIndex(CSI.type) != null && aJCas.getAnnotationIndex(CSI.type).iterator().hasNext()) {
+            csi = (CSI) aJCas.getAnnotationIndex(CSI.type).iterator().next();
+        }
+        featureMap.put("AnnotationFeature", csi);
+        Annotation token = this.addOutputAnnotation(tokenOutputType, aJCas, begin, end, featureMap);
         token.setIntValue(tokenTypeFeature, tokenType);
 
 
@@ -347,6 +356,7 @@ public class WhitespaceTokenizer extends LeoBaseAnnotator {
     public LeoTypeSystemDescription getLeoTypeSystemDescription() {
         TypeDescription token = new TypeDescription_impl("gov.va.vinci.leo.whitespace.types.Token", "", "uima.tcas.Annotation");
         token.addFeature("TokenType", "", "uima.cas.Integer");
+        token.addFeature("AnnotationFeature", "", CAS.TYPE_NAME_ANNOTATION);
 
         LeoTypeSystemDescription ftsd = new LeoTypeSystemDescription();
         try {

@@ -1,13 +1,13 @@
 
 
-/* First created by JCasGen Wed Oct 02 11:17:44 MDT 2013 */
+/* First created by JCasGen Mon Aug 08 14:23:56 MDT 2016 */
 package gov.va.vinci.leo.whitespace.types;
 
 /*
  * #%L
- * whitespaceTokenizer
+ * Leo Client
  * %%
- * Copyright (C) 2010 - 2014 Department of Veterans Affairs
+ * Copyright (C) 2010 - 2017 Department of Veterans Affairs
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** Annotates collections of letters
- * Updated by JCasGen Wed Oct 02 11:17:44 MDT 2013
- * XML source: /var/folders/87/6grdjq5n2cl1w8lh02tn_2zc0000gn/T/leoTypeDescription_4ce5fd10-9e44-4d55-861d-a412928ec07d4848048330208689900.xml
+ * Updated by JCasGen Mon Aug 08 14:23:56 MDT 2016
+ * XML source: /var/folders/9p/6qt9dlgd1ks8d036hkqb9kz00000gn/T/leoTypeDescription_39e12376-aec5-4acf-a70c-afa4b7cffaa81105431736418235892.xml
  * @generated */
 public class WordToken extends Annotation {
   /** @generated
@@ -44,7 +44,9 @@ public class WordToken extends Annotation {
    */
   @SuppressWarnings ("hiding")
   public final static int type = typeIndexID;
-  /** @generated  */
+  /** @generated
+   * @return index of the type  
+   */
   @Override
   public              int getTypeIndexID() {return typeIndexID;}
  
@@ -53,19 +55,28 @@ public class WordToken extends Annotation {
   protected WordToken() {/* intentionally empty block */}
     
   /** Internal - constructor used by generator 
-   * @generated */
+   * @generated
+   * @param addr low level Feature Structure reference
+   * @param type the type of this Feature Structure 
+   */
   public WordToken(int addr, TOP_Type type) {
     super(addr, type);
     readObject();
   }
   
-  /** @generated */
+  /** @generated
+   * @param jcas JCas to which this Feature Structure belongs 
+   */
   public WordToken(JCas jcas) {
     super(jcas);
     readObject();   
   } 
 
-  /** @generated */  
+  /** @generated
+   * @param jcas JCas to which this Feature Structure belongs
+   * @param begin offset to the begin spot in the SofA
+   * @param end offset to the end spot in the SofA 
+  */  
   public WordToken(JCas jcas, int begin, int end) {
     super(jcas);
     setBegin(begin);
@@ -73,10 +84,13 @@ public class WordToken extends Annotation {
     readObject();
   }   
 
-  /** <!-- begin-user-doc -->
-    * Write your own initialization here
-    * <!-- end-user-doc -->
-  @generated modifiable */
+  /** 
+   * <!-- begin-user-doc -->
+   * Write your own initialization here
+   * <!-- end-user-doc -->
+   *
+   * @generated modifiable 
+   */
   private void readObject() {/*default - does nothing empty block */}
      
 }

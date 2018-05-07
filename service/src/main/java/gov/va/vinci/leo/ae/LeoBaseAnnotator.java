@@ -33,14 +33,14 @@ import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.Feature;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
-import org.apache.uima.cas.text.AnnotationIndex;
+import org.apache.uima.impl.ChildUimaContext_impl;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.Map;
 
 /**
  * Base annotator class for holding functions that all annotators might take
@@ -55,7 +55,7 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     /**
      * Logger object for messaging.
      */
-    private static Logger  logger = Logger.getLogger(LeoBaseAnnotator.class.getCanonicalName());
+    protected static Logger logger = Logger.getLogger(LeoBaseAnnotator.class.getCanonicalName());
 
     /**
      * The types of annotations to use as "anchors" or to be processed.
@@ -257,6 +257,9 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
             throws ResourceInitializationException {
         super.initialize(aContext);
         ConfigurationParameterUtils.initParameterValues(this, aContext);
+        if (this.getName() == null && aContext instanceof ChildUimaContext_impl ) {
+            this.setName(((ChildUimaContext_impl)aContext).getManagementInterface().getName());
+        }
     }// initialize method
 
     /**
@@ -387,6 +390,8 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
                         outputAnnotation.setStringValue(feature, (String) featureNameValues.get(featureName));
                     } else if (featureNameValues.get(featureName) instanceof FeatureStructure) {
                         outputAnnotation.setFeatureValue(feature, (FeatureStructure) featureNameValues.get(featureName));
+                    } else if (featureNameValues.get(featureName) == null) {
+                        outputAnnotation.setFeatureValue(feature, (FeatureStructure)null);
                     } else {
                         throw new AnalysisEngineProcessException(
                                 new RuntimeException("Unknown feature type in map for feature name: " + featureName
@@ -416,8 +421,16 @@ public abstract class LeoBaseAnnotator extends JCasAnnotator_ImplBase implements
     public String getResourceFileAsString(String resourcePath)
             throws IOException {
         StringWriter writer = new StringWriter();
-        InputStream stream = getResourceAsInputStream(resourcePath);
-        IOUtils.copy(stream, writer);
+        InputStream is=null;
+        try
+        {
+        	is = getResourceAsInputStream(resourcePath);
+        	IOUtils.copy(is, writer);
+        }
+        finally
+        {
+        	if ( is!=null ) is.close();
+        }
         return writer.toString();
     }
 

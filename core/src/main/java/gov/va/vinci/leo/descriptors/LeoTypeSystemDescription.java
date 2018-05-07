@@ -22,6 +22,8 @@ package gov.va.vinci.leo.descriptors;
 
 
 import gov.va.vinci.leo.tools.AutoCompile;
+//import gov.va.vinci.leo.tools.ESAPIValidationType;
+//import gov.va.vinci.leo.tools.ESAPIValidator;
 import gov.va.vinci.leo.tools.LeoUtils;
 import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.lang3.StringUtils;
@@ -81,7 +83,8 @@ public class LeoTypeSystemDescription {
      */
     public LeoTypeSystemDescription(TypeSystemDescription td) {
         setTypeSystemDescription(td);
-        if (StringUtils.isBlank(myTypeSystemDescription.getName())) {
+        if (myTypeSystemDescription!=null && StringUtils.isBlank(myTypeSystemDescription.getName())) 
+        {
             myTypeSystemDescription.setName("leoTypeDescription_" + LeoUtils.getUUID());
         }//if
 
@@ -116,7 +119,7 @@ public class LeoTypeSystemDescription {
      */
     public LeoTypeSystemDescription(String aType, String aDescription, String aSupertypeName) {
         this(TypeSystemFactory.generateTypeSystemDescription());
-        myTypeSystemDescription.addType(aType, aDescription, aSupertypeName);
+        if ( myTypeSystemDescription!=null ) myTypeSystemDescription.addType(aType, aDescription, aSupertypeName);
     }//constructor for creating type description from scratch
 
     /**
@@ -282,15 +285,26 @@ public class LeoTypeSystemDescription {
      * @throws Exception If unable to serialize to the file or if the XML if invalid
      */
     public void toXML(String filename) throws Exception {
-        //If the path is null throw error.
+//    	filename = ESAPIValidator.validateStringInput(filename, ESAPIValidationType.PATH_MANIPULATION);
+    	//If the path is null throw error.
         if (StringUtils.isBlank(filename)) {
             throw new Exception("Filename cannot be blank.");
         }//if
 
         if (this.myTypeSystemDescription == null) throw new Exception("No Descriptor available for XML output");
 
-        this.myTypeSystemDescription.toXML(new FileOutputStream(new File(filename)));
-    }//toXML filename input
+        FileOutputStream fis = null;
+        try
+        {
+        	
+        	fis=new FileOutputStream(new File(filename));
+        	this.myTypeSystemDescription.toXML(fis);
+        }
+        finally
+        {
+        	if ( fis!=null ) fis.close();
+        }		
+    }
 
     /**
      * Generate the .java files for the types in this TypeSystem then compile them into byte code

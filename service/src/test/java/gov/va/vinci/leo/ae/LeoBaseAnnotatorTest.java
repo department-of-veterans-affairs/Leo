@@ -25,12 +25,16 @@ import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.types.ExampleType;
 import gov.va.vinci.leo.whitespace.types.Token;
 import gov.va.vinci.leo.whitespace.types.WordToken;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngine;
+import org.apache.uima.analysis_engine.AnalysisEngineManagement;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.FSIterator;
+import org.apache.uima.impl.ChildUimaContext_impl;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -46,7 +50,10 @@ import java.io.InputStream;
 import static org.junit.Assert.*;
 
 public class LeoBaseAnnotatorTest {
-    String rootDirectory = "";
+    
+	static final Log log = LogFactory.getLog(LeoBaseAnnotatorTest.class);
+	
+	String rootDirectory = "";
 
 
     @Before
@@ -102,8 +109,6 @@ public class LeoBaseAnnotatorTest {
         ExampleType exampleType = getExampleType(exampleAnnotator, jCas);
         assertNotNull(exampleType);
         assertEquals(exampleType.getNumberOfCASesProcessed(), exampleType.getNumberOfFilteredCASesProcessed());
-//        System.out.println("Number of CASes: " + exampleType.getNumberOfCASesProcessed()
-//                + ", Number of Filtered CASes: " + exampleType.getNumberOfFilteredCASesProcessed());
 
         //Get a new CAS with only number tokens and process it
         jCas = ae.newJCas();
@@ -113,11 +118,6 @@ public class LeoBaseAnnotatorTest {
         //Check the results of processing
         exampleType = getExampleType(exampleAnnotator, jCas);
         assertNull(exampleType);
-//        if(exampleType == null)
-//            System.out.println("CAS2 example type is null.");
-//        else
-//            System.out.println("Number of CASes: " + exampleType.getNumberOfCASesProcessed()
-//                    + ", Number of Filtered CASes: " + exampleType.getNumberOfFilteredCASesProcessed());
     }
 
     @Test
@@ -150,11 +150,6 @@ public class LeoBaseAnnotatorTest {
         //Make sure that there is no example type.
         ExampleType exampleType = getExampleType(exampleAnnotator, jCas);
         assertNull(exampleType);
-//        if(exampleType == null)
-//            System.out.println("CAS2 example type is null.");
-//        else
-//            System.out.println("Number of CASes: " + exampleType.getNumberOfCASesProcessed()
-//                    + ", Number of Filtered CASes: " + exampleType.getNumberOfFilteredCASesProcessed());
 
         //Get a new CAS with only number tokens and process it
         jCas = ae.newJCas();
@@ -166,11 +161,6 @@ public class LeoBaseAnnotatorTest {
         assertNotNull(exampleType);
         assertEquals(2, exampleType.getNumberOfCASesProcessed());
         assertEquals(1, exampleType.getNumberOfFilteredCASesProcessed());
-//        if(exampleType == null)
-//            System.out.println("CAS2 example type is null.");
-//        else
-//            System.out.println("Number of CASes: " + exampleType.getNumberOfCASesProcessed()
-//                    + ", Number of Filtered CASes: " + exampleType.getNumberOfFilteredCASesProcessed());
     }
 
     @Test
@@ -339,6 +329,20 @@ public class LeoBaseAnnotatorTest {
         new ExampleAnnotator().initialize(aContext);
     }
 
+    @Test
+    public void testInitializeWithName() throws ResourceInitializationException {
+        ChildUimaContext_impl aContext = Mockito.mock(ChildUimaContext_impl.class);
+        AnalysisEngineManagement managementInterface = Mockito.mock(AnalysisEngineManagement.class);
+        Mockito.when(aContext.getManagementInterface()).thenReturn(managementInterface);
+        Mockito.when(aContext.getConfigParameterValue("myParamRequired")).thenReturn("req");
+        Mockito.when(managementInterface.getName()).thenReturn("Test Name!");
+
+        ExampleAnnotator annotator = new ExampleAnnotator();
+        annotator.initialize(aContext);
+
+        assert (annotator.getName().equals("Test Name!"));
+
+    }
 
     @Test
     public void testAddAnnotation() throws Exception {

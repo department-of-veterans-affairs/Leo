@@ -20,15 +20,24 @@ package gov.va.vinci.leo.tools;
  * #L%
  */
 
+import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.AgentLoadException;
+import com.sun.tools.attach.AttachNotSupportedException;
+import com.sun.tools.attach.VirtualMachine;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.URLEncoder;
 
 /**
@@ -37,6 +46,11 @@ import java.net.URLEncoder;
  * Web Services.
  */
 public class JamService {
+    /**
+     * Logger for this class.
+     */
+    public static final Logger LOGGER = Logger.getLogger(JamService.class.getCanonicalName());
+
     /**
      * The HTTP Client used for making requests to the web services.
      */
@@ -324,5 +338,57 @@ public class JamService {
         return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><serviceQueue><queueName>"
                 + StringEscapeUtils.escapeXml(queueName) + "</queueName><brokerUrl>"
                 + StringEscapeUtils.escapeXml(brokerUrl) + "</brokerUrl></serviceQueue>";
+    }
+
+    /**
+     * Load the JMX Agent for gathering statistics via JMX on this running service.
+     *
+     * Note: If parameters were set on the command line, this existing JMX server is used and the connect url from
+     * the existing JMX server returned.
+     *
+     * The command line options are:
+     *
+     *  -Dcom.sun.management.jmxremote.port=####
+     *  -Dcom.sun.management.jmxremote.authenticate=false
+     *  -Dcom.sun.management.jmxremote.ssl=false
+     *
+     * @param port The port to bind the jmx server to. If -1, an open port is automatically chosen.
+     * @return the port used for the JMX Server.
+     * @throws IOException
+     * @throws AttachNotSupportedException
+     * @throws AgentLoadException
+     * @throws AgentInitializationException
+     */
+    public int loadJMXAgent(int port) throws IOException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+        String name = ManagementFactory.getRuntimeMXBean().getName();
+        VirtualMachine vm = VirtualMachine.attach(name.substring(0, name.indexOf('@')));
+
+        // See if it is already setup. If so, just return the url, no more work needed.
+        String remoteConnectorPort = vm.getSystemProperties().getProperty("com.sun.management.jmxremote.port");
+        if (remoteConnectorPort != null) {
+            final String remoteConnectorAddress = "service:jmx:rmi:///jndi/rmi://"+ InetAddress.getLocalHost().getHostAddress()+":"+remoteConnectorPort+"/jmxrmi";
+            LOGGER.info("JMX Available at " + remoteConnectorAddress);
+            return new Integer(remoteConnectorPort);
+        }
+
+        int localPort = port;
+
+        if (localPort == -1) {
+            ServerSocket s = new ServerSocket(0);
+            localPort = s.getLocalPort();
+            s.close();
+        }
+
+        final String home = vm.getSystemProperties().getProperty("java.home");
+        final String agent = home + File.separator + "lib" + File.separator + "management-agent.jar";
+
+        vm.loadAgent(agent, "com.sun.management.jmxremote.port=" + localPort + "," +
+                    "com.sun.management.jmxremote.authenticate=false,com.sun.management.jmxremote.ssl=false");
+
+        final String remoteConnectorAddress = "service:jmx:rmi:///jndi/rmi://"+ InetAddress.getLocalHost().getHostAddress()+":"+localPort+"/jmxrmi";
+        LOGGER.info("JMX Available at " + remoteConnectorAddress);
+
+        vm.detach();
+        return  localPort;
     }
 }

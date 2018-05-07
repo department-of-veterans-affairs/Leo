@@ -264,8 +264,8 @@ public class AsciiService {
                 }
                 if (newch == null) {
                     newch = '_';
-                    LOG.warn("No ASCII-8 mapping found for char " + src
-                            + " (" + ((int) src) + ")");
+                    String message ="No ASCII-8 mapping found for char " + src + " (" + ((int) src) + ")";
+                    LOG.warn(LeoUtils.getHeaderManipulationSafeString(message));
                 }
                 sb.append(newch.charValue());
             }
@@ -292,8 +292,8 @@ public class AsciiService {
                 Character newch = getASCII8Map().get(src);
                 if (newch == null) {
                     newch = '_';
-                    LOG.warn("No ASCII-8 mapping found for char " + src
-                            + " (" + ((int) src) + ")");
+                    String message ="No ASCII-8 mapping found for char " + src + " (" + ((int) src) + ")"; 
+                    LOG.warn(LeoUtils.getHeaderManipulationSafeString(message));
                 }
                 sb.append(newch.charValue());
             }

@@ -27,8 +27,6 @@ import org.apache.uima.collection.CollectionReaderDescription;
 import org.apache.uima.collection.CollectionReader_ImplBase;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.InvalidXMLException;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;

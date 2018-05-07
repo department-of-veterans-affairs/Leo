@@ -1,7 +1,7 @@
 
 ## 1. Leo Overview 
 
-The [VINCI](http://www.hsrd.research.va.gov/for_researchers/vinci/)-developed Natural Language Processing(NLP) infrastructure, is a set of services and libraries that facilitate the rapid creation and deployment of Apache UIMA-AS annotators focused on NLP. Leo is separated into three main components; Leo-client, Leo-core, and Leo-service.  
+The [VINCI](http://www.hsrd.research.va.gov/for_researchers/vinci/)-developed Natural Language Processing (NLP) infrastructure, is a set of services and libraries that facilitate the rapid creation and deployment of Apache UIMA-AS annotators focused on NLP. Leo is separated into three main components; Leo-client, Leo-core, and Leo-service.  
 
 **leo-client** contains the components that send requests to the services. Setting up a client is as simple as picking the collection reader and listener required.  
 
@@ -260,11 +260,11 @@ The Leo Service class can be used to define type system and annotators for the p
 
 ####Analysis Engines
 
-** LeoBaseAnnotator: **
+**LeoBaseAnnotator:**
 
 This is a base annotator class for holding functions that all annotators might take advantage of, such as loading resources files, initializing parameters etc...
 
-** LeoCachingAnnotator: **
+**LeoCachingAnnotator:**
 
 A base annotator with methods that implement caching via EHCache.
 
@@ -334,34 +334,26 @@ Here you'll find useful tools like an ascii filter, text filters and xml filters
 ### Installation and Configuration
 The guide below will walk you through the steps needed to configure your computer, set up Leo, and start running a simple Leo pipeline. It is exhaustive; if you're already familiar with UIMA and Maven, you can go to the Download page [here](download.html) for the POM's required.  
 
-#### **2.1 Install the UIMA Framework**
-
-####2.1.1 Downloading and Extracting UIMA
-1. Visit the [Apache UIMA - Downloads](http://uima.apache.org/downloads.cgi#Latest) Official Releases webpage.
-2. Skip to Section v2.6.0, download the binary version of the UIMA-AS Asynchronous Scale-out.  
-3. Extract the contents of the file you just downloaded to any permanent location you choose on your computer. Just don't forget what folder you choose because you will need it later. A reasonable location on a Windows computer would be the root of the C: drive. For Linux or Mac users, you might choose /usr/local/ or /usr/share/.
-
-####2.1.2 Setting the UIMA Environment Variable
-You will need to set an environment variable called UIMA_HOME, the value of which should be the directory into which you just extracted the UIMA files. For example, on Windows, this might be C:\apache-uima-as-2.6.0
-
-* For help setting a Windows environment variable, click [here](http://www.itechtalk.com/thread3595.html). These instructions are specifically for Windows 7, but the process is virtually identical on all versions of Windows.
-* To set the environment variable in Mac OSX, add the following to /etc/launchd.conf (create the file, if necessary):  setenv UIMA_HOME {your_uima_path}  (i.e. /Applications/apache-uima-as-2.6.0)
-* To set the environment variable in Linux, add the following line(or some variant thereof) to the .profile file in your home directory:
-
-~~~ 
-export UIMA_HOME=/usr/local/apache-uima-as-2.6.0
-~~~
+### **2.1 Install Java**
+Leo uses Java 8 and both the JRE and JDK are required.
+####2.1.1 Java Runtime Environment (JRE)
+You will need Java 8 installed on your system. It can be obtained [here](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) or through another preferred download method such as your package manager. Please choose the version appropriate for your operating system and processor.
+####2.1.2 Java Development Kit (JDK)
+You will also need the Java Development Kit installed on your system. It can be obtained [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) or through another preferred download method such as your package manager. Please choose the version appropriate for your operating system,  processor, and JRE installation.
 
 ---
 
-### **2.2 Install Java Development Kit**
-You will need a copy of the JDK on your system.
+#### **2.2 Install the UIMA Framework**
 
-* If you need to install the JDK for a windows machine, click [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and click on the button labeled Java Platform(JDK). Next Accept the license agreement and click the link appropriate for your platform (32-bit vs 64-bit).
+####2.1.1 Downloading and Extracting UIMA
+1. Visit the [Apache UIMA - Downloads](http://uima.apache.org/downloads.cgi) Official Releases webpage.
+2. Download the 2.9.0 binary version of the **UIMA-AS Asynchronous Scale-out**.  
+3. Extract the contents of the file you just downloaded to any permanent location you choose on your computer. Just don't forget what folder you choose because you will need it later. A reasonable location on a Windows computer would be the root of the C: drive. For Linux or Mac users, you might choose /usr/local/ or /usr/share/.
 
-* If you need to install the JDK for a linux machine, use your system's package manager. Example: sudo aptitude install default-jdk
+####2.1.2 Setting the UIMA Environment Variable
+You will need to set an environment variable called UIMA_HOME, the value of which should be the directory into which you just extracted the UIMA files. For example, on Windows, this might be C:\apache-uima-as-2.9.0
 
-* The oracle JDK for Mac can be downloaded at [this site](http://www.oracle.com/technetwork/java/javase/downloads/index.html). 
+* For help setting a the environment variable, see these examples for Windows, Mac, and Linux provided by Oracle [here](https://docs.oracle.com/javase/tutorial/essential/environment/paths.html).
 
 ---
 
@@ -428,13 +420,13 @@ Enter the Eclipse Preferences window once again and select Java -> Installed JRE
 
 Select your JRE and click the "Edit" Button on the right.  In the window that pops up, click on the "Add External JARs..." button. Browse to the location where your JDK is installed, looking either for tools.jar or classes.jar (depending on your platform): 
 
-* In Windows, look for C:\Program Files\Java\jdk1.7.0_02\lib\tools.jar (the folder version number may vary).
-* In Ubuntu Linux, this will likely be something like /usr/lib/jvm/java-6-openjdk/lib/tools.jar
+* In Windows, look for C:\Program Files\Java\jdk1.8.0_02\lib\tools.jar (the folder version number may vary).
+* In Ubuntu Linux, this will likely be something like /usr/lib/jvm/java-8-openjdk/lib/tools.jar
 * In Mac OS, look in /System/Library/Frameworks/JavaVM.framework/Classes
 
 Verify that the JAR you just selected (either tools.jar or classes.jar) was added to the list in the "Edit JRE" window and click Finish.
 
-Before closing the Preferences window, select Java -> Build Path -> User Libraries. Click the "New" button, name the library "UIMA-AS-2.6.0", and click OK. You should now see UIMA-AS-2.6.0 in your list of User Libraries. Select UIMA-AS-2.6.0 and click on the "Add JARs..." button. Now browse to the location where you saved the UIMA library way back at the beginning of this document. Within the UIMA directory, browse into the lib directory and select all of the JARs. After you click OK, you should see many entries under UIMA-AS-2.6.0 in the User Libraries dialog. We still need to add more JARs to it, so select UIMA-AS-2.6.0 again and click the "Add JARs..." button. Under the main UIMA directory, look for a directory called apache-activemq-5.4.1. Browse into it, then browse into its lib directory, and select all of the JARs you find. Now click OK on the User Libraries dialog.
+Before closing the Preferences window, select Java -> Build Path -> User Libraries. Click the "New" button, name the library "UIMA-AS-2.9.0", and click OK. You should now see UIMA-AS-2.9.0 in your list of User Libraries. Select UIMA-AS-2.9.0 and click on the "Add JARs..." button. Now browse to the location where you saved the UIMA library way back at the beginning of this document. Within the UIMA directory, browse into the lib directory and select all of the JARs. After you click OK, you should see many entries under UIMA-AS-2.9.0 in the User Libraries dialog. We still need to add more JARs to it, so select UIMA-AS-2.9.0 again and click the "Add JARs..." button. Under the main UIMA directory, look for a directory called apache-activemq-5.14.0. Browse into it, then browse into its lib directory, and select all of the JARs you find. Now click OK on the User Libraries dialog.
 
 ---
 
@@ -444,19 +436,18 @@ While it is true that you already installed the Git plugin, the command line too
 
 #### 2.6.1 Windows
 
-Git was not designed to run in Windows. Fortunately, some folks created a windows port called msysgit. In order to find the most recent version [click here](https://code.google.com/p/msysgit/downloads/list).
-Git is also available through [Cygwin](http://www.cygwin.com/), though untested with respect to this document.
+A distribution of git can be downloaded [here](https://git-scm.com/downloads). If a GUI interface is desired, a list of available interfaces is [here](https://git-scm.com/download/gui/windows). Both [Eclipse](https://projects.eclipse.org/projects/technology.egit) and [IntelliJ](https://www.jetbrains.com/help/idea/using-git-integration.html) offer plugins to work with git.
 
 #### 2.6.2 Linux
 
 Check your package manager.  Example:
 
 ~~~
-sudo aptitude install git
+sudo apt-get install git
 ~~~
 
 #### 2.6.3 Mac OS X
-Macs are great; it's likely that you already have Git installed. You can check by using ```git --version``` in terminal. If for some reason you don't, [click here](http://git-scm.com/download).  
+It's likely that you already have Git installed. You can check by using ```git --version``` in terminal. If for some reason you don't, [click here](http://git-scm.com/downloads).  
 
 ---
 
@@ -475,7 +466,7 @@ Git has now created an example pipeline that uses Leo, and has the ability to pr
 ###**2.8. Import Leo into Eclipse Workspace**
 In the step above, we downloaded Leo into a directory contained in our workspace directory. However, Eclipse doesn't know that yet. You can add the project into eclipse by either using maven, or the Eclipse menus.
 
-####2.8.1 Create eclipse Project Using Maven
+####2.9.0 Create eclipse Project Using Maven
 This step is the quickest and easiest, but for the sake of completeness, the option to create the project through Eclipse can be found in the next step. While in the terminal or command line, make sure that you are currently in the directory for the project (i.e. User/Workspace/leo-example). While in the directory run:
  
 ~~~
@@ -556,27 +547,30 @@ Specify the Output files in the Listener(SimpleXmiListernExample.groovy):
 ```java
 listener = new SimpleXmiListener(new File("data/output"))
 ```
-The ClientConfig.groovy file requires the user to specify a brokerUrl where the ActiveMQ Broker is running, a CAS pool size to determine how big the input and output queue is, as well as the "endpoint" or project name. The "jam" options are used when you want to actively monitor performance using the JAM app described in "Components and Tools".
+The ClientConfig.groovy file requires the user to specify a brokerUrl where the ActiveMQ Broker is running, a CAS pool size to determine how big the input and output queue is, as well as the "endpoint" or project name. 
 
 ```java
 brokerUrl                       = "tcp://localhost:61616"
 endpoint                        = "leoExample"
 casPoolSize                     = 4
 CCTimeout                       = 1000
-jamQueryIntervalInSeconds       = 60
-jamResetStatisticsAfterQuery    = true
-jamServerBaseUrl                = "http://localhost:8080/jam"
 ```
 
 The client has now been configured for your specific project.
 
 ###Adapting the Service
-Creating a service requires an input queue name that is unique to this service as well as the broker url used by the ActiveMQ broker.
+
 **For scalability, multiple instances of a service may be started in their own JVM instances. All services should have the same broker url and service names. In that scenario, the client requests are routed to whichever instance is currently idle.** In gov.va.vinci.leo.examples/ExampleService.java  you will find the code required to change the broker url and name of the input queue.
 
+The ServerConfig.groovy file requires the user to specify a brokerUrl where the ActiveMQ Broker is running, a CAS pool size to determine how big the input and output queue is, as well as the "endpoint" or project name. 
+
 ```java
-server.setBrokerURL("tcp://localhost:61616"); /* Step 1 - set the ActiveMQ broker URL */
-server.setEndpoint("leoExample"); /* Step 2 - name of the input queue for ActiveMQ */
+brokerUrl                       = "tcp://localhost:61616"
+endpoint                        = "leoExample"
+jamQueryIntervalInSeconds       = 60
+jamResetStatisticsAfterQuery    = true
+jamServerBaseUrl                = "http://localhost:8080/jam" // If not specified, the service will not try to register with JAM. 
+jamJmxPort                      =-1  // If -1, the service will pick an open port automatically.
 ```
 
 In addition, a service requires a type description and aggregate to actually do work.
@@ -668,9 +662,11 @@ if (generateTypes)
 ### Running your Project
 
 The process used to finally run a project is the same as described at the end of the previous section.
+
 1. Start the Broker
 2. Run the Service
 3. Run the Client
+
 From here, you can view the annotations created in your pipeline using the default UIMA annotation viewer, or some of the other tools described in the [Components and Tools](components.html) page.
 
 ---
@@ -681,9 +677,11 @@ Several specialized annotators have been developed and optimized for general NLP
 
 ### Annotation Librarian
 
-Building on Annotation Librarian ideas, the AnnotationPatternAnnotator mirrors regular expression functionality to manipulate annotations. It uses a resource file that contains regular expressions that include tagged annotation types combined with standard regular expressions syntax. Additionally, part of the pattern can be separated as an Anchor feature, where a new annotation is created for the tagged snippet.
+The AnnotationLibrarian is a helper class that performs many of the common functions needed by Annotation Engines. Functionality includes methods such as getAllAnotationsOfType(), getFirstAnnotationOfType(), mergeAnnotations().
 
 ### Annotation Pattern Annotator(APA)
+
+Building on Annotation Librarian ideas, the AnnotationPatternAnnotator mirrors regular expression functionality to manipulate annotations. It uses a resource file that contains regular expressions that include tagged annotation types combined with standard regular expressions syntax. Additionally, part of the pattern can be separated as an Anchor feature, where a new annotation is created for the tagged snippet.
 
 The behavior of Annotation Pattern is very similar to the Java Regex Package's Pattern and Matcher classes.
 The AnnotationPattern Object is created using the simple syntax :
@@ -785,7 +783,7 @@ The Window annotator takes an anchor annotation and builds a new annotation that
 
 [eHost](http://ehostdoc.com/)
 
-[UIMA-AS Documentation](http://uima.apache.org/downloads/releaseDocs/2.3.0-incubating/docs-uima-as/html/uima_async_scaleout/uima_async_scaleout.html#ugr.async.ov.terminology)
+[UIMA-AS 2.9.0 Documentation](https://uima.apache.org/d/uima-as-2.9.0/uima_async_scaleout.html)
 
 [VINCI Home](http://www.hsrd.research.va.gov/for_researchers/vinci/)
 

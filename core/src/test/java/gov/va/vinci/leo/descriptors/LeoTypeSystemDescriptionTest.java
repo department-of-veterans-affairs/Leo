@@ -122,7 +122,6 @@ public class LeoTypeSystemDescriptionTest {
 					f.delete();
 				}//if
 			} catch (Exception e) {
-				System.err.println("Exception thrown removing file: " + file);
 				e.printStackTrace();
 			}//catch
 		}//for

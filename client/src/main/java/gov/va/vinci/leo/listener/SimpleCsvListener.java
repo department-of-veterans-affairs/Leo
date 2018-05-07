@@ -23,10 +23,13 @@ package gov.va.vinci.leo.listener;
 import org.apache.uima.cas.*;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 
 
 /**
@@ -123,27 +126,43 @@ public class SimpleCsvListener extends BaseCsvListener {
                 if (includeFeatures) {
                     List<Feature> features = type.getFeatures();
                     for (Feature f : features) {
-                        if (f.getName().startsWith(singleType + ":")) {
-                            FeatureStructure fs = null;
-                            // Try to get the feature structure as an object. If it fails, it is primitive.
-                            try {
-                                fs = a.getFeatureValue(f);
-                            } catch (Exception e) {
-                                // No-op
-                            }
 
-                            if (fs != null && fs instanceof ArrayFS) {
-                                String[] values = ((ArrayFS) a.getFeatureValue(f)).toStringArray();
-                                String featureValue = ("[ " + f.getShortName() + " = ");
-                                for (String val : values) {
-                                    featureValue += val + ",";
-                                }
-                                featureValue += "] ";
-                                row.add(featureValue);
-                            } else if(f.getRange().getName().contains("Array")) {
-                                row.add("[" + f.getShortName() + " = null]");
-                            } else {
+                        if (f.getName().startsWith(singleType + ":")) {
+                            if (f.getRange().isPrimitive()) {
                                 row.add("[" + f.getShortName() + " = " + a.getFeatureValueAsString(f) + "]");
+                            } else {
+
+                                FeatureStructure fs = null;
+                                // Try to get the feature structure as an object. If it fails, it is primitive.
+                                try {
+                                    fs = a.getFeatureValue(f);
+                                } catch (Exception e) {
+                                    // No-op
+                                    e.printStackTrace();
+                                }
+
+                                if (fs != null && fs instanceof ArrayFS) {
+                                    String[] values = ((ArrayFS) a.getFeatureValue(f)).toStringArray();
+                                    String featureValue = ("[ " + f.getShortName() + " = ");
+                                    for (String val : values) {
+                                        featureValue += val + ",";
+                                    }
+                                    featureValue += "] ";
+                                    row.add(featureValue);
+                                } else if (f.getRange().getName().contains("Array")) {
+                                    row.add("[" + f.getShortName() + " = null]");
+                                } else {
+                                    if ("uima.tcas.Annotation".equals(f.getRange().toString())) {
+                                        Annotation featureAnnotation = (Annotation) a.getFeatureValue(f);
+                                        if (featureAnnotation != null) {
+                                            row.add("[" + f.getShortName() + " = " + featureAnnotation.getCoveredText().replaceAll("\"", Matcher.quoteReplacement("\\\"")) + "]");
+                                        } else {
+                                            row.add("[" + f.getShortName() + " = null]");
+                                        }
+                                    } else {
+                                        row.add("[" + f.getShortName() + " = " + a.getFeatureValueAsString(f) + "]");
+                                    }
+                                }
                             }
                         }
                     }

@@ -1,12 +1,30 @@
 package gov.va.vinci.leo.cr;
 
+/*
+ * #%L
+ * Leo Client
+ * %%
+ * Copyright (C) 2010 - 2017 Department of Veterans Affairs
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import gov.va.vinci.leo.descriptors.ConfigurationParameterUtils;
 import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
-import gov.va.vinci.leo.tools.TextFilter;
 import gov.va.vinci.leo.types.TypeLibrarian;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.uima.Constants;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.collection.CollectionReader;
@@ -18,12 +36,9 @@ import org.apache.uima.resource.metadata.ConfigurationParameterSettings;
 import org.apache.uima.resource.metadata.OperationalProperties;
 import org.apache.uima.resource.metadata.ProcessingResourceMetaData;
 import org.apache.uima.resource.metadata.impl.OperationalProperties_impl;
-import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This is a file reader that generates a descriptor file for testing importing external readers from descriptors.

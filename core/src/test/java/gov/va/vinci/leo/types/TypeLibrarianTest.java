@@ -1,7 +1,26 @@
 package gov.va.vinci.leo.types;
 
+/*
+ * #%L
+ * Leo Core
+ * %%
+ * Copyright (C) 2010 - 2017 Department of Veterans Affairs
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import gov.va.vinci.leo.model.FeatureNameType;
-import jdk.nashorn.internal.runtime.ECMAException;
 import org.apache.uima.resource.metadata.FeatureDescription;
 import org.apache.uima.resource.metadata.TypeDescription;
 import org.junit.Test;
@@ -26,7 +45,7 @@ public class TypeLibrarianTest {
     @Test
     public void testRelationshipAnnotationTypeSystemDescription() throws Exception {
         TypeDescription typeDescription = TypeLibrarian.getRelationshipAnnotationTypeSystemDescription();
-        assertEquals("gov.va.vinci.leo.types.RelationshipAnnotation", typeDescription.getName());
+        assertEquals("gov.va.vinci.knowtator.types.RelationshipAnnotation", typeDescription.getName());
         FeatureDescription[] featureDescriptions = typeDescription.getFeatures();
         assertNotNull(featureDescriptions);
         assertEquals(2, featureDescriptions.length);

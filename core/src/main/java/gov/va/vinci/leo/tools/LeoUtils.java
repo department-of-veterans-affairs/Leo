@@ -30,14 +30,25 @@ import com.google.gson.JsonSyntaxException;
 import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.uima.UIMAFramework;
+import org.apache.uima.pear.tools.PackageBrowser;
+import org.apache.uima.pear.tools.PackageInstaller;
+import org.apache.uima.pear.tools.PackageInstallerException;
+import org.apache.uima.resource.Parameter;
 import org.apache.uima.resource.metadata.ConfigurationParameter;
 import org.apache.uima.resource.metadata.Import;
 import org.apache.uima.resource.metadata.impl.Import_impl;
 import org.apache.uima.util.InvalidXMLException;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -51,12 +62,28 @@ import java.util.*;
  */
 public class LeoUtils {
     /**
+     * Logging object
+     */
+    private static final Logger log = Logger.getLogger(LeoUtils.class);
+
+    /**
      * Return a timestamp in the format of yyyyMMdd.HHmmss.
      *
      * @return String representation of a timestamp
      */
     public static String getTimestampDateDotTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd.HHmmss");
+        return sdf.format(new Date());
+    }//getTimestampDateDotTime method
+
+
+    /**
+     * Return a timestamp in the format of yyyyMMdd_HHmmss.
+     *
+     * @return String representation of a timestamp
+     */
+    public static String getTimestampDateUnderscoreTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         return sdf.format(new Date());
     }//getTimestampDateDotTime method
 
@@ -135,6 +162,24 @@ public class LeoUtils {
         return files;
     }//listFiles method
 
+	/**
+	 * Extracts the contents of a PEAR file to the directory specified, optionally performs a verification
+	 * step.  If there are no errors then return the path to the root descriptor file.
+	 *
+	 * @param installDir Directory where the pear file will be extracted.
+	 * @param pearFile Pear file to extract
+	 * @param doVerification If true then the PackageInstaller will perform an optional validation step
+	 * @param cleanInstallDir Clean out the installation directory before extracting
+	 * @return Path to the root component descriptor file
+	 * @throws PackageInstallerException If there is an error extracting the PEAR file
+	 * @throws IOException If there is an error retrieving the path toe hte root component descriptor file
+	 */
+	public static String extractPearFile(File installDir, File pearFile, boolean doVerification, boolean cleanInstallDir)
+		throws PackageInstallerException, IOException {
+		PackageBrowser instPear = PackageInstaller.installPackage(installDir, pearFile, doVerification, cleanInstallDir);
+		return instPear.getComponentPearDescPath();
+	}
+
     /**
      * Determines the currently executing runtime class.
      *
@@ -149,7 +194,7 @@ public class LeoUtils {
              * Get the current runtime class.
              * @return  the current runtime class.
              */
-            public Class<?> getRuntimeClass() {
+            public final Class<?> getRuntimeClass() {
                 return this.getClassContext()[2];
             }
         }
@@ -168,12 +213,19 @@ public class LeoUtils {
         ConfigSlurper slurper = new ConfigSlurper(environment);
         ConfigObject config = new ConfigObject();
         ClassLoader cl = ClassLoader.getSystemClassLoader();
-        for (String filePath : configFilePaths) {
-            InputStream in = cl.getResourceAsStream(filePath);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            IOUtils.copy(in, out);
-            String resourceAsString = out.toString();
-            config.merge(slurper.parse(resourceAsString));
+        DefaultResourceLoader loader = new DefaultResourceLoader(cl);
+        for (String filePath : configFilePaths) 
+        {
+			Resource resource = loader.getResource(filePath);
+			if(!resource.exists()) {
+				log.warn("File " + filePath + " not found. Loading other configuration files...");
+				continue;
+			}
+
+			//Slurp in the config and merge it with the others
+			String resourceString = IOUtils.toString(resource.getInputStream());
+			config.merge(slurper.parse(resourceString));
+			log.info("Loaded file:  " + resource.getURI());
         }
         return config;
     }
@@ -218,6 +270,38 @@ public class LeoUtils {
         return list;
     }
 
+	/**
+	 * Return the Parameter in the array whose name matches the name provided.
+	 *
+	 * @param name Name of the parameter to find
+	 * @param parameters Array of parameters to search
+	 * @return The matching parameter or null if the parameter is not found or the arguments are empty
+	 */
+	public static Parameter getParameter(String name, Parameter[] parameters) {
+    	if(ArrayUtils.isEmpty(parameters) || StringUtils.isBlank(name))
+    		return null;
+		Optional<Parameter> param = Arrays.asList(parameters).parallelStream()
+				.filter(parameter -> parameter.getName().equals(name))
+				.findFirst();
+		if(param.isPresent())
+			return param.get();
+		return null;
+	}
+
+	/**
+	 * Add the parameter p to the array of parameters.
+	 *
+	 * @param p Parameter to add
+	 * @param parameters Array of parameters to which the parameter will be added
+	 * @return New Array of Parameter objects which include the parameter provided.
+	 */
+	public static Parameter[] addParameter(Parameter p, Parameter[] parameters) {
+		List<Parameter> completeList = (ArrayUtils.isEmpty(parameters))?
+				new ArrayList<>(1) : new ArrayList<>(Arrays.asList(parameters));
+		completeList.add(p);
+		return completeList.toArray(new Parameter[completeList.size()]);
+	}
+
     /**
      * Convert the JSON formatted string into a Map of Strings.
      * i.e. {"jsonString":"class"},
@@ -241,5 +325,129 @@ public class LeoUtils {
         }
         return map;
     }
+    
+    /**
+     * returns a Header-Manipulation safe string using a "WhiteList" approach.  Note that the algorithm is designed to 
+     * satisfy the HP Fortify Scanning algorithms.  
+     * 
+     * @param value the String value to be made Header-Manipulation safe
+     * @return the Header-Manipulation safe string
+     */
+    public static String getHeaderManipulationSafeString(Object object)
+    {
+    	if (object == null) return null;
+    	try {
+        	String value = object.toString();
+        	StringBuilder sb=new StringBuilder();
+        	for ( char c: value.toCharArray())
+        	{
+        		switch ( c)
+        		{
+    	    		case '\n': { sb.append(" "); break; }
+    	    		case '\r': { sb.append(" "); break; }
+    	    		case ' ': { sb.append(" "); break; }
+    	    		case '!': { sb.append("!"); break; }
+    	    		case '"': { sb.append("\""); break; }
+    	    		case '#': { sb.append("#"); break; }
+    	    		case '$': { sb.append("$"); break; }
+    	    		case '%': { sb.append("%"); break; }
+    	    		case '&': { sb.append("&"); break; }
+    	    		case '\'': { sb.append("'"); break; }
+    	    		case '(': { sb.append("("); break; }
+    	    		case ')': { sb.append(")"); break; }
+    	    		case '*': { sb.append("*"); break; }
+    	    		case '+': { sb.append("+"); break; }
+    	    		case ',': { sb.append(","); break; }
+    	    		case '-': { sb.append("-"); break; }
+    	    		case '.': { sb.append("."); break; }
+    	    		case '/': { sb.append("/"); break; }
+    	    		case '0': { sb.append("0"); break; }
+    	    		case '1': { sb.append("1"); break; }
+    	    		case '2': { sb.append("2"); break; }
+    	    		case '3': { sb.append("3"); break; }
+    	    		case '4': { sb.append("4"); break; }
+    	    		case '5': { sb.append("5"); break; }
+    	    		case '6': { sb.append("6"); break; }
+    	    		case '7': { sb.append("7"); break; }
+    	    		case '8': { sb.append("8"); break; }
+    	    		case '9': { sb.append("9"); break; }
+    	    		case ':': { sb.append(":"); break; }
+    	    		case ';': { sb.append(";"); break; }
+    	    		case '<': { sb.append("<"); break; }
+    	    		case '=': { sb.append("="); break; }
+    	    		case '>': { sb.append(">"); break; }
+    	    		case '?': { sb.append("?"); break; }
+    	    		case '@': { sb.append("@"); break; }
+    	    		case 'A': { sb.append("A"); break; }
+    	    		case 'B': { sb.append("B"); break; }
+    	    		case 'C': { sb.append("C"); break; }
+    	    		case 'D': { sb.append("D"); break; }
+    	    		case 'E': { sb.append("E"); break; }
+    	    		case 'F': { sb.append("F"); break; }
+    	    		case 'G': { sb.append("G"); break; }
+    	    		case 'H': { sb.append("H"); break; }
+    	    		case 'I': { sb.append("I"); break; }
+    	    		case 'J': { sb.append("J"); break; }
+    	    		case 'K': { sb.append("K"); break; }
+    	    		case 'L': { sb.append("L"); break; }
+    	    		case 'M': { sb.append("M"); break; }
+    	    		case 'N': { sb.append("N"); break; }
+    	    		case 'O': { sb.append("O"); break; }
+    	    		case 'P': { sb.append("P"); break; }
+    	    		case 'Q': { sb.append("Q"); break; }
+    	    		case 'R': { sb.append("R"); break; }
+    	    		case 'S': { sb.append("S"); break; }
+    	    		case 'T': { sb.append("T"); break; }
+    	    		case 'U': { sb.append("U"); break; }
+    	    		case 'V': { sb.append("V"); break; }
+    	    		case 'W': { sb.append("W"); break; }
+    	    		case 'X': { sb.append("X"); break; }
+    	    		case 'Y': { sb.append("Y"); break; }
+    	    		case 'Z': { sb.append("Z"); break; }
+    	    		case '[': { sb.append("["); break; }
+    	    		case '\\': { sb.append("\\"); break; }
+    	    		case ']': { sb.append("]"); break; }
+    	    		case '^': { sb.append("^"); break; }
+    	    		case '_': { sb.append("_"); break; }
+    	    		case '`': { sb.append("`"); break; }
+    	    		case 'a': { sb.append("a"); break; }
+    	    		case 'b': { sb.append("b"); break; }
+    	    		case 'c': { sb.append("c"); break; }
+    	    		case 'd': { sb.append("d"); break; }
+    	    		case 'e': { sb.append("e"); break; }
+    	    		case 'f': { sb.append("f"); break; }
+    	    		case 'g': { sb.append("g"); break; }
+    	    		case 'h': { sb.append("h"); break; }
+    	    		case 'i': { sb.append("i"); break; }
+    	    		case 'j': { sb.append("j"); break; }
+    	    		case 'k': { sb.append("k"); break; }
+    	    		case 'l': { sb.append("l"); break; }
+    	    		case 'm': { sb.append("m"); break; }
+    	    		case 'n': { sb.append("n"); break; }
+    	    		case 'o': { sb.append("o"); break; }
+    	    		case 'p': { sb.append("p"); break; }
+    	    		case 'q': { sb.append("q"); break; }
+    	    		case 'r': { sb.append("r"); break; }
+    	    		case 's': { sb.append("s"); break; }
+    	    		case 't': { sb.append("t"); break; }
+    	    		case 'u': { sb.append("u"); break; }
+    	    		case 'v': { sb.append("v"); break; }
+    	    		case 'w': { sb.append("w"); break; }
+    	    		case 'x': { sb.append("x"); break; }
+    	    		case 'y': { sb.append("y"); break; }
+    	    		case 'z': { sb.append("z"); break; }
+    	    		case '{': { sb.append("{"); break; }
+    	    		case '|': { sb.append("|"); break; }
+    	    		case '}': { sb.append("}"); break; }
+    	    		case '~': { sb.append("~"); break; }
+    	    		default: sb.append("");
+        		}
+        	}
+        	return sb.toString();
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	return null;
+    }
 
-}//Common class
+}

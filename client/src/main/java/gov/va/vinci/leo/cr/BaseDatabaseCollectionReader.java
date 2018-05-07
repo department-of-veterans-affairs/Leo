@@ -248,7 +248,7 @@ public abstract class BaseDatabaseCollectionReader extends BaseLeoCollectionRead
     protected void getData(String query) throws SQLException, ClassNotFoundException, CollectionException {
         StopWatch timer = new StopWatch();
         dataManager = getDataManager();
-        LOG.info("Query: " + query);
+        LOG.info("Running Query: " + query);
         timer.start();
         mRecordList = dataManager.query(query);
         mRowIndex = 0;

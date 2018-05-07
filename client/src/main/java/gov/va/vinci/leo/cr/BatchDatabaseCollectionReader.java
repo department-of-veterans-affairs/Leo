@@ -23,16 +23,11 @@ package gov.va.vinci.leo.cr;
 import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.model.DataQueryInformation;
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
-import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
-import gov.va.vinci.leo.tools.LeoUtils;
 import org.apache.uima.collection.CollectionException;
-import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
 
+import java.security.SecureRandom;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
 
 /**
  * Database CollectionReader that pulls the data in batches of a configurable size.  Assumes the query provided returns
@@ -86,7 +81,8 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
     /**
      * Generates the random batch number if random batches are indicated.
      */
-    protected Random random = new Random(System.currentTimeMillis());
+	protected static final SecureRandom secureRandom = new SecureRandom();
+
 
     /**
      * Default constructor used during UIMA initialization.
@@ -291,13 +287,13 @@ public class BatchDatabaseCollectionReader extends DatabaseCollectionReader {
      * @return random batch number
      */
     protected int getNextRandomBatchNumber() {
-        int randomBatch = random.nextInt(totalNumberOfBatches);
+        int randomBatch = secureRandom.nextInt(totalNumberOfBatches);
         //make sure we have not picked this batch before
         while(usedBatches.contains(new Integer(randomBatch))){
             if(randomBatch < totalNumberOfBatches - 1) {
                 randomBatch++;
             } else {
-                randomBatch = random.nextInt(totalNumberOfBatches);
+                randomBatch = secureRandom.nextInt(totalNumberOfBatches);
             }
         }
         usedBatches.add(randomBatch);

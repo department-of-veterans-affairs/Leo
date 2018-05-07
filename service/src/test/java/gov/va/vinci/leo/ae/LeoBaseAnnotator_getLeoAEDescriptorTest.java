@@ -32,7 +32,6 @@ public class LeoBaseAnnotator_getLeoAEDescriptorTest {
         ExampleAnnotator annotator = new ExampleAnnotator("test", "testRequired");
         LeoAEDescriptor d = (LeoAEDescriptor) annotator.getDescriptor();
         Assert.assertNotNull(d);
-        System.out.println(d.getName());
         assert(d.getName().startsWith("ExampleAnnotator"));
         Assert.assertEquals("test", d.getParameterValue("myParam"));
         Assert.assertEquals("testRequired", d.getParameterValue("myParamRequired"));

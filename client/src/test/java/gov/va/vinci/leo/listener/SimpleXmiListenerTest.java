@@ -1,5 +1,25 @@
 package gov.va.vinci.leo.listener;
 
+/*
+ * #%L
+ * Leo Client
+ * %%
+ * Copyright (C) 2010 - 2017 Department of Veterans Affairs
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.cr.FileCollectionReader;
 import gov.va.vinci.leo.cr.RandomStringCollectionReader;
@@ -12,7 +32,6 @@ import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
-import org.apache.uima.collection.EntityProcessStatus;
 import org.apache.uima.collection.impl.EntityProcessStatusImpl;
 import org.apache.uima.util.ProcessTrace;
 import org.apache.uima.util.impl.ProcessTrace_impl;
@@ -38,7 +57,6 @@ public class SimpleXmiListenerTest {
     @Before
     public void setup() throws Exception {
         String path = new File(".").getCanonicalPath();
-        System.out.println(path);
         if (!path.endsWith("client")) {
             rootDirectory = "client/";
             aggregateDescriptor = new File(rootDirectory + "src/test/resources/aggSimpleXmiListenerTest.xml");

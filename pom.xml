@@ -1,11 +1,19 @@
 <?xml version="1.0"?>
 <!--suppress MavenModelInspection -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <repositories>
+        <repository>
+            <id>Decipher</id>
+            <url>http://decipher.chpc.utah.edu/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>gov.va.vinci</groupId>
     <artifactId>leo</artifactId>
     <packaging>pom</packaging>
-    <version>2016.05.3-SNAPSHOT</version>
+    <version>2018.01.0</version>
     <name>Leo Parent Project</name>
     <modules>
         <module>base</module>
@@ -25,7 +33,7 @@
     </licenses>
     <properties>
         <checkstyle.config.location>checkstyle_javadoc_only.xml</checkstyle.config.location>
-        <uima-as-version>2.6.0</uima-as-version>
+        <uima-as-version>2.9.0</uima-as-version>
         <skipJavadoc>true</skipJavadoc>
         <github.global.server>github</github.global.server>
         <additionalparam>-Xdoclint:none</additionalparam>
@@ -313,7 +321,7 @@
     <scm>
         <connection>scm:git:http://decipher.chpc.utah.edu/gitblit/git/bones/leo.git/</connection>
         <url>http://decipher.chpc.utah.edu/gitblit/git/bones/leo.git/</url>
-        <tag>HEAD</tag>
+        <tag>leo-2018.01.0</tag>
     </scm>
     <distributionManagement>
         <site>

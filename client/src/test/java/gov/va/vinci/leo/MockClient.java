@@ -1,12 +1,30 @@
 package gov.va.vinci.leo;
 
+/*
+ * #%L
+ * Leo Client
+ * %%
+ * Copyright (C) 2010 - 2017 Department of Veterans Affairs
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import gov.va.vinci.leo.cr.LeoCollectionReaderInterface;
 import gov.va.vinci.leo.descriptors.LeoAEDescriptor;
-import gov.va.vinci.leo.descriptors.LeoTypeSystemDescription;
 import gov.va.vinci.leo.listener.MockUimaASProcessStatus;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.AsynchAECasManager_impl;
-import org.apache.uima.aae.client.UimaASProcessStatusImpl;
 import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
 import org.apache.uima.aae.client.UimaAsynchronousEngine;
 import org.apache.uima.analysis_engine.AnalysisEngine;
@@ -15,7 +33,6 @@ import org.apache.uima.resource.Resource;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceManager;
 import org.apache.uima.resource.ResourceProcessException;
-import org.apache.uima.resource.metadata.TypeSystemDescription;
 
 import java.io.InputStream;
 import java.util.List;

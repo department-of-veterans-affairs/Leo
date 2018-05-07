@@ -27,8 +27,8 @@ import gov.va.vinci.leo.cr.LeoCollectionReaderInterface;
 import gov.va.vinci.leo.listener.BaseListener;
 import gov.va.vinci.leo.tools.LeoProperties;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.aae.client.UimaAsBaseCallbackListener;
@@ -40,6 +40,7 @@ import org.apache.uima.resource.metadata.TypeSystemDescription;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -301,7 +302,7 @@ public class Client extends LeoProperties {
         } catch (Exception e) {
             LOG.error("Exception thrown during content processing:\n"
                     + ExceptionUtils.getMessage(e) + "\n"
-                    + ExceptionUtils.getFullStackTrace(e));
+                    + ExceptionUtils.getStackTrace(e));
             throw e;
         } finally {
 
@@ -361,13 +362,18 @@ public class Client extends LeoProperties {
     }//run method with CAS object as input
 
     /**
-     * Get the list of listeners that have been registered with the client.  If no listeners have been registered then an
+     * Get the list of listeners that have been registered with the client.  If no listeners have been registered or the
+     * engine has not been initialized, then an
      * empty list will be returned.
      *
      * @return List of registered listeners
      */
     public List getListeners() {
-        return mUAEngine.getListeners();
+        if (mUAEngine != null) {
+            return mUAEngine.getListeners();
+        } else {
+            return new ArrayList();
+        }
     }
 
     /**

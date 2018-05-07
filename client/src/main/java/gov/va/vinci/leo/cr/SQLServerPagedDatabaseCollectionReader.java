@@ -23,15 +23,9 @@ package gov.va.vinci.leo.cr;
 import gov.va.vinci.leo.descriptors.LeoConfigurationParameter;
 import gov.va.vinci.leo.model.DataQueryInformation;
 import gov.va.vinci.leo.model.DatabaseConnectionInformation;
-import gov.va.vinci.leo.tools.ConfigurationParameterImpl;
-import gov.va.vinci.leo.tools.LeoUtils;
 import gov.va.vinci.leo.tools.db.SQLServerPagedQuery;
 import org.apache.uima.collection.CollectionException;
-import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.apache.uima.resource.metadata.ConfigurationParameter;
-
-import java.util.Map;
 
 /**
  * Database CollectionReader that pulls the data in pages of a configurable size from SQL Server. This uses the

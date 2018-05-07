@@ -31,7 +31,6 @@ public class LeoCachingAnnotatorTest {
 	
 	@Test
 	public void testGetCacheName() {
-        System.out.println(annotator.getCacheName());
 		Assert.assertEquals(annotator.getCacheName(), "gov.va.vinci.leo.ae.LeoCachingAnnotatorTest.MyTestAnnotator");
 	}
 

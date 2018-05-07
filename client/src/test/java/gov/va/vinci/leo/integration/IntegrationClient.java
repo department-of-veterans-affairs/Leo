@@ -63,7 +63,6 @@ public class IntegrationClient {
 
         //Test xml retrieval
         String typeSystemDesc = Client.getServiceTypeSystemDescriptionXml(serviceBrokerURL, serviceQueueName);
-        System.out.println("Type System Description = [\n" + typeSystemDesc + "\n]");
 
         //Init the client and process the data
         FileCollectionReader cr = new FileCollectionReader(dataDir, true);
@@ -75,13 +74,9 @@ public class IntegrationClient {
 
         //Double check type system retrieval before running
         String tsd = myClient.getServiceTypeSystemDescriptionXml();
-        System.out.println("Descriptions Match: " + tsd.equals(typeSystemDesc));
 
-        try {
-            myClient.run(cr);
-        } catch (Exception e) {
-            System.out.println("Got exception.");
-        }
+        myClient.run(cr);
+
         System.out.println("Finished client processing, press any key to exit.");
         System.in.read();
         System.exit(0);

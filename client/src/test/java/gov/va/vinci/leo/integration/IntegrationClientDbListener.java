@@ -76,7 +76,6 @@ public class IntegrationClientDbListener  extends IntegrationClient{
         }
 
         public List<Object[]> getRows(CAS aCas) {
-            System.out.println("get rows called.");
             List<Object[]> rows = new ArrayList<Object[]>();
             rows.add(new Object[]{"LONG FIELD TEST 1234567890", "LONG FIELD TEST 1234567890", "LONG FIELD TEST 1234567890"});
             return rows;

@@ -64,6 +64,7 @@ public class DatabaseConnectionInformation {
      */
     public DatabaseConnectionInformation(String driver, String url,
                                          String username, String password) {
+        super();
         this.driver = driver;
         this.url = url;
         this.username = username;

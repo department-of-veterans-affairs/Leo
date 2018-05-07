@@ -39,9 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class BaseDatabaseListenerTest {
 
@@ -213,9 +211,30 @@ public class BaseDatabaseListenerTest {
         assertNotNull(rs);
         int numCols = rs.getMetaData().getColumnCount();
         assertEquals(2, numCols);
+        assertEquals(2, listener.getBatchSize());
+    }
+
+    @Test
+    public void testFieldList() {
+        List<DatabaseField> fields = new ArrayList<>();
+
+        fields.add(new DatabaseField("f1", "varchar(10)"));
+        fields.add(new DatabaseField("f2", "datetime"));
+        fields.add(new DatabaseField("number1", "bigdecimal(20)"));
+
+        TestDatabaseListener listener = new TestDatabaseListener(dbConnectionInfo, "mydb", "myTable", fields);
+        assertEquals("INSERT INTO mydb.myTable ( f1, f2, number1 ) VALUES (  ?, ?, ? ) ;", listener.preparedStatementSQL);
+
+        listener = new TestDatabaseListener(dbConnectionInfo, null, "myTable", fields);
+        assertEquals("INSERT INTO myTable ( f1, f2, number1 ) VALUES (  ?, ?, ? ) ;", listener.preparedStatementSQL);
+
     }
 
     public class TestDatabaseListener extends BaseDatabaseListener {
+
+        public TestDatabaseListener(DatabaseConnectionInformation databaseConnectionInformation, String databaseName, String databaseTable,  List<DatabaseField> fieldList) {
+            super(databaseConnectionInformation, databaseName, databaseTable, fieldList);
+        }
 
         public TestDatabaseListener(
                 DatabaseConnectionInformation databaseConnectionInformation, String preparedStatementSQL) {

@@ -23,14 +23,10 @@ package gov.va.vinci.leo.listener;
 
 import gov.va.vinci.leo.SampleService;
 import gov.va.vinci.leo.types.CSI;
-import gov.va.vinci.leo.whitespace.ae.WhitespaceTokenizer;
-import gov.va.vinci.leo.whitespace.types.Token;
-import gov.va.vinci.leo.whitespace.types.WordToken;
 import org.apache.commons.io.FileUtils;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.cas.CAS;
-import org.apache.uima.util.CasCreationUtils;
 import org.junit.Before;
 import org.junit.Test;
 

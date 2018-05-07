@@ -12,8 +12,8 @@ Defining your NLP system service as a class separate from the client class would
 
 ## Prerequisites
 
-* [UIMA-AS 2.6.0 or higher](http://uima.apache.org/)
-* Java 1.6 or higher
+* [UIMA-AS 2.9.0 or higher](http://uima.apache.org/)
+* Java 1.8 or higher
 * Java Development environment (for example [Eclipse](http://eclipse.org) or [IntelliJ](https://www.jetbrains.com/idea/download/))
 * [Maven](http://maven.apache.org/)
 
@@ -45,42 +45,45 @@ For A complete leo and all of its components, use the Leo-Base Pom:
 <dependency>
     <groupId>gov.va.vinci.leo</groupId>
     <artifactId>leo-base</artifactId>
-    <version>2016.05.2</version>
+    <version>2018.01.0</version>
     <type>pom</type>
 </dependency>
 ```
 
 Leo-client:
+
 ```xml
-   <dependency>
-       <groupId>gov.va.vinci</groupId>
-       <artifactId>leo</artifactId>
-       <version>2016.05.2</version>
-   </dependency>
+<dependency>
+   <groupId>gov.va.vinci</groupId>
+   <artifactId>leo</artifactId>
+   <version>2018.01.0</version>
+</dependency>
 ```
 
 Leo-service:
+
 ```xml
-   <dependency>
-       <groupId>gov.va.vinci</groupId>
-       <artifactId>leo</artifactId>
-       <version>2016.05.2</version>
-   </dependency>
+<dependency>
+   <groupId>gov.va.vinci</groupId>
+   <artifactId>leo</artifactId>
+   <version>2018.01.0</version>
+</dependency>
 ```
 
 Leo-Core contains the descriptors and tools used with Leo projects.
 
 ```xml
-   <dependency>
-       <groupId>gov.va.vinci</groupId>
-       <artifactId>leo</artifactId>
-       <version>2016.05.2</version>
-   </dependency>
+<dependency>
+   <groupId>gov.va.vinci</groupId>
+   <artifactId>leo</artifactId>
+   <version>2018.01.0</version>
+</dependency>
 ```
 
 Below are the dependencies of annotators that are most likely going to be required in many projects.  Descriptions of each can be found in Annotator section of the [User guide](userguide.html).
 
 Whitespace Tokenizer:
+
 ```xml
 <dependency>
     <groupId>gov.va.vinci</groupId>
@@ -90,6 +93,7 @@ Whitespace Tokenizer:
 ```
 
 Regex:
+
 ```xml
 <dependency>
     <groupId>gov.va.vinci</groupId>
@@ -99,6 +103,7 @@ Regex:
 ```
 
 Annotation Librarian:
+
 ```xml
 <dependency>
     <groupId>gov.va.vinci</groupId>
@@ -108,6 +113,7 @@ Annotation Librarian:
 ```
 
 AnnotationPattern:
+
 ```xml
 <dependency>
   <groupId>gov.va.vinci</groupId>
@@ -117,6 +123,7 @@ AnnotationPattern:
 ```
 
 Context:
+
 ```xml
 <dependency>
   <groupId>gov.va.vinci</groupId>
@@ -126,6 +133,7 @@ Context:
 ```
 
 Siman:
+
 ```xml
 <dependency>
   <groupId>gov.va.vinci</groupId>
@@ -133,4 +141,3 @@ Siman:
   <version>LATEST</version>
 </dependency>
 ```
-
