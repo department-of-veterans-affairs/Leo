@@ -3,6 +3,13 @@
 Leo provides a framework and set of classes for more easily using UIMA AS. These include classes for programatically
 creating analysis, aggregate, and type descriptors, and well as base classes for different readers and listeners.
 
+If you use Leo, please cite:
+
+Cornia R, Patterson OV, Ginter T, Duvall SL. Rapid NLP Development with Leo. In: AMIA Annu Symp Proc. Washington, DC, USA; 2014:1356.
+Can be retrieved from: 
+https://knowledge.amia.org/56638-amia-1.1540970/t-005-1.1543914/f-005-1.1543915/a-288-1.1544807/an-288-1.1544808?qr=1
+
+
 # Packages & Classes
 
 * **gov.va.vinci.leo** :
