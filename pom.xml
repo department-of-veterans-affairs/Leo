@@ -5,7 +5,7 @@
     <repositories>
         <repository>
             <id>Decipher</id>
-            <url>https://decipher.chpc.utah.edu/nexus/content/groups/public/</url>
+            <url>http://decipher.chpc.utah.edu/nexus/content/groups/public/</url>
         </repository>
     </repositories>
 
@@ -334,7 +334,7 @@
         <repository>
             <id>nexus</id>
             <name>Nexus Staging Repo</name>
-            <url>https://decipher.chpc.utah.edu/nexus/content/repositories/releases</url>
+            <url>http://decipher.chpc.utah.edu/nexus/content/repositories/releases</url>
         </repository>
     </distributionManagement>
 
